@@ -1,4 +1,7 @@
-"""F-35B 短距滑跃起飞仿真（平直段 + 滑跃段，策略 A/B/C 喷口偏转对比）。
+"""F-35B 短距滑跃起飞仿真（平直段 + 圆弧滑跃段，策略 A/B/C 喷口偏转对比）。
+
+滑跃段建模为圆弧：入口切线与平直甲板相切（水平），出口切线角为资料给定滑跃角；
+弧长与水平投影由圆弧半径导出（仅需滑跃角，可选唇口高度定半径）。见 ski_jump_geometry。
 
 策略说明
 --------
@@ -24,6 +27,8 @@ ALLOW_AIR_NOZZLE_VECTORING 为 True 时，策略 A/B 还可搜索离舰后主喷
 """
 import numpy as np
 
+from ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s
+
 # ---------------------------------------------------------------------------
 # 仿真模式开关
 # ---------------------------------------------------------------------------
@@ -34,7 +39,7 @@ ALLOW_AIR_NOZZLE_VECTORING = False
 # ---------------------------------------------------------------------------
 # 大气与温度（推力在 T_THRUST_REF_C 海平面标定）
 # ---------------------------------------------------------------------------
-AMBIENT_TEMP_C = 30.0           # 环境温度，°C
+AMBIENT_TEMP_C = 15.0           # 环境温度，°C
 T_THRUST_REF_C = 15.0           # 推力标定参考温度（ISA 海平面），°C
 RHO_ISA_KG_M3 = 1.225           # ISA 海平面标准密度，kg/m³
 THRUST_TEMP_EXPONENT = 0.85     # 涡扇海平面静态推力温度修正指数（含 FADEC 部分补偿）
@@ -113,20 +118,25 @@ HORIZONTAL_JET_THETA_DEG = 5.0  # 低于此 θ 按水平自由射流处理
 
 
 # ---------------------------------------------------------------------------
-# 航母甲板参数
+# 航母甲板参数（滑跃段为圆弧：入口切线水平，出口切线 = SKI_JUMP_ANGLE_DEG）
 # ---------------------------------------------------------------------------
-SKI_JUMP_LENGTH_M = 37.0
-SKI_JUMP_ANGLE_DEG = 12.5
-SKI_JUMP_ANGLE_RAD = np.radians(SKI_JUMP_ANGLE_DEG)
-SKI_JUMP_COS = np.cos(SKI_JUMP_ANGLE_RAD)
-SKI_JUMP_SIN = np.sin(SKI_JUMP_ANGLE_RAD)
-SKI_JUMP_HORIZONTAL_M = SKI_JUMP_LENGTH_M * SKI_JUMP_COS
+SKI_JUMP_ANGLE_DEG = 13.0
+SKI_JUMP_ARC: SkiJumpArc = compute_ski_jump_arc(SKI_JUMP_ANGLE_DEG, lip_height_m=6.0)
+SKI_JUMP_ANGLE_RAD = SKI_JUMP_ARC.angle_rad
+SKI_JUMP_RADIUS_M = SKI_JUMP_ARC.radius_m
+SKI_JUMP_ARC_LENGTH_M = SKI_JUMP_ARC.arc_length_m
+SKI_JUMP_HORIZONTAL_M = SKI_JUMP_ARC.horizontal_m
+SKI_JUMP_LIP_HEIGHT_M = SKI_JUMP_ARC.lip_height_m
+SKI_JUMP_COS = SKI_JUMP_ARC.cos_exit
+SKI_JUMP_SIN = SKI_JUMP_ARC.sin_exit
+# 兼容旧名
+SKI_JUMP_LENGTH_M = SKI_JUMP_ARC_LENGTH_M
 MU = 0.03
-WIND_KT = 25
+WIND_KT = 22
 V_WIND_MPS = WIND_KT * KT_TO_MPS
 
 # 策略 C：尾流约束（必须为负，表示该 x 以左的甲板须全程安全）
-MIN_SAFE_DISTANCE_M = -60.0
+MIN_SAFE_DISTANCE_M = -70.0
 
 # 全项目俯仰角硬上限（°）；舰基起飞操纵/结构限制，搜索与仿真均不得超过
 PITCH_MAX_DEG = 20
@@ -139,7 +149,7 @@ def check_pitch_deg(pitch_deg):
     return pitch_deg
 
 # 策略 C 搜索范围
-FLAT_LENGTH_M_LIST_C = range(50, 501, 10) if not ALLOW_AIR_NOZZLE_VECTORING else range(30, 501, 20)
+FLAT_LENGTH_M_LIST_C = range(0, 501, 10) if not ALLOW_AIR_NOZZLE_VECTORING else range(0, 501, 20)
 PITCH_DEG_LIST_C = range(20, PITCH_MAX_DEG + 1, 1) if not ALLOW_AIR_NOZZLE_VECTORING else range(10, PITCH_MAX_DEG + 1, 2)
 
 # ---------------------------------------------------------------------------
@@ -232,12 +242,11 @@ def calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps):
     return hi
 
 
-def calc_min_nozzle_deg_for_plume(x_m, min_safe_distance_m, u_wind_mps, on_ski_jump=False):
-    """位置 x 处满足尾流约束的最小喷口偏转角（°）；滑跃段 θ 含滑跃角。"""
+def calc_min_nozzle_deg_for_plume(x_m, min_safe_distance_m, u_wind_mps, deck_angle_deg=0.0):
+    """位置 x 处满足尾流约束的最小喷口偏转角（°）；deck_angle_deg 为当前甲板切线角。"""
     max_safe_m = x_m - min_safe_distance_m
     theta_total = calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps)
-    offset = SKI_JUMP_ANGLE_DEG if on_ski_jump else 0.0
-    return max(0.0, theta_total - offset)
+    return max(0.0, theta_total - deck_angle_deg)
 
 
 def update_min_plume_trailing_edge_m(x_m, theta_deg, u_wind_mps, current_min_m):
@@ -334,15 +343,21 @@ def apply_aircraft_geometry(mass_kg, s_ref_m2, wingspan_m, wing_height_m, sweep_
     recompute_aero_parameters()
 
 
-def apply_ski_jump_deck(length_m, angle_deg):
-    global SKI_JUMP_LENGTH_M, SKI_JUMP_ANGLE_DEG, SKI_JUMP_ANGLE_RAD
-    global SKI_JUMP_COS, SKI_JUMP_SIN, SKI_JUMP_HORIZONTAL_M
-    SKI_JUMP_LENGTH_M = length_m
-    SKI_JUMP_ANGLE_DEG = angle_deg
-    SKI_JUMP_ANGLE_RAD = np.radians(angle_deg)
-    SKI_JUMP_COS = np.cos(SKI_JUMP_ANGLE_RAD)
-    SKI_JUMP_SIN = np.sin(SKI_JUMP_ANGLE_RAD)
-    SKI_JUMP_HORIZONTAL_M = SKI_JUMP_LENGTH_M * SKI_JUMP_COS
+def apply_ski_jump_deck(angle_deg, lip_height_m=None):
+    """设置圆弧滑跃甲板；仅需出口切线角，可选唇口高度定半径。"""
+    global SKI_JUMP_ARC, SKI_JUMP_ANGLE_DEG, SKI_JUMP_ANGLE_RAD, SKI_JUMP_RADIUS_M
+    global SKI_JUMP_ARC_LENGTH_M, SKI_JUMP_HORIZONTAL_M, SKI_JUMP_LIP_HEIGHT_M
+    global SKI_JUMP_COS, SKI_JUMP_SIN, SKI_JUMP_LENGTH_M
+    SKI_JUMP_ARC = compute_ski_jump_arc(angle_deg, lip_height_m=lip_height_m)
+    SKI_JUMP_ANGLE_DEG = SKI_JUMP_ARC.angle_deg
+    SKI_JUMP_ANGLE_RAD = SKI_JUMP_ARC.angle_rad
+    SKI_JUMP_RADIUS_M = SKI_JUMP_ARC.radius_m
+    SKI_JUMP_ARC_LENGTH_M = SKI_JUMP_ARC.arc_length_m
+    SKI_JUMP_HORIZONTAL_M = SKI_JUMP_ARC.horizontal_m
+    SKI_JUMP_LIP_HEIGHT_M = SKI_JUMP_ARC.lip_height_m
+    SKI_JUMP_COS = SKI_JUMP_ARC.cos_exit
+    SKI_JUMP_SIN = SKI_JUMP_ARC.sin_exit
+    SKI_JUMP_LENGTH_M = SKI_JUMP_ARC_LENGTH_M
 
 
 recompute_aero_parameters()
@@ -371,6 +386,9 @@ def print_config_summary():
     print(f"诱导因子 k:   {K_IND:.3f}")
     print(f"C_Lα:         {CL_ALPHA:.4f} /rad  (Λ={SWEEP_LE_DEG}°)")
     print(f"Cl_taxi:      {CL_TAXI:.4f}")
+    print(f"滑跃圆弧:     {SKI_JUMP_ANGLE_DEG:.1f}° 出口 | R={SKI_JUMP_RADIUS_M:.0f} m | "
+          f"弧长 {SKI_JUMP_ARC_LENGTH_M:.1f} m | 水平 {SKI_JUMP_HORIZONTAL_M:.1f} m | "
+          f"唇高 {SKI_JUMP_LIP_HEIGHT_M:.1f} m")
 
 
 def total_takeoff_distance_m(flat_length_m):
@@ -405,10 +423,10 @@ def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg
     transitioned, in_trans, trans_start_t = False, False, 0.0
     nozzle_rad = nozzle_start_rad
 
-    def track_plume(on_ski_jump):
-        """θ = 喷口偏转角 + 滑跃角（若在滑跃段）；更新甲板受影响最后缘。"""
+    def track_plume(deck_deg):
+        """θ = 喷口偏转角 + 当前甲板切线角；更新甲板受影响最后缘。"""
         nonlocal min_plume_trailing_edge_m
-        theta_deg = np.degrees(nozzle_rad) + (SKI_JUMP_ANGLE_DEG if on_ski_jump else 0.0)
+        theta_deg = np.degrees(nozzle_rad) + deck_deg
         min_plume_trailing_edge_m = update_min_plume_trailing_edge_m(
             x, theta_deg, V_WIND_MPS, min_plume_trailing_edge_m)
 
@@ -438,27 +456,29 @@ def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg
         v_gs = max(v_gs + (t_h - drag - MU * normal) / MASS_KG * dt, 0.0)
         x += v_gs * dt
         t += dt
-        track_plume(on_ski_jump=False)
+        track_plume(0.0)
 
-    # ==================== 阶段 2：滑跃甲板滑跑 ====================
+    # ==================== 阶段 2：滑跃圆弧段 ====================
     s = 0.0
-    while s < SKI_JUMP_LENGTH_M and t < MAX_GROUND_TIME_S:
+    while s < SKI_JUMP_ARC_LENGTH_M and t < MAX_GROUND_TIME_S:
         step_nozzle()
-        v_air = v_gs + V_WIND_MPS * SKI_JUMP_COS
+        deck_deg = deck_angle_deg_at_s(s, SKI_JUMP_ARC)
+        cos_p, sin_p = deck_cos_sin_at_s(s, SKI_JUMP_ARC)
+        v_air = v_gs + V_WIND_MPS * cos_p
         q = dynamic_pressure(v_air)
-        phi_s = PHI_GROUND_FLAT * (1 - s / SKI_JUMP_LENGTH_M) + s / SKI_JUMP_LENGTH_M
+        phi_s = PHI_GROUND_FLAT * (1 - s / SKI_JUMP_ARC_LENGTH_M) + s / SKI_JUMP_ARC_LENGTH_M
         t_s = T_MAIN_GROUND_N * np.cos(nozzle_rad)
         t_n = T_MAIN_GROUND_N * np.sin(nozzle_rad) + T_LIFTFAN_N
         lift = q * S_REF_M2 * CL_TAXI
         drag = q * S_REF_M2 * drag_coefficient(CL_TAXI, phi_s)
-        normal = max(WEIGHT_N * SKI_JUMP_COS - lift - t_n, 0.0)
-        v_gs = max(v_gs + (t_s - drag - WEIGHT_N * SKI_JUMP_SIN - MU * normal) / MASS_KG * dt, 0.0)
+        normal = max(WEIGHT_N * cos_p - lift - t_n, 0.0)
+        v_gs = max(v_gs + (t_s - drag - WEIGHT_N * sin_p - MU * normal) / MASS_KG * dt, 0.0)
         s += v_gs * dt
-        x += v_gs * SKI_JUMP_COS * dt
+        x += v_gs * cos_p * dt
         t += dt
-        track_plume(on_ski_jump=True)
+        track_plume(deck_deg)
 
-    if s < SKI_JUMP_LENGTH_M * 0.99:
+    if s < SKI_JUMP_ARC_LENGTH_M * 0.99:
         return False, x, v_gs, t, 0.0, _plume_edge_or_zero(min_plume_trailing_edge_m)
 
     v_deck = v_gs
@@ -596,17 +616,18 @@ def _ground_step_flat_c(v_gs, x, nozzle_deg, dt):
 
 def _ground_step_ski_c(v_gs, x, s, nozzle_deg, dt):
     nozzle_rad = np.radians(nozzle_deg)
-    v_air = v_gs + V_WIND_MPS * SKI_JUMP_COS
+    cos_p, sin_p = deck_cos_sin_at_s(s, SKI_JUMP_ARC)
+    v_air = v_gs + V_WIND_MPS * cos_p
     q = dynamic_pressure(v_air)
-    phi_s = PHI_GROUND_FLAT * (1 - s / SKI_JUMP_LENGTH_M) + s / SKI_JUMP_LENGTH_M
+    phi_s = PHI_GROUND_FLAT * (1 - s / SKI_JUMP_ARC_LENGTH_M) + s / SKI_JUMP_ARC_LENGTH_M
     t_s = T_MAIN_GROUND_N * np.cos(nozzle_rad)
     t_n = T_MAIN_GROUND_N * np.sin(nozzle_rad) + T_LIFTFAN_N
     lift = q * S_REF_M2 * CL_TAXI
     drag = q * S_REF_M2 * drag_coefficient(CL_TAXI, phi_s)
-    normal = max(WEIGHT_N * SKI_JUMP_COS - lift - t_n, 0.0)
-    v2 = max(v_gs + (t_s - drag - WEIGHT_N * SKI_JUMP_SIN - MU * normal) / MASS_KG * dt, 0.0)
+    normal = max(WEIGHT_N * cos_p - lift - t_n, 0.0)
+    v2 = max(v_gs + (t_s - drag - WEIGHT_N * sin_p - MU * normal) / MASS_KG * dt, 0.0)
     s2 = s + v2 * dt
-    return v2, x + v2 * SKI_JUMP_COS * dt, s2
+    return v2, x + v2 * cos_p * dt, s2
 
 
 def simulate_strategy_c(flat_length_m, pitch_deg, min_safe_distance_m, dt=DT_DEFAULT):
@@ -618,7 +639,7 @@ def simulate_strategy_c(flat_length_m, pitch_deg, min_safe_distance_m, dt=DT_DEF
         raise ValueError("min_safe_distance_m 必须为负值")
 
     rate_step = NOZZLE_RATE_DEG_S * dt
-    init_nozzle = calc_min_nozzle_deg_for_plume(0.0, min_safe_distance_m, V_WIND_MPS, on_ski_jump=False)
+    init_nozzle = calc_min_nozzle_deg_for_plume(0.0, min_safe_distance_m, V_WIND_MPS, deck_angle_deg=0.0)
     states = {round(init_nozzle, 2): (0.0, 0.0, 0.0, 0.0, False)}
     min_plume_trailing_edge_m = None
     completed = []
@@ -628,12 +649,13 @@ def simulate_strategy_c(flat_length_m, pitch_deg, min_safe_distance_m, dt=DT_DEF
             break
         new_states = {}
         for nozzle_deg, (v_gs, x, t, s, on_ski) in states.items():
-            if on_ski and s >= SKI_JUMP_LENGTH_M:
+            if on_ski and s >= SKI_JUMP_ARC_LENGTH_M:
                 completed.append((nozzle_deg, v_gs, x, t, s))
                 continue
 
+            deck_deg = deck_angle_deg_at_s(s, SKI_JUMP_ARC) if on_ski else 0.0
             nozzle_min = calc_min_nozzle_deg_for_plume(
-                x, min_safe_distance_m, V_WIND_MPS, on_ski_jump=on_ski)
+                x, min_safe_distance_m, V_WIND_MPS, deck_angle_deg=deck_deg)
             nozzle_deg = max(nozzle_deg, nozzle_min)
 
             for decrease in (False, True):
@@ -645,7 +667,7 @@ def simulate_strategy_c(flat_length_m, pitch_deg, min_safe_distance_m, dt=DT_DEF
                 if on_ski:
                     v2, x2, s2 = _ground_step_ski_c(v_gs, x, s, n2, dt)
                     on_ski2 = True
-                    theta_deg = n2 + SKI_JUMP_ANGLE_DEG
+                    theta_deg = n2 + deck_angle_deg_at_s(s, SKI_JUMP_ARC)
                 else:
                     v2, x2 = _ground_step_flat_c(v_gs, x, n2, dt)
                     on_ski2 = x2 >= flat_length_m
@@ -656,7 +678,7 @@ def simulate_strategy_c(flat_length_m, pitch_deg, min_safe_distance_m, dt=DT_DEF
                 min_plume_trailing_edge_m = update_min_plume_trailing_edge_m(
                     x2, theta_deg, V_WIND_MPS, min_plume_trailing_edge_m)
 
-                if on_ski2 and s2 >= SKI_JUMP_LENGTH_M:
+                if on_ski2 and s2 >= SKI_JUMP_ARC_LENGTH_M:
                     completed.append((n2, v2, x2, t2, s2))
                     continue
 
@@ -672,7 +694,7 @@ def simulate_strategy_c(flat_length_m, pitch_deg, min_safe_distance_m, dt=DT_DEF
     total_m = total_takeoff_distance_m(flat_length_m)
 
     for nozzle_deg, v_deck, x_deck, t_deck, s in completed:
-        if s < SKI_JUMP_LENGTH_M * 0.99:
+        if s < SKI_JUMP_ARC_LENGTH_M * 0.99:
             continue
         vy = v_deck * SKI_JUMP_SIN
         if vy < 0:
@@ -949,7 +971,7 @@ def _main():
     print(f"策略 C：尾流约束 min(x−安全距离) ≥ {MIN_SAFE_DISTANCE_M:.0f} m")
     print("=" * 60)
 
-    init_nozzle_c = calc_min_nozzle_deg_for_plume(0.0, MIN_SAFE_DISTANCE_M, V_WIND_MPS, on_ski_jump=False)
+    init_nozzle_c = calc_min_nozzle_deg_for_plume(0.0, MIN_SAFE_DISTANCE_M, V_WIND_MPS, deck_angle_deg=0.0)
     print(f"起始喷管角（x=0 反推）: {init_nozzle_c:.1f}°")
 
     best_c = search_strategy_c(MIN_SAFE_DISTANCE_M)

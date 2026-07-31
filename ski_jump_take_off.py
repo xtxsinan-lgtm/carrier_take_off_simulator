@@ -1,5 +1,9 @@
-"""固定翼舰载机滑跃起飞仿真（以歼-15 为气动参考）。"""
+"""固定翼舰载机滑跃起飞仿真（以歼-15 为气动参考）。
+
+滑跃段为圆弧：入口切线水平，出口切线角 = 资料滑跃角；见 ski_jump_geometry。"""
 import numpy as np
+
+from ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s
 
 # ---------------------------------------------------------------------------
 # 大气与温度（推力在 T_THRUST_REF_C 海平面标定）
@@ -61,12 +65,19 @@ WING_INCIDENCE_DEG = 2
 # ---------------------------------------------------------------------------
 # 航母甲板参数
 # ---------------------------------------------------------------------------
-SKI_JUMP_LENGTH_M = 50.0        # 滑跃段弧长，m，库兹涅佐夫级为50米
-SKI_JUMP_ANGLE_DEG = 14 # 滑跃段角度，库兹涅佐夫级为14度
-SKI_JUMP_ANGLE_RAD = np.radians(SKI_JUMP_ANGLE_DEG)
-SKI_JUMP_COS = np.cos(SKI_JUMP_ANGLE_RAD)   # 预计算，避免循环内重复三角函数
-SKI_JUMP_SIN = np.sin(SKI_JUMP_ANGLE_RAD)
-SKI_JUMP_HORIZONTAL_M = SKI_JUMP_LENGTH_M * SKI_JUMP_COS  # 滑跃段水平投影
+# ---------------------------------------------------------------------------
+# 航母甲板参数（滑跃段为圆弧：入口切线水平，出口切线 = SKI_JUMP_ANGLE_DEG）
+# ---------------------------------------------------------------------------
+SKI_JUMP_ANGLE_DEG = 14.0
+SKI_JUMP_ARC: SkiJumpArc = compute_ski_jump_arc(SKI_JUMP_ANGLE_DEG)
+SKI_JUMP_ANGLE_RAD = SKI_JUMP_ARC.angle_rad
+SKI_JUMP_RADIUS_M = SKI_JUMP_ARC.radius_m
+SKI_JUMP_ARC_LENGTH_M = SKI_JUMP_ARC.arc_length_m
+SKI_JUMP_HORIZONTAL_M = SKI_JUMP_ARC.horizontal_m
+SKI_JUMP_LIP_HEIGHT_M = SKI_JUMP_ARC.lip_height_m
+SKI_JUMP_COS = SKI_JUMP_ARC.cos_exit
+SKI_JUMP_SIN = SKI_JUMP_ARC.sin_exit
+SKI_JUMP_LENGTH_M = SKI_JUMP_ARC_LENGTH_M  # 兼容旧名
 MU = 0.03                       # 甲板滚动摩擦系数
 WIND_KT = 30
 V_WIND_MPS = WIND_KT * KT_TO_MPS  # 甲板逆风，m/s
@@ -152,15 +163,21 @@ def apply_aircraft_geometry(mass_kg, s_ref_m2, wingspan_m, wing_height_m, sweep_
     recompute_aero_parameters()
 
 
-def apply_ski_jump_deck(length_m, angle_deg):
-    global SKI_JUMP_LENGTH_M, SKI_JUMP_ANGLE_DEG, SKI_JUMP_ANGLE_RAD
-    global SKI_JUMP_COS, SKI_JUMP_SIN, SKI_JUMP_HORIZONTAL_M
-    SKI_JUMP_LENGTH_M = length_m
-    SKI_JUMP_ANGLE_DEG = angle_deg
-    SKI_JUMP_ANGLE_RAD = np.radians(angle_deg)
-    SKI_JUMP_COS = np.cos(SKI_JUMP_ANGLE_RAD)
-    SKI_JUMP_SIN = np.sin(SKI_JUMP_ANGLE_RAD)
-    SKI_JUMP_HORIZONTAL_M = SKI_JUMP_LENGTH_M * SKI_JUMP_COS
+def apply_ski_jump_deck(angle_deg, lip_height_m=None):
+    """设置圆弧滑跃甲板；仅需出口切线角，可选唇口高度定半径。"""
+    global SKI_JUMP_ARC, SKI_JUMP_ANGLE_DEG, SKI_JUMP_ANGLE_RAD, SKI_JUMP_RADIUS_M
+    global SKI_JUMP_ARC_LENGTH_M, SKI_JUMP_HORIZONTAL_M, SKI_JUMP_LIP_HEIGHT_M
+    global SKI_JUMP_COS, SKI_JUMP_SIN, SKI_JUMP_LENGTH_M
+    SKI_JUMP_ARC = compute_ski_jump_arc(angle_deg, lip_height_m=lip_height_m)
+    SKI_JUMP_ANGLE_DEG = SKI_JUMP_ARC.angle_deg
+    SKI_JUMP_ANGLE_RAD = SKI_JUMP_ARC.angle_rad
+    SKI_JUMP_RADIUS_M = SKI_JUMP_ARC.radius_m
+    SKI_JUMP_ARC_LENGTH_M = SKI_JUMP_ARC.arc_length_m
+    SKI_JUMP_HORIZONTAL_M = SKI_JUMP_ARC.horizontal_m
+    SKI_JUMP_LIP_HEIGHT_M = SKI_JUMP_ARC.lip_height_m
+    SKI_JUMP_COS = SKI_JUMP_ARC.cos_exit
+    SKI_JUMP_SIN = SKI_JUMP_ARC.sin_exit
+    SKI_JUMP_LENGTH_M = SKI_JUMP_ARC_LENGTH_M
 
 
 recompute_aero_parameters()
@@ -184,6 +201,8 @@ def print_config_summary():
     print(f"诱导因子 k:   {K_IND:.3f}")
     print(f"C_Lα:         {CL_ALPHA:.4f} /rad  (Λ={SWEEP_LE_DEG}°)")
     print(f"Cl_taxi:      {CL_TAXI:.4f}")
+    print(f"滑跃圆弧:     {SKI_JUMP_ANGLE_DEG:.1f}° 出口 | R={SKI_JUMP_RADIUS_M:.0f} m | "
+          f"弧长 {SKI_JUMP_ARC_LENGTH_M:.1f} m | 水平 {SKI_JUMP_HORIZONTAL_M:.1f} m")
 
 
 def total_takeoff_distance_m(flat_length_m):
@@ -221,22 +240,22 @@ def simulate(flat_length_m, pitch_deg, dt=DT_DEFAULT, max_time_s=MAX_GROUND_TIME
         x += v_gs * dt
         t += dt
 
-    # ==================== 阶段 2：滑跃甲板滑跑 ====================
-    s = 0.0                                       # 沿滑跃斜面的滑行距离
-    while s < SKI_JUMP_LENGTH_M and t < max_time_s:
-        v_air = v_gs + V_WIND_MPS * SKI_JUMP_COS  # 沿斜面方向的空速
+    # ==================== 阶段 2：滑跃圆弧段 ====================
+    s = 0.0
+    while s < SKI_JUMP_ARC_LENGTH_M and t < max_time_s:
+        cos_p, sin_p = deck_cos_sin_at_s(s, SKI_JUMP_ARC)
+        v_air = v_gs + V_WIND_MPS * cos_p
         q = dynamic_pressure(v_air)
-        phi_s = PHI_GROUND_FLAT * (1 - s / SKI_JUMP_LENGTH_M) + s / SKI_JUMP_LENGTH_M  # 地面效应衰减
+        phi_s = PHI_GROUND_FLAT * (1 - s / SKI_JUMP_ARC_LENGTH_M) + s / SKI_JUMP_ARC_LENGTH_M
         lift = q * S_REF_M2 * CL_TAXI
         drag = q * S_REF_M2 * drag_coefficient(CL_TAXI, phi_s)
-        normal = max(WEIGHT_N * SKI_JUMP_COS - lift, 0.0)  # 垂直于斜面的正压力
-        # 沿斜面加速度 a = (T - D - W·sin(θ) - μ·N) / m
-        v_gs = max(v_gs + (T_MAX_N - drag - WEIGHT_N * SKI_JUMP_SIN - MU * normal) / MASS_KG * dt, 0.0)
+        normal = max(WEIGHT_N * cos_p - lift, 0.0)
+        v_gs = max(v_gs + (T_MAX_N - drag - WEIGHT_N * sin_p - MU * normal) / MASS_KG * dt, 0.0)
         s += v_gs * dt
-        x += v_gs * SKI_JUMP_COS * dt              # 水平位置增量
+        x += v_gs * cos_p * dt
         t += dt
 
-    if s < SKI_JUMP_LENGTH_M * 0.99:
+    if s < SKI_JUMP_ARC_LENGTH_M * 0.99:
         return False, x, v_gs, 0.0, 0.0, t, 0.0
 
     v_deck = v_gs                                 # 离甲板速度（沿斜面）

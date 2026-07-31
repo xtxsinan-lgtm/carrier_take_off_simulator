@@ -6,7 +6,6 @@ F-35B：策略 A（short_take_off / short_ski_jump_take_off）
 """
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -15,6 +14,7 @@ import numpy as np
 import short_ski_jump_take_off as ski_stovl
 import short_take_off as flat_stovl
 import ski_jump_take_off as ski_conv
+from ski_jump_geometry import compute_ski_jump_arc
 
 SURVEY_TEMP_C = 30.0
 PILOT_LOAD_KG = 100.0
@@ -87,30 +87,25 @@ class CarrierSpec:
     max_speed_kt: float
     ski_jump: bool
     ski_jump_angle_deg: float = 0.0
-    ski_jump_length_m: float = 0.0
-    ski_jump_height_m: float | None = None
+    ski_jump_height_m: float | None = None  # 可选唇口高度，用于确定圆弧半径
     f35b_capable: bool = False
     notes: str = ''
 
     def deck_wind_kt(self) -> float:
         return self.max_speed_kt
 
-    def ski_jump_arc_m(self) -> float:
+    def ski_jump_geom(self):
         if not self.ski_jump:
-            return 0.0
-        if self.ski_jump_length_m > 0:
-            return self.ski_jump_length_m
-        if self.ski_jump_height_m:
-            return self.ski_jump_height_m / math.sin(math.radians(self.ski_jump_angle_deg))
-        return 35.0
+            return None
+        return compute_ski_jump_arc(self.ski_jump_angle_deg, lip_height_m=self.ski_jump_height_m)
 
+    def ski_jump_arc_m(self) -> float:
+        g = self.ski_jump_geom()
+        return g.arc_length_m if g else 0.0
 
-def _estimate_arc(angle_deg: float, height_m: float | None, documented_m: float | None) -> float:
-    if documented_m:
-        return documented_m
-    if height_m:
-        return height_m / math.sin(math.radians(angle_deg))
-    return 35.0
+    def ski_jump_horizontal_m(self) -> float:
+        g = self.ski_jump_geom()
+        return g.horizontal_m if g else 0.0
 
 
 AIRCRAFT: dict[str, AircraftSpec] = {
@@ -188,13 +183,13 @@ CARRIERS: list[CarrierSpec] = [
     CarrierSpec(
         id='CAVOUR', name='加富尔级', nation='意大利',
         max_speed_kt=29, ski_jump=True, ski_jump_angle_deg=12.0,
-        ski_jump_length_m=35.0, f35b_capable=True,
-        notes='29 kn，12° ski-jump；弧长约 35 m（估算）',
+        f35b_capable=True,
+        notes='29 kn，12° 圆弧 ski-jump',
     ),
     CarrierSpec(
         id='TRIESTE', name='的里雅斯特级', nation='意大利',
         max_speed_kt=25, ski_jump=True, ski_jump_angle_deg=12.0,
-        ski_jump_length_m=35.0, f35b_capable=True,
+        f35b_capable=True,
         notes='LHD Trieste，25 kn，12° ski-jump',
     ),
     CarrierSpec(
@@ -205,19 +200,19 @@ CARRIERS: list[CarrierSpec] = [
     CarrierSpec(
         id='KUZNETSOV', name='库兹涅佐夫级', nation='中/俄',
         max_speed_kt=30, ski_jump=True, ski_jump_angle_deg=14.0,
-        ski_jump_length_m=50.0, f35b_capable=False,
-        notes='辽宁/山东/库兹涅佐夫；29 kn，14°，弧长约 50 m',
+        f35b_capable=False,
+        notes='辽宁/山东/库兹涅佐夫；30 kn，14°',
     ),
     CarrierSpec(
         id='VIKRAMADITYA', name='超日王号', nation='印度',
         max_speed_kt=29, ski_jump=True, ski_jump_angle_deg=14.3,
-        ski_jump_length_m=45.0, f35b_capable=False,
+        f35b_capable=False,
         notes='改装自戈尔什科夫号；29 kn，14.3°',
     ),
     CarrierSpec(
         id='VIKRANT', name='维克兰特号', nation='印度',
         max_speed_kt=28, ski_jump=True, ski_jump_angle_deg=14.0,
-        ski_jump_length_m=45.0, f35b_capable=False,
+        f35b_capable=False,
         notes='国产 STOBAR；28 kn，14°',
     ),
 ]
@@ -225,7 +220,8 @@ CARRIERS: list[CarrierSpec] = [
 
 def _carrier_deck_desc(c: CarrierSpec) -> str:
     if c.ski_jump:
-        return (f"滑跃 {c.ski_jump_arc_m():.0f} m / {c.ski_jump_angle_deg:.1f}°，"
+        g = c.ski_jump_geom()
+        return (f"滑跃弧 {g.arc_length_m:.0f} m（水平 {g.horizontal_m:.0f} m）/ {c.ski_jump_angle_deg:.1f}°，"
                 f"最大航速 {c.max_speed_kt:.0f} kt（甲板风）")
     return f"平直甲板，最大航速 {c.max_speed_kt:.0f} kt（甲板风）"
 
@@ -241,7 +237,7 @@ def _configure_f35b(ac: AircraftSpec, carrier: CarrierSpec, mass_kg: float):
         ski_stovl.apply_stovl_thrust_sl(**thrust)
         ski_stovl.apply_wind_knots(wind_kt)
         ski_stovl.apply_aircraft_geometry(**geom)
-        ski_stovl.apply_ski_jump_deck(carrier.ski_jump_arc_m(), carrier.ski_jump_angle_deg)
+        ski_stovl.apply_ski_jump_deck(carrier.ski_jump_angle_deg, carrier.ski_jump_height_m)
         return ski_stovl
     flat_stovl.apply_thrust_temperature(SURVEY_TEMP_C)
     flat_stovl.apply_stovl_thrust_sl(**thrust)
@@ -253,7 +249,7 @@ def _configure_f35b(ac: AircraftSpec, carrier: CarrierSpec, mass_kg: float):
 def _configure_conventional(ac: AircraftSpec, carrier: CarrierSpec, mass_kg: float):
     ski_conv.apply_thrust_temperature(SURVEY_TEMP_C)
     ski_conv.apply_wind_knots(carrier.deck_wind_kt())
-    ski_conv.apply_ski_jump_deck(carrier.ski_jump_arc_m(), carrier.ski_jump_angle_deg)
+    ski_conv.apply_ski_jump_deck(carrier.ski_jump_angle_deg, carrier.ski_jump_height_m)
     ski_conv.apply_aircraft_geometry(
         mass_kg=mass_kg, s_ref_m2=ac.wing_area_m2, wingspan_m=ac.wingspan_m,
         wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg,
@@ -395,7 +391,8 @@ def _expand_ski_conv_bounds(hits: set[str]):
 def _carrier_deck_short(c: CarrierSpec) -> str:
     """汇总表用：仅航速与滑跃参数。"""
     if c.ski_jump:
-        return f"{c.max_speed_kt:.0f} kt，滑跃 {c.ski_jump_arc_m():.0f} m / {c.ski_jump_angle_deg:.1f}°"
+        return (f"{c.max_speed_kt:.0f} kt，滑跃 {c.ski_jump_horizontal_m():.0f} m / "
+                f"{c.ski_jump_angle_deg:.1f}°")
     return f"{c.max_speed_kt:.0f} kt，平直甲板"
 
 
