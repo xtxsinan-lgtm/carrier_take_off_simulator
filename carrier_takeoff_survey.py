@@ -392,6 +392,59 @@ def _expand_ski_conv_bounds(hits: set[str]):
         ski_conv.PITCH_SEARCH_MAX = min(PITCH_MAX_DEG, ski_conv.PITCH_SEARCH_MAX + 3)
 
 
+def _carrier_deck_short(c: CarrierSpec) -> str:
+    """汇总表用：仅航速与滑跃参数。"""
+    if c.ski_jump:
+        return f"{c.max_speed_kt:.0f} kt，滑跃 {c.ski_jump_arc_m():.0f} m / {c.ski_jump_angle_deg:.1f}°"
+    return f"{c.max_speed_kt:.0f} kt，平直甲板"
+
+
+def _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump: bool) -> dict[str, Any]:
+    base = dict(
+        success=True, aircraft=ac.id, aircraft_name=ac.name,
+        carrier=carrier.id, carrier_name=carrier.name, load=load_label,
+        mass_kg=mass_kg, temp_c=SURVEY_TEMP_C, wind_kt=carrier.deck_wind_kt(),
+        carrier_desc=_carrier_deck_desc(carrier),
+        carrier_short=_carrier_deck_short(carrier),
+        nozzle_deg=result['nozzle_deg'],
+        v_trans_mps=result['v_trans_mps'],
+        min_plume_trailing_edge_m=result['min_plume_trailing_edge_m'],
+    )
+    if ski_jump:
+        base.update(
+            distance_m=float(result['total_m']),
+            flat_m=float(result['flat_m']),
+            pitch_deg=int(result['pitch_deg']),
+            v_deck_mps=float(result['v_deck_mps']),
+            t_deck_s=float(result['t_deck_s']),
+        )
+    else:
+        base.update(
+            distance_m=float(result['x_m']),
+            flat_m=float(result['x_m']),
+            pitch_deg=None,
+            v_deck_mps=float(result['v_gs_mps']),
+            t_deck_s=float(result['t_s']),
+        )
+    return base
+
+
+def _build_conv_result(ac, carrier, load_label, mass_kg, result) -> dict[str, Any]:
+    return dict(
+        success=True, aircraft=ac.id, aircraft_name=ac.name,
+        carrier=carrier.id, carrier_name=carrier.name, load=load_label,
+        mass_kg=mass_kg, temp_c=SURVEY_TEMP_C, wind_kt=carrier.deck_wind_kt(),
+        carrier_desc=_carrier_deck_desc(carrier),
+        carrier_short=_carrier_deck_short(carrier),
+        distance_m=float(result['total_m']),
+        flat_m=float(result['flat_m']),
+        pitch_deg=int(result['pitch_deg']),
+        v_deck_mps=float(result['v_deck_mps']),
+        t_deck_s=float(result['t_deck_s']),
+        nozzle_deg=None, v_trans_mps=None, min_plume_trailing_edge_m=None,
+    )
+
+
 def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_kg: float) -> dict[str, Any]:
     mod = _configure_f35b(ac, carrier, mass_kg)
     for attempt in range(3):
@@ -406,9 +459,7 @@ def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_
                 _expand_ski_stovl_bounds(hits)
                 _configure_f35b(ac, carrier, mass_kg)
                 continue
-            dist = result['total_m']
-            detail = (f"平直段 {result['flat_m']:.0f} m，喷管 {result['nozzle_deg']}°，"
-                      f"转换 {result['v_trans_mps']} m/s，俯仰 {result['pitch_deg']}°")
+            return _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=True)
         else:
             result = mod.run_strategy_a_search()
             if result is None:
@@ -419,15 +470,7 @@ def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_
                 _expand_flat_stovl_bounds(hits)
                 _configure_f35b(ac, carrier, mass_kg)
                 continue
-            dist = result['x_m']
-            detail = (f"喷管 {result['nozzle_deg']}°，转换 {result['v_trans_mps']} m/s，"
-                      f"离地 {result['v_gs_mps']:.1f} m/s")
-        return dict(
-            success=True, aircraft=ac.id, carrier=carrier.id, load=load_label,
-            mass_kg=mass_kg, distance_m=dist, detail=detail,
-            carrier_desc=_carrier_deck_desc(carrier),
-            wind_kt=carrier.deck_wind_kt(), temp_c=SURVEY_TEMP_C,
-        )
+            return _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=False)
     return dict(success=False, aircraft=ac.id, carrier=carrier.id, load=load_label)
 
 
@@ -447,14 +490,7 @@ def run_conventional_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: st
             _expand_ski_conv_bounds(hits)
             _configure_conventional(ac, carrier, mass_kg)
             continue
-        detail = (f"平直段 {result['flat_m']:.0f} m，俯仰 {result['pitch_deg']}°，"
-                  f"离板 {result['v_deck_mps']:.1f} m/s")
-        return dict(
-            success=True, aircraft=ac.id, carrier=carrier.id, load=load_label,
-            mass_kg=mass_kg, distance_m=result['total_m'], detail=detail,
-            carrier_desc=_carrier_deck_desc(carrier),
-            wind_kt=carrier.deck_wind_kt(), temp_c=SURVEY_TEMP_C,
-        )
+        return _build_conv_result(ac, carrier, load_label, mass_kg, result)
     return dict(success=False, aircraft=ac.id, carrier=carrier.id, load=load_label)
 
 
@@ -493,9 +529,148 @@ def _print_result_row(r: dict[str, Any]):
     if not r.get('success'):
         print(f"  ✗ {r['aircraft']} @ {r['carrier']} [{r['load']}] — 未能找到可行解")
         return
-    print(f"  ✓ {r['aircraft']} @ {r['carrier']} [{r['load']}]  {r['mass_kg']:.0f} kg")
-    print(f"      航母: {r['carrier_desc']}")
-    print(f"      最小起飞总距离: {r['distance_m']:.1f} m  |  {r['detail']}")
+    print(f"  ✓ {r['aircraft']} @ {r['carrier']} [{r['load']}]  {r['mass_kg']:.0f} kg  总距 {r['distance_m']:.1f} m")
+
+
+def _fmt_opt(v, fmt: str = '.1f', na: str = '—') -> str:
+    if v is None:
+        return na
+    if fmt == 'd':
+        return f"{int(v)}"
+    return f"{v:{fmt}}"
+
+
+def _format_f35b_detail_block(r: dict[str, Any]) -> list[str]:
+    pitch = '—' if r['pitch_deg'] is None else f"{r['pitch_deg']}°"
+    lines = [
+        f"  重量:           {r['mass_kg']:.0f} kg",
+        f"  最小总距离:     {r['distance_m']:.1f} m",
+        f"  平直段:         {r['flat_m']:.0f} m",
+        f"  喷管最终角:     {r['nozzle_deg']}°",
+        f"  开始偏转地速:   {r['v_trans_mps']} m/s",
+        f"  甲板受影响最后缘: {_fmt_opt(r['min_plume_trailing_edge_m'])} m",
+        f"  俯仰角:         {pitch}",
+        f"  离舰速度:       {r['v_deck_mps']:.1f} m/s",
+        f"  离舰用时:       {r['t_deck_s']:.2f} s",
+    ]
+    return lines
+
+
+def _format_conv_detail_block(r: dict[str, Any]) -> list[str]:
+    return [
+        f"  重量:           {r['mass_kg']:.0f} kg",
+        f"  最小总距离:     {r['distance_m']:.1f} m",
+        f"  平直段:         {r['flat_m']:.0f} m",
+        f"  俯仰角:         {r['pitch_deg']}°",
+        f"  离舰速度:       {r['v_deck_mps']:.1f} m/s",
+        f"  离舰用时:       {r['t_deck_s']:.2f} s",
+    ]
+
+
+def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> str:
+    """生成规整的文本报告。"""
+    w = 96
+    sep = '=' * w
+    thin = '-' * w
+    lines: list[str] = []
+
+    lines += [
+        sep,
+        '舰载机最小起飞距离遍历报告',
+        sep,
+        f'条件: {SURVEY_TEMP_C:.0f}°C | 甲板风 = 航母最大航速 | 俯仰角硬上限 {PITCH_MAX_DEG}°',
+        f'F-35B: 策略 A（short_take_off / short_ski_jump_take_off）',
+        f'常规型: ski_jump_take_off（仅 STOBAR 航母，不含 F-35B 适用舰）',
+        '',
+    ]
+
+    # ── F-35B 明细 ──
+    lines += [sep, '一、F-35B 各航母组合优化结果', sep, '']
+    f35b_carriers = [c for c in CARRIERS if c.f35b_capable]
+    for carrier in f35b_carriers:
+        lines.append(f"【{carrier.name}】 {_carrier_deck_short(carrier)}")
+        for load in ('空战挂载', 'MTOW'):
+            r = next((x for x in f35b_results
+                      if x.get('carrier') == carrier.id and x.get('load') == load), None)
+            if not r or not r.get('success'):
+                lines.append(f"  [{load}]  ✗ 未能找到可行解")
+                lines.append('')
+                continue
+            lines.append(f"  [{load}]")
+            lines += _format_f35b_detail_block(r)
+            lines.append('')
+        lines.append(thin)
+
+    # ── 常规型明细 ──
+    lines += ['', sep, '二、常规舰载机 × STOBAR 航母优化结果', sep, '']
+    conv_carriers = [c for c in CARRIERS if c.ski_jump and not c.f35b_capable]
+    conv_ac_ids = ('J-15', 'J-15T', 'J-35', 'MiG-29K', 'Rafale-M', 'FA-18E')
+    for aid in conv_ac_ids:
+        ac = AIRCRAFT[aid]
+        lines.append(f"【{ac.name}】")
+        for carrier in conv_carriers:
+            lines.append(f"  {carrier.name}（{_carrier_deck_short(carrier)}）")
+            for load in ('空战挂载', 'MTOW'):
+                r = next((x for x in conv_results
+                          if x.get('aircraft') == aid and x.get('carrier') == carrier.id
+                          and x.get('load') == load), None)
+                if not r or not r.get('success'):
+                    lines.append(f"    [{load}]  ✗ 未能找到可行解")
+                    continue
+                lines.append(f"    [{load}]")
+                for ln in _format_conv_detail_block(r):
+                    lines.append('  ' + ln)
+            lines.append('')
+        lines.append(thin)
+
+    # ── F-35B 总表 ──
+    lines += ['', sep, '三、F-35B 跨航母对比总表', sep, '']
+    hdr = (f"{'航母':<16} {'甲板条件':<32} {'空战kg':>8} {'空战总距m':>10} "
+           f"{'MTOW kg':>8} {'MTOW总距m':>10}")
+    lines += [hdr, thin]
+    for carrier in f35b_carriers:
+        r_a2a = next((x for x in f35b_results
+                      if x.get('carrier') == carrier.id and x.get('load') == '空战挂载'), {})
+        r_mt = next((x for x in f35b_results
+                     if x.get('carrier') == carrier.id and x.get('load') == 'MTOW'), {})
+        a2a_dist = f"{r_a2a['distance_m']:.1f}" if r_a2a.get('success') else '失败'
+        mt_dist = f"{r_mt['distance_m']:.1f}" if r_mt.get('success') else '失败'
+        a2a_kg = f"{r_a2a['mass_kg']:.0f}" if r_a2a.get('success') else '—'
+        mt_kg = f"{r_mt['mass_kg']:.0f}" if r_mt.get('success') else '—'
+        lines.append(
+            f"{carrier.name:<16} {_carrier_deck_short(carrier):<32} "
+            f"{a2a_kg:>8} {a2a_dist:>10} {mt_kg:>8} {mt_dist:>10}")
+
+    # ── 常规型总表 ──
+    lines += ['', sep, '四、常规舰载机 × STOBAR 航母对比总表（总距离 m）', sep, '']
+    carrier_labels = [f"{c.name}\n({_carrier_deck_short(c)})" for c in conv_carriers]
+    col_w = 14
+    lines.append(f"{'机型':<12} {'挂载':<8}" +
+                 ''.join(f"{lbl.split(chr(10))[0]:>{col_w}}" for lbl in carrier_labels))
+    lines.append(f"{'':12} {'':8}" +
+                 ''.join(f"{c.ski_jump_arc_m():.0f}m/{c.ski_jump_angle_deg:.0f}°/{c.max_speed_kt:.0f}kt".center(col_w)
+                         for c in conv_carriers))
+    lines.append(thin)
+    for aid in conv_ac_ids:
+        for load in ('空战挂载', 'MTOW'):
+            row = f"{aid:<12} {load:<8}"
+            for carrier in conv_carriers:
+                r = next((x for x in conv_results
+                          if x.get('aircraft') == aid and x.get('carrier') == carrier.id
+                          and x.get('load') == load), None)
+                cell = f"{r['distance_m']:.1f}" if r and r.get('success') else '失败'
+                row += f"{cell:>{col_w}}"
+            lines.append(row)
+
+    lines += ['', sep]
+    return '\n'.join(lines)
+
+
+def write_survey_report(path: str, f35b_results: list[dict], conv_results: list[dict]):
+    text = format_survey_report(f35b_results, conv_results)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(text)
+    return text
 
 
 def _reset_search_ranges():
@@ -555,6 +730,9 @@ def run_conv_survey_subset(aircraft_ids: tuple[str, ...]):
             continue
         print(f"{r['aircraft']:<10} {r['carrier']:<14} {r['load']:<8} {r['mass_kg']:>8.0f} "
               f"{r['distance_m']:>8.1f}  {r['carrier_desc']}")
+    report_path = 'carrier_takeoff_survey_results.txt'
+    # 增量模式：读取已有报告中的结果不可行，需全量重跑写入；此处仅追加控制台提示
+    print(f'\n提示: 运行完整 survey 以更新 {report_path}')
     return results
 
 
@@ -611,6 +789,11 @@ def run_survey():
     print('\n边界触及记录（供搜索范围调整参考）:')
     for key, hits in BOUNDARY_HITS.items():
         print(f"  {key}: {sorted(hits) if hits else '无'}")
+
+    report_path = 'carrier_takeoff_survey_results.txt'
+    write_survey_report(report_path, f35b_results, conv_results)
+    print(f'\n报告已写入 {report_path}')
+    return f35b_results, conv_results
 
 
 if __name__ == '__main__':

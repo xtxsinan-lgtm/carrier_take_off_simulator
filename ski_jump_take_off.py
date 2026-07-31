@@ -43,17 +43,17 @@ MPS_TO_KT = 1.94384             # m/s → kt
 # ---------------------------------------------------------------------------
 # 飞机参数（当前几何仍取 F-35B 量级，Λ 取歼-15）
 # ---------------------------------------------------------------------------
-MASS_KG = 27200                 # 典型舰基起飞重量，kg
+MASS_KG = 29500                 # 典型舰基起飞重量，kg
 WEIGHT_N = MASS_KG * G          # 重力，N
-S_REF_M2 = 42.74                # 机翼参考面积，m² ；歼-15/15T 68.84m2,歼-35 68.9m2 
-WINGSPAN_M = 10.7               # 翼展，m；歼-15/15T 14.7m,歼-35 13.6m
+S_REF_M2 = 68.9              # 机翼参考面积，m² ；歼-15/15T 68.84m2,歼-35 68.9m2 
+WINGSPAN_M = 13.6               # 翼展，m；歼-15/15T 14.7m,歼-35 13.6m
 WING_HEIGHT_M = 1.96            # 机翼平均离地高度，m，歼-15/15T 2.55m,歼-35 1.96m
 ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2  # 展弦比 AR = b²/S
-T_MAX_SL_N = 182000             # 最大加力推力（T_THRUST_REF_C 标定），N；歼-15 ~251 kN，歼-15T 264kN,歼-35 ~186 kN
+T_MAX_SL_N = 186000             # 最大加力推力（T_THRUST_REF_C 标定），N；歼-15 ~251 kN，歼-15T 264kN,歼-35 ~186 kN
 T_MAX_N = T_MAX_SL_N * THRUST_TEMP_FACTOR
 CD0 = 0.039                     # 零升阻力系数（襟翼放下、起落架未收） 歼35为0.039， 歼15为0.0475
 
-SWEEP_LE_DEG = 42  # F-35B 35°，歼-35 38°，歼-15 42°
+SWEEP_LE_DEG = 38  # F-35B 35°，歼-35 38°，歼-15 42°
 FLAP_DEFLECTION_DEG = 20
 FLAP_EFFICIENCY = 0.5
 WING_INCIDENCE_DEG = 2
@@ -61,14 +61,14 @@ WING_INCIDENCE_DEG = 2
 # ---------------------------------------------------------------------------
 # 航母甲板参数
 # ---------------------------------------------------------------------------
-SKI_JUMP_LENGTH_M = 37.0        # 滑跃段弧长，m，库兹涅佐夫级为50米
-SKI_JUMP_ANGLE_DEG = 12.5 # 滑跃段角度，库兹涅佐夫级为14度
+SKI_JUMP_LENGTH_M = 50.0        # 滑跃段弧长，m，库兹涅佐夫级为50米
+SKI_JUMP_ANGLE_DEG = 14 # 滑跃段角度，库兹涅佐夫级为14度
 SKI_JUMP_ANGLE_RAD = np.radians(SKI_JUMP_ANGLE_DEG)
 SKI_JUMP_COS = np.cos(SKI_JUMP_ANGLE_RAD)   # 预计算，避免循环内重复三角函数
 SKI_JUMP_SIN = np.sin(SKI_JUMP_ANGLE_RAD)
 SKI_JUMP_HORIZONTAL_M = SKI_JUMP_LENGTH_M * SKI_JUMP_COS  # 滑跃段水平投影
 MU = 0.03                       # 甲板滚动摩擦系数
-WIND_KT = 25
+WIND_KT = 30
 V_WIND_MPS = WIND_KT * KT_TO_MPS  # 甲板逆风，m/s
 
 PITCH_MAX_DEG = 20  # 全项目俯仰角硬上限（°）；舰基起飞操纵/结构限制，搜索与仿真均不得超过
@@ -174,6 +174,8 @@ CL_MAX = 1.8
 def print_config_summary():
     print(f"环境温度:     {AMBIENT_TEMP_C:.0f} °C (推力标定 {T_THRUST_REF_C:.0f} °C)")
     print(f"空气密度 ρ:   {RHO:.4f} kg/m³ | 推力温度系数 {THRUST_TEMP_FACTOR:.4f}")
+    print(f"实际加力推力({AMBIENT_TEMP_C:.0f}°C SL): {T_MAX_N/1000:.1f} kN"
+          f"（{T_THRUST_REF_C:.0f}°C 标定 {T_MAX_SL_N/1000:.1f} kN）")
     print(f"起飞重量:     {MASS_KG:,} kg")
     print(f"展弦比 AR:    {ASPECT_RATIO:.3f}")
     print(f"甲板风:       {WIND_KT} kt ({V_WIND_MPS:.2f} m/s)")
@@ -350,7 +352,7 @@ def run_min_takeoff_search():
         return None
 
     for flat_m in range(max(int(best_overall['flat_m']) - 20, 0),
-                        int(best_overall['flat_m']) + 21, 2):
+                        int(best_overall['flat_m']) + 1, 1):
         pitch_range = range(max(best_overall['pitch_deg'] - 3, PITCH_SEARCH_MIN),
                             min(best_overall['pitch_deg'] + 4, PITCH_SEARCH_MAX + 1), 1)
         result = best_pitch_for_flat(flat_m, pitch_range)
