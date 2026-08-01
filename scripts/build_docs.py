@@ -64,7 +64,13 @@ def main() -> None:
     aircraft = load_aircraft_csv(ROOT / 'aircraft_database.csv')
     carriers = load_carriers_csv(ROOT / 'carriers_database.csv')
 
+    py_sources = {
+        name: (ROOT / name).read_text(encoding='utf-8')
+        for name in PY_FILES
+    }
+
     data = {
+        'version': 3,
         'pilot_load_kg': 100.0,
         'a2a_missile_count': 4,
         'pitch_max_deg': 20,
@@ -76,6 +82,7 @@ def main() -> None:
         'aircraft': [_aircraft_dict(ac) for ac in aircraft.values()],
         'carriers': [_carrier_dict(c) for c in carriers],
         'py_load_order': LOAD_ORDER,
+        'py_sources': py_sources,
     }
     (DOCS / 'data.json').write_text(
         json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')

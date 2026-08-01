@@ -11,7 +11,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const PY_BASE = 'py/';
+const APP_VERSION = 3;
 
 let data = null;
 let pyodide = null;
@@ -26,9 +26,46 @@ function $(id) {
 }
 
 async function loadData() {
-  const resp = await fetch('data.json');
+  const resp = await fetch(`data.json?v=${APP_VERSION}`);
   if (!resp.ok) throw new Error(`无法加载 data.json (${resp.status})`);
   data = await resp.json();
+  if (!data.py_sources) {
+    throw new Error('data.json 缺少 py_sources，请运行 python3 scripts/build_docs.py');
+  }
+}
+
+async function loadPythonModules() {
+  pyodide.runPython(`
+import sys
+from pathlib import Path
+Path('/py').mkdir(parents=True, exist_ok=True)
+if '/py' not in sys.path:
+    sys.path.insert(0, '/py')
+`);
+
+  for (const name of data.py_load_order) {
+    const code = data.py_sources[name];
+    if (!code) throw new Error(`缺少 Python 模块: ${name}`);
+    pyodide.FS.writeFile(`/py/${name}`, code);
+  }
+
+  pyodide.globals.set(
+    '_py_order',
+    data.py_load_order.map((n) => n.replace(/\.py$/, ''))
+  );
+  await pyodide.runPythonAsync(`
+import importlib.util
+import sys
+
+for _name in _py_order:
+    _path = f'/py/{_name}.py'
+    _spec = importlib.util.spec_from_file_location(_name, _path)
+    if _spec is None or _spec.loader is None:
+        raise ImportError(f'无法加载模块 {_name} from {_path}')
+    _mod = importlib.util.module_from_spec(_spec)
+    sys.modules[_name] = _mod
+    _spec.loader.exec_module(_mod)
+`);
 }
 
 function setStatus(text, cls = '') {
@@ -182,32 +219,10 @@ async function initPyodide() {
   pyodide = await loadPyodide();
   await pyodide.loadPackage('numpy');
 
-  // 写入 Pyodide 虚拟文件系统，以便 Python 的 import 能正常工作
-  pyodide.runPython(`
-import sys
-from pathlib import Path
-Path('/py').mkdir(parents=True, exist_ok=True)
-if '/py' not in sys.path:
-    sys.path.insert(0, '/py')
-`);
-
-  for (const name of data.py_load_order) {
-    const code = await fetch(`${PY_BASE}${name}`).then((r) => {
-      if (!r.ok) throw new Error(`无法加载 ${PY_BASE}${name}`);
-      return r.text();
-    });
-    pyodide.FS.writeFile(`/py/${name}`, code);
-  }
-
-  for (const name of data.py_load_order) {
-    const modName = name.replace(/\.py$/, '');
-    try {
-      await pyodide.runPythonAsync(
-        `import importlib; importlib.import_module(${JSON.stringify(modName)})`
-      );
-    } catch (e) {
-      throw new Error(`模块 ${modName} 加载失败: ${e.message}`);
-    }
+  try {
+    await loadPythonModules();
+  } catch (e) {
+    throw new Error(`Python 模块加载失败: ${e.message}`);
   }
 
   pyReady = true;
