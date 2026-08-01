@@ -418,8 +418,13 @@ def _fail(msg: str, config_text: str, mode: str) -> dict[str, Any]:
     return {'success': False, 'mode': mode, 'output': output, 'error': msg}
 
 
-def run_simulation_json(payload: dict[str, Any]) -> dict[str, Any]:
-    """Pyodide 入口：接收 JSON dict，返回 JSON-serializable dict。"""
+def run_simulation_json(payload: dict[str, Any] | str) -> dict[str, Any]:
+    """Pyodide 入口：接收 JSON dict 或 JSON 字符串，返回 JSON-serializable dict。"""
+    if isinstance(payload, str):
+        import json
+        payload = json.loads(payload)
+    elif hasattr(payload, 'to_py'):
+        payload = payload.to_py()
     ac = payload['aircraft']
     carrier = payload['carrier']
     return run_simulation(

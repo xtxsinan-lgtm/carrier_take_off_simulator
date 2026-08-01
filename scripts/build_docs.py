@@ -70,7 +70,7 @@ def main() -> None:
     }
 
     data = {
-        'version': 3,
+        'version': 4,
         'pilot_load_kg': 100.0,
         'a2a_missile_count': 4,
         'pitch_max_deg': 20,

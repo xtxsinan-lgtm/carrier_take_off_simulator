@@ -11,7 +11,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 3;
+const APP_VERSION = 4;
 
 let data = null;
 let pyodide = null;
@@ -276,11 +276,11 @@ async function runSimulation() {
   }
 
   try {
-    pyodide.globals.set('_payload', payload);
+    pyodide.globals.set('_payload_json', JSON.stringify(payload));
     const raw = pyodide.runPython(`
 import json
 from web_simulator import run_simulation_json
-json.dumps(run_simulation_json(_payload), ensure_ascii=False)
+json.dumps(run_simulation_json(_payload_json), ensure_ascii=False)
 `);
     const result = JSON.parse(raw);
     els.output.textContent = result.output || '(无输出)';
