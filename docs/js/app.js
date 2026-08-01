@@ -182,9 +182,13 @@ async function initPyodide() {
   pyodide = await loadPyodide();
   await pyodide.loadPackage('numpy');
 
+  // 写入 Pyodide 虚拟文件系统，以便 Python 的 import 能正常工作
   pyodide.runPython(`
 import sys
-sys.path.insert(0, 'py')
+from pathlib import Path
+Path('/py').mkdir(parents=True, exist_ok=True)
+if '/py' not in sys.path:
+    sys.path.insert(0, '/py')
 `);
 
   for (const name of data.py_load_order) {
@@ -192,7 +196,18 @@ sys.path.insert(0, 'py')
       if (!r.ok) throw new Error(`无法加载 ${PY_BASE}${name}`);
       return r.text();
     });
-    await pyodide.runPythonAsync(code);
+    pyodide.FS.writeFile(`/py/${name}`, code);
+  }
+
+  for (const name of data.py_load_order) {
+    const modName = name.replace(/\.py$/, '');
+    try {
+      await pyodide.runPythonAsync(
+        `import importlib; importlib.import_module(${JSON.stringify(modName)})`
+      );
+    } catch (e) {
+      throw new Error(`模块 ${modName} 加载失败: ${e.message}`);
+    }
   }
 
   pyReady = true;
