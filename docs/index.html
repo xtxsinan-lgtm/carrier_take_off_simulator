@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>航母舰载机起飞仿真</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>航母舰载机起飞仿真</h1>
+    <p>支持滑跃起飞、短距起飞（STOVL 平直甲板）、短距滑跃起飞三种模式</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. 起飞模式</h2>
+      <div class="mode-group">
+        <button type="button" class="mode-btn active" data-mode="ski_jump">滑跃起飞</button>
+        <button type="button" class="mode-btn" data-mode="short_takeoff">短距起飞</button>
+        <button type="button" class="mode-btn" data-mode="short_ski_jump">短距滑跃起飞</button>
+      </div>
+      <p style="margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--muted);">
+        滑跃 / 短距滑跃模式需滑跃甲板航母；短距起飞需 STOVL 战斗机 + 平直甲板。
+      </p>
+    </section>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>2. 航母</h2>
+        <label for="carrierSelect">选择航母</label>
+        <select id="carrierSelect"></select>
+        <table class="spec-table" style="margin-top: 1rem;">
+          <tbody id="carrierSpecs"></tbody>
+        </table>
+        <div id="skiJumpSection" class="hidden">
+          <p style="font-size: 0.85rem; color: var(--muted); margin: 1rem 0 0.5rem;">
+            滑跃参数（修改角度或弧长后，唇口高度自动重算）：
+          </p>
+          <div class="ski-edit-row">
+            <div>
+              <label for="skiAngle">滑跃角 (°)</label>
+              <input type="number" id="skiAngle" step="0.1" min="1" max="20">
+            </div>
+            <div>
+              <label for="skiArcLength">滑跃弧长 (m)</label>
+              <input type="number" id="skiArcLength" step="0.1" min="1">
+            </div>
+            <div class="readonly">
+              <label for="skiHeight">唇口高度 (m)</label>
+              <input type="number" id="skiHeight" readonly tabindex="-1">
+            </div>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0 0;">
+            滑跃水平投影：<span id="skiHorizontal">—</span> m
+          </p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>3. 战斗机</h2>
+        <label for="aircraftSelect">选择战斗机</label>
+        <select id="aircraftSelect"></select>
+        <table class="spec-table" style="margin-top: 1rem;">
+          <tbody id="aircraftSpecs"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>4. 仿真条件</h2>
+      <div class="run-row">
+        <div class="field">
+          <label for="windInput">甲板风 (kt)</label>
+          <input type="number" id="windInput" step="0.5" min="0" value="30">
+        </div>
+        <div class="field">
+          <label for="tempInput">环境温度 (°C)</label>
+          <input type="number" id="tempInput" step="0.5" value="30">
+        </div>
+        <div class="field">
+          <label for="massInput">起飞重量 (kg)</label>
+          <input type="number" id="massInput" step="10" min="1000">
+        </div>
+        <button type="button" id="preloadBtn" class="mode-btn">预加载引擎</button>
+        <button type="button" id="runBtn" class="primary">开始仿真</button>
+      </div>
+      <div id="status"></div>
+    </section>
+
+    <section class="card">
+      <h2>5. 仿真输出</h2>
+      <pre id="output" class="empty">选择参数后点击「开始仿真」，结果将显示在此处。</pre>
+    </section>
+  </main>
+
+  <footer>
+    仿真在浏览器内通过 Pyodide 运行 Python 物理模型 · 数据来自 aircraft_database.csv / carriers_database.csv
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

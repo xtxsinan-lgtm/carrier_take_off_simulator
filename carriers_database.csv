@@ -1,0 +1,10 @@
+﻿id,name,nation,max_speed_kt,ski_jump,total_deck_length_m,ski_jump_angle_deg,ski_jump_height_m,f35b_capable,deck_length_source,notes
+QE,伊丽莎白女王级,英国,25,1,280.0,13.0,6.0,1,Royal Navy：flight deck 280 m,公开数据：>25 kn，13° ski-jump，跳台高约 6 m
+IZUMO,出云级,日本,30,0,248.0,0.0,,1,Defense Media Network：舰长 248 m,改装后无 ski-jump，F-35B 短距滑跑起飞
+CAVOUR,加富尔级,意大利,29,1,232.6,12.0,,1,Fincantieri：flight deck 232.6 m,29 kn，12° 圆弧 ski-jump
+TRIESTE,的里雅斯特级,意大利,25,1,230.0,12.0,,1,Fincantieri / Wikipedia：flight deck 230 m,LHD Trieste，25 kn，12° ski-jump
+WASP,黄蜂级,美国,22,0,253.2,0.0,,1,US Navy LHD-1：844 ft = 253.2 m,LHD/LHA，22 kn，平直甲板 STOVL
+KUZNETSOV,库兹涅佐夫级,中/俄,30,1,304.5,14.0,,0,Navypedia / 维基：flight deck 304.5 m,辽宁舰/库兹涅佐夫号；30 kn，14°
+SHANDONG,山东号,中国,30,1,300.0,12.0,5.099,0,GlobalSecurity Type 001A：flight deck 300 m,002 型；30 kn，12°；滑跃弧长与库兹涅佐夫级一致（水平投影约 49 m）
+VIKRAMADITYA,超日王号,印度,29,1,273.1,14.3,,0,Navypedia：flight deck 273.1 m,改装自戈尔什科夫号；29 kn，14.3°
+VIKRANT,维克兰特号,印度,28,1,262.0,14.0,,0,PIB / Wikipedia：舰长 262 m,国产 STOBAR；28 kn，14°

@@ -86,10 +86,12 @@ class CarrierSpec:
     nation: str
     max_speed_kt: float
     ski_jump: bool
+    total_deck_length_m: float  # 飞行甲板沿起飞方向可用总长，m（公开资料）
     ski_jump_angle_deg: float = 0.0
     ski_jump_height_m: float | None = None  # 可选唇口高度，用于确定圆弧半径
     f35b_capable: bool = False
     notes: str = ''
+    deck_length_source: str = ''
 
     def deck_wind_kt(self) -> float:
         return self.max_speed_kt
@@ -106,6 +108,9 @@ class CarrierSpec:
     def ski_jump_horizontal_m(self) -> float:
         g = self.ski_jump_geom()
         return g.horizontal_m if g else 0.0
+
+    def deck_fits_distance(self, required_m: float) -> bool:
+        return required_m <= self.total_deck_length_m
 
 
 AIRCRAFT: dict[str, AircraftSpec] = {
@@ -173,57 +178,141 @@ CARRIERS: list[CarrierSpec] = [
         id='QE', name='伊丽莎白女王级', nation='英国',
         max_speed_kt=25, ski_jump=True, ski_jump_angle_deg=13.0,
         ski_jump_height_m=6.0, f35b_capable=True,
+        total_deck_length_m=280.0,
+        deck_length_source='Royal Navy：flight deck 280 m',
         notes='公开数据：>25 kn，13° ski-jump，跳台高约 6 m',
     ),
     CarrierSpec(
         id='IZUMO', name='出云级', nation='日本',
         max_speed_kt=30, ski_jump=False, f35b_capable=True,
+        total_deck_length_m=248.0,
+        deck_length_source='Defense Media Network：舰长 248 m',
         notes='改装后无 ski-jump，F-35B 短距滑跑起飞',
     ),
     CarrierSpec(
         id='CAVOUR', name='加富尔级', nation='意大利',
         max_speed_kt=29, ski_jump=True, ski_jump_angle_deg=12.0,
         f35b_capable=True,
+        total_deck_length_m=232.6,
+        deck_length_source='Fincantieri：flight deck 232.6 m',
         notes='29 kn，12° 圆弧 ski-jump',
     ),
     CarrierSpec(
         id='TRIESTE', name='的里雅斯特级', nation='意大利',
         max_speed_kt=25, ski_jump=True, ski_jump_angle_deg=12.0,
         f35b_capable=True,
+        total_deck_length_m=230.0,
+        deck_length_source='Fincantieri / Wikipedia：flight deck 230 m',
         notes='LHD Trieste，25 kn，12° ski-jump',
     ),
     CarrierSpec(
         id='WASP', name='黄蜂级', nation='美国',
         max_speed_kt=22, ski_jump=False, f35b_capable=True,
+        total_deck_length_m=253.2,
+        deck_length_source='US Navy LHD-1：844 ft = 253.2 m',
         notes='LHD/LHA，22 kn，平直甲板 STOVL',
     ),
     CarrierSpec(
         id='KUZNETSOV', name='库兹涅佐夫级', nation='中/俄',
         max_speed_kt=30, ski_jump=True, ski_jump_angle_deg=14.0,
         f35b_capable=False,
-        notes='辽宁/山东/库兹涅佐夫；30 kn，14°',
+        total_deck_length_m=304.5,
+        deck_length_source='Navypedia / 维基：flight deck 304.5 m',
+        notes='辽宁舰/库兹涅佐夫号；30 kn，14°',
+    ),
+    CarrierSpec(
+        id='SHANDONG', name='山东号', nation='中国',
+        max_speed_kt=30, ski_jump=True, ski_jump_angle_deg=12.0,
+        ski_jump_height_m=5.099,  # 唇口高度使滑跃弧长 ≈ 库兹涅佐夫级（R=200 m, 14°）
+        f35b_capable=False,
+        total_deck_length_m=300.0,
+        deck_length_source='GlobalSecurity Type 001A：flight deck 300 m',
+        notes='002 型；30 kn，12°；滑跃弧长与库兹涅佐夫级一致（水平投影约 49 m）',
     ),
     CarrierSpec(
         id='VIKRAMADITYA', name='超日王号', nation='印度',
         max_speed_kt=29, ski_jump=True, ski_jump_angle_deg=14.3,
         f35b_capable=False,
+        total_deck_length_m=273.1,
+        deck_length_source='Navypedia：flight deck 273.1 m',
         notes='改装自戈尔什科夫号；29 kn，14.3°',
     ),
     CarrierSpec(
         id='VIKRANT', name='维克兰特号', nation='印度',
         max_speed_kt=28, ski_jump=True, ski_jump_angle_deg=14.0,
         f35b_capable=False,
+        total_deck_length_m=262.0,
+        deck_length_source='PIB / Wikipedia：舰长 262 m',
         notes='国产 STOBAR；28 kn，14°',
     ),
 ]
+
+AIRCRAFT_CSV_PATH = 'aircraft_database.csv'
+CARRIERS_CSV_PATH = 'carriers_database.csv'
+
+
+def export_databases_to_csv(
+    aircraft_path: str = AIRCRAFT_CSV_PATH,
+    carriers_path: str = CARRIERS_CSV_PATH,
+) -> None:
+    from database_csv import export_aircraft_csv, export_carriers_csv
+
+    export_aircraft_csv(aircraft_path, AIRCRAFT)
+    export_carriers_csv(carriers_path, CARRIERS)
+    print(f'已写入 {aircraft_path}（{len(AIRCRAFT)} 架）')
+    print(f'已写入 {carriers_path}（{len(CARRIERS)} 艘）')
+
+
+def load_databases_from_csv(
+    aircraft_path: str = AIRCRAFT_CSV_PATH,
+    carriers_path: str = CARRIERS_CSV_PATH,
+) -> bool:
+    """若两个 CSV 均存在则从文件加载，覆盖模块内默认 AIRCRAFT / CARRIERS。"""
+    global AIRCRAFT, CARRIERS
+    from pathlib import Path
+
+    from database_csv import load_aircraft_csv, load_carriers_csv
+
+    ap, cp = Path(aircraft_path), Path(carriers_path)
+    if not ap.is_file() or not cp.is_file():
+        return False
+    AIRCRAFT = load_aircraft_csv(ap)
+    CARRIERS = load_carriers_csv(cp)
+    return True
 
 
 def _carrier_deck_desc(c: CarrierSpec) -> str:
     if c.ski_jump:
         g = c.ski_jump_geom()
         return (f"滑跃弧 {g.arc_length_m:.0f} m（水平 {g.horizontal_m:.0f} m）/ {c.ski_jump_angle_deg:.1f}°，"
+                f"飞行甲板总长 {c.total_deck_length_m:.0f} m，"
                 f"最大航速 {c.max_speed_kt:.0f} kt（甲板风）")
-    return f"平直甲板，最大航速 {c.max_speed_kt:.0f} kt（甲板风）"
+    return (f"平直甲板，飞行甲板总长 {c.total_deck_length_m:.0f} m，"
+            f"最大航速 {c.max_speed_kt:.0f} kt（甲板风）")
+
+
+def _annotate_deck_feasibility(result: dict[str, Any], carrier: CarrierSpec) -> dict[str, Any]:
+    """在仿真可行解上标注：所需总距是否不超过飞行甲板总长。"""
+    out = dict(result)
+    out['total_deck_length_m'] = carrier.total_deck_length_m
+    if not out.get('success') or out.get('distance_m') is None:
+        out['deck_launch_ok'] = None
+        out['deck_margin_m'] = None
+        return out
+    margin = carrier.total_deck_length_m - float(out['distance_m'])
+    out['deck_margin_m'] = margin
+    out['deck_launch_ok'] = margin >= 0
+    return out
+
+
+def _deck_launch_label(r: dict[str, Any]) -> str:
+    if not r.get('success'):
+        return '仿真失败'
+    if r.get('deck_launch_ok') is True:
+        return f"甲板可用（余量 {r['deck_margin_m']:.1f} m）"
+    if r.get('deck_launch_ok') is False:
+        return f"甲板不足（超出 {-r['deck_margin_m']:.1f} m）"
+    return '—'
 
 
 def _configure_f35b(ac: AircraftSpec, carrier: CarrierSpec, mass_kg: float):
@@ -456,7 +545,8 @@ def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_
                 _expand_ski_stovl_bounds(hits)
                 _configure_f35b(ac, carrier, mass_kg)
                 continue
-            return _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=True)
+            return _annotate_deck_feasibility(
+                _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=True), carrier)
         else:
             result = mod.run_strategy_a_search()
             if result is None:
@@ -467,7 +557,8 @@ def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_
                 _expand_flat_stovl_bounds(hits)
                 _configure_f35b(ac, carrier, mass_kg)
                 continue
-            return _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=False)
+            return _annotate_deck_feasibility(
+                _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=False), carrier)
     return dict(success=False, aircraft=ac.id, carrier=carrier.id, load=load_label)
 
 
@@ -487,7 +578,8 @@ def run_conventional_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: st
             _expand_ski_conv_bounds(hits)
             _configure_conventional(ac, carrier, mass_kg)
             continue
-        return _build_conv_result(ac, carrier, load_label, mass_kg, result)
+        return _annotate_deck_feasibility(
+            _build_conv_result(ac, carrier, load_label, mass_kg, result), carrier)
     return dict(success=False, aircraft=ac.id, carrier=carrier.id, load=load_label)
 
 
@@ -518,6 +610,8 @@ def print_carrier_database():
         cap = 'F-35B 适用' if c.f35b_capable else '常规滑跃机适用'
         print(f"\n【{c.name}】 ({c.nation}) — {cap}")
         print(f"  {_carrier_deck_desc(c)}")
+        if c.deck_length_source:
+            print(f"  甲板长度来源: {c.deck_length_source}")
         if c.notes:
             print(f"  备注: {c.notes}")
 
@@ -526,7 +620,9 @@ def _print_result_row(r: dict[str, Any]):
     if not r.get('success'):
         print(f"  ✗ {r['aircraft']} @ {r['carrier']} [{r['load']}] — 未能找到可行解")
         return
-    print(f"  ✓ {r['aircraft']} @ {r['carrier']} [{r['load']}]  {r['mass_kg']:.0f} kg  总距 {r['distance_m']:.1f} m")
+    deck = _deck_launch_label(r)
+    print(f"  ✓ {r['aircraft']} @ {r['carrier']} [{r['load']}]  {r['mass_kg']:.0f} kg  "
+          f"总距 {r['distance_m']:.1f} m | {deck}")
 
 
 def _fmt_opt(v, fmt: str = '.1f', na: str = '—') -> str:
@@ -542,6 +638,8 @@ def _format_f35b_detail_block(r: dict[str, Any]) -> list[str]:
     lines = [
         f"  重量:           {r['mass_kg']:.0f} kg",
         f"  最小总距离:     {r['distance_m']:.1f} m",
+        f"  飞行甲板总长:   {r['total_deck_length_m']:.0f} m",
+        f"  甲板起飞:       {_deck_launch_label(r)}",
         f"  平直段:         {r['flat_m']:.0f} m",
         f"  喷管最终角:     {r['nozzle_deg']}°",
         f"  开始偏转地速:   {r['v_trans_mps']} m/s",
@@ -557,11 +655,20 @@ def _format_conv_detail_block(r: dict[str, Any]) -> list[str]:
     return [
         f"  重量:           {r['mass_kg']:.0f} kg",
         f"  最小总距离:     {r['distance_m']:.1f} m",
+        f"  飞行甲板总长:   {r['total_deck_length_m']:.0f} m",
+        f"  甲板起飞:       {_deck_launch_label(r)}",
         f"  平直段:         {r['flat_m']:.0f} m",
         f"  俯仰角:         {r['pitch_deg']}°",
         f"  离舰速度:       {r['v_deck_mps']:.1f} m/s",
         f"  离舰用时:       {r['t_deck_s']:.2f} s",
     ]
+
+
+def _deck_cell(r: dict[str, Any] | None) -> str:
+    if not r or not r.get('success'):
+        return '失败'
+    mark = '✓' if r.get('deck_launch_ok') else '✗'
+    return f"{r['distance_m']:.1f}{mark}"
 
 
 def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> str:
@@ -578,8 +685,14 @@ def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> 
         f'条件: {SURVEY_TEMP_C:.0f}°C | 甲板风 = 航母最大航速 | 俯仰角硬上限 {PITCH_MAX_DEG}°',
         f'F-35B: 策略 A（short_take_off / short_ski_jump_take_off）',
         f'常规型: ski_jump_take_off（仅 STOBAR 航母，不含 F-35B 适用舰）',
+        f'甲板判定: 所需总距 ≤ 飞行甲板总长 → 甲板起飞成功（✓），否则失败（✗）',
         '',
+        '航母飞行甲板总长（公开资料，m）:',
     ]
+    for c in CARRIERS:
+        src = f" — {c.deck_length_source}" if c.deck_length_source else ''
+        lines.append(f"  {c.name}: {c.total_deck_length_m:.1f}{src}")
+    lines += ['', ]
 
     # ── F-35B 明细 ──
     lines += [sep, '一、F-35B 各航母组合优化结果', sep, '']
@@ -621,8 +734,8 @@ def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> 
         lines.append(thin)
 
     # ── F-35B 总表 ──
-    lines += ['', sep, '三、F-35B 跨航母对比总表', sep, '']
-    hdr = (f"{'航母':<16} {'甲板条件':<32} {'空战kg':>8} {'空战总距m':>10} "
+    lines += ['', sep, '三、F-35B 跨航母对比总表（✓=甲板可用 ✗=甲板不足）', sep, '']
+    hdr = (f"{'航母':<16} {'甲板总长m':>8} {'空战kg':>8} {'空战总距m':>10} "
            f"{'MTOW kg':>8} {'MTOW总距m':>10}")
     lines += [hdr, thin]
     for carrier in f35b_carriers:
@@ -630,16 +743,16 @@ def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> 
                       if x.get('carrier') == carrier.id and x.get('load') == '空战挂载'), {})
         r_mt = next((x for x in f35b_results
                      if x.get('carrier') == carrier.id and x.get('load') == 'MTOW'), {})
-        a2a_dist = f"{r_a2a['distance_m']:.1f}" if r_a2a.get('success') else '失败'
-        mt_dist = f"{r_mt['distance_m']:.1f}" if r_mt.get('success') else '失败'
+        a2a_dist = _deck_cell(r_a2a) if r_a2a else '失败'
+        mt_dist = _deck_cell(r_mt) if r_mt else '失败'
         a2a_kg = f"{r_a2a['mass_kg']:.0f}" if r_a2a.get('success') else '—'
         mt_kg = f"{r_mt['mass_kg']:.0f}" if r_mt.get('success') else '—'
         lines.append(
-            f"{carrier.name:<16} {_carrier_deck_short(carrier):<32} "
+            f"{carrier.name:<16} {carrier.total_deck_length_m:>8.0f} "
             f"{a2a_kg:>8} {a2a_dist:>10} {mt_kg:>8} {mt_dist:>10}")
 
     # ── 常规型总表 ──
-    lines += ['', sep, '四、常规舰载机 × STOBAR 航母对比总表（总距离 m）', sep, '']
+    lines += ['', sep, '四、常规舰载机 × STOBAR 航母对比总表（总距离 m，✓/✗=甲板可用性）', sep, '']
     carrier_labels = [f"{c.name}\n({_carrier_deck_short(c)})" for c in conv_carriers]
     col_w = 14
     lines.append(f"{'机型':<12} {'挂载':<8}" +
@@ -647,6 +760,8 @@ def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> 
     lines.append(f"{'':12} {'':8}" +
                  ''.join(f"{c.ski_jump_arc_m():.0f}m/{c.ski_jump_angle_deg:.0f}°/{c.max_speed_kt:.0f}kt".center(col_w)
                          for c in conv_carriers))
+    lines.append(f"{'':12} {'':8}" +
+                 ''.join(f"{c.total_deck_length_m:.0f}m".center(col_w) for c in conv_carriers))
     lines.append(thin)
     for aid in conv_ac_ids:
         for load in ('空战挂载', 'MTOW'):
@@ -655,9 +770,28 @@ def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> 
                 r = next((x for x in conv_results
                           if x.get('aircraft') == aid and x.get('carrier') == carrier.id
                           and x.get('load') == load), None)
-                cell = f"{r['distance_m']:.1f}" if r and r.get('success') else '失败'
-                row += f"{cell:>{col_w}}"
+                row += f"{_deck_cell(r):>{col_w}}"
             lines.append(row)
+
+    # ── 甲板可用性汇总 ──
+    lines += ['', sep, '五、甲板起飞可用性汇总（仿真可行且总距≤甲板总长）', sep, '']
+    all_results = f35b_results + conv_results
+    ok_count = sum(1 for r in all_results if r.get('deck_launch_ok') is True)
+    fail_count = sum(1 for r in all_results if r.get('deck_launch_ok') is False)
+    sim_fail = sum(1 for r in all_results if not r.get('success'))
+    lines.append(f"  仿真可行且甲板可用: {ok_count} 组 | 仿真可行但甲板不足: {fail_count} 组 | 仿真失败: {sim_fail} 组")
+    lines.append('')
+    lines.append(f"  {'机型':<10} {'航母':<14} {'挂载':<8} {'总距m':>8} {'甲板m':>8} {'判定':>6}")
+    lines.append('  ' + thin)
+    for r in all_results:
+        if not r.get('success'):
+            lines.append(f"  {r.get('aircraft', '?'):<10} {r.get('carrier', '?'):<14} "
+                         f"{r.get('load', '?'):<8} {'—':>8} {'—':>8} {'仿真失败':>6}")
+            continue
+        mark = '成功' if r.get('deck_launch_ok') else '失败'
+        lines.append(
+            f"  {r['aircraft']:<10} {r['carrier']:<14} {r['load']:<8} "
+            f"{r['distance_m']:>8.1f} {r['total_deck_length_m']:>8.0f} {mark:>6}")
 
     lines += ['', sep]
     return '\n'.join(lines)
@@ -774,14 +908,15 @@ def run_survey():
     print('\n' + '=' * 88)
     print('汇总表')
     print('=' * 88)
-    print(f"\n{'机型':<10} {'航母':<14} {'挂载':<8} {'重量kg':>8} {'总距m':>8}  甲板条件")
+    print(f"\n{'机型':<10} {'航母':<14} {'挂载':<8} {'重量kg':>8} {'总距m':>8} {'甲板m':>8} {'甲板':>4}  条件")
     print('-' * 88)
     for r in f35b_results + conv_results:
         if not r.get('success'):
-            print(f"{r['aircraft']:<10} {r['carrier']:<14} {r['load']:<8} {'—':>8} {'失败':>8}")
+            print(f"{r['aircraft']:<10} {r['carrier']:<14} {r['load']:<8} {'—':>8} {'失败':>8} {'—':>8} {'—':>4}  —")
             continue
+        deck = '✓' if r.get('deck_launch_ok') else '✗'
         print(f"{r['aircraft']:<10} {r['carrier']:<14} {r['load']:<8} {r['mass_kg']:>8.0f} "
-              f"{r['distance_m']:>8.1f}  {r['carrier_desc']}")
+              f"{r['distance_m']:>8.1f} {r['total_deck_length_m']:>8.0f} {deck:>4}  {r['carrier_desc']}")
 
     print('\n边界触及记录（供搜索范围调整参考）:')
     for key, hits in BOUNDARY_HITS.items():
@@ -795,8 +930,15 @@ def run_survey():
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1 and sys.argv[1] == '--conv-only':
+
+    if len(sys.argv) > 1 and sys.argv[1] == '--export-db':
+        export_databases_to_csv()
+    elif len(sys.argv) > 1 and sys.argv[1] == '--conv-only':
+        if load_databases_from_csv():
+            print(f'已从 {AIRCRAFT_CSV_PATH} / {CARRIERS_CSV_PATH} 加载参数库')
         ids = tuple(sys.argv[2:]) if len(sys.argv) > 2 else ('Rafale-M', 'FA-18E')
         run_conv_survey_subset(ids)
     else:
+        if load_databases_from_csv():
+            print(f'已从 {AIRCRAFT_CSV_PATH} / {CARRIERS_CSV_PATH} 加载参数库')
         run_survey()
