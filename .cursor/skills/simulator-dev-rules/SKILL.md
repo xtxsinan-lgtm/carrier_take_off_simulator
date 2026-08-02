@@ -13,6 +13,29 @@ description: >-
 2. **功能改动需要有 e2e test**
 3. **所有注释用中文**
 
+## 四条发布通道必须同步
+
+任何功能/模式/机型/策略改动，必须同时覆盖以下通道（缺一不可）：
+
+| 通道 | 路径 | 同步方式 |
+|-----|------|---------|
+| Python 仿真核心 | `simulators/`、`utils/`、`apps/web_simulator.py` | 源码 |
+| GitHub Pages HTML | `docs/index.html`、`docs/js/`、`docs/data.json` | `build_all.py`；模式按钮由 `data.modes` 动态生成 |
+| 微信小程序 | `miniprogram/`（`data.json` + 页面） | `build_all.py`；模式列表来自 catalog |
+| 小程序 HTTP API | `apps/miniprogram_api.py` | 与 `web_simulator` 同一套模式契约 |
+
+**禁止**：只改仿真器或只改小程序就结束；HTML 硬编码模式按钮（须读 `data.modes`）。
+
+任务结束前自检：
+
+```
+- [ ] scripts/frontend_catalog.py 的 MODES / 策略表已更新（若新增模式）
+- [ ] apps/web_simulator.py 的 MODES / 策略表与 catalog 一致（有测试校验）
+- [ ] 已运行 python3 scripts/build_all.py
+- [ ] 本地打开 docs/ 或确认 Pages 能看到新模式（push 后等 1–3 分钟；必要时递增 APP_VERSION 与 index.html ?v=）
+- [ ] 小程序模式列表含新模式（来自 data.json，勿只改 wxml 文案）
+```
+
 ## 实施流程
 
 每次改代码前复制此清单并逐项完成：
@@ -23,6 +46,7 @@ description: >-
 - [ ] 注释、docstring、行内说明均为中文（模块 docstring 亦用中文）
 - [ ] 若改了 utils/simulators/CSV：已运行 python3 scripts/build_all.py
 - [ ] 已运行 python3 -m pytest tests/ -m "not e2e" -q（含前端产物同步检查）
+- [ ] 已确认 HTML / 小程序 / API 三端模式与策略与 catalog 同步
 - [ ] 若改动影响含 RPC 的后端（小程序 API）：按 restart-rpc-services 重启本地服务
 ```
 

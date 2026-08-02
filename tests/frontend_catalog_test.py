@@ -33,6 +33,40 @@ def test_build_catalog_payload_modes():
     assert any(a['id'] == 'MV-22' for a in payload['aircraft'])
 
 
+def test_web_simulator_modes_match_frontend_catalog():
+    """Web API 与前端 catalog 的模式/策略表必须一致，防止某一端漏加新模式。"""
+    from apps import web_simulator as ws
+    from scripts.frontend_catalog import STOVL_STRATEGIES, TILTROTOR_STRATEGIES
+
+    assert ws.MODES == MODES
+    assert ws.STOVL_STRATEGIES == STOVL_STRATEGIES
+    assert ws.TILTROTOR_STRATEGIES == TILTROTOR_STRATEGIES
+
+
+def test_docs_html_renders_modes_from_catalog_not_hardcoded():
+    """HTML 版模式按钮须由 data.modes 动态生成，禁止在 index.html 硬编码模式 id。"""
+    import re
+    from utils.paths import ROOT
+
+    html = (ROOT / 'docs' / 'index.html').read_text(encoding='utf-8')
+    app_js = (ROOT / 'docs' / 'js' / 'app.js').read_text(encoding='utf-8')
+
+    assert 'id="modeGroup"' in html
+    assert 'data-mode="ski_jump"' not in html
+    assert 'data-mode="tiltrotor_short_takeoff"' not in html
+    assert 'function populateModeButtons' in app_js
+    assert 'data.modes' in app_js
+
+    # index.html 的 app.js?v= 须与 APP_VERSION 一致，避免 Pages/浏览器继续用旧脚本
+    ver_js = re.search(r'const APP_VERSION\s*=\s*(\d+)', app_js)
+    ver_html = re.search(r'app\.js\?v=(\d+)', html)
+    assert ver_js and ver_html
+    assert ver_js.group(1) == ver_html.group(1), (
+        f'缓存版本不一致: app.js APP_VERSION={ver_js.group(1)} '
+        f'vs index.html ?v={ver_html.group(1)}'
+    )
+
+
 def test_render_esm_and_cjs_contain_injected_constants():
     c = _load_constants()
     esm = render_esm(c)

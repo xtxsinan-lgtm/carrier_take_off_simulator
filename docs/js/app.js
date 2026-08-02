@@ -12,7 +12,8 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 15;
+/** 与 index.html 中 app.js?v= 及 data.json?v= 同步递增，避免 CDN/浏览器缓存旧资源 */
+const APP_VERSION = 16;
 let data = null;
 let pyodide = null;
 let pyReady = false;
@@ -92,6 +93,30 @@ function modeNeedsStovlStrategy(mode) {
 
 function modeAllowsStrategyC(mode) {
   return mode === 'short_takeoff' || mode === 'short_ski_jump';
+}
+
+function populateModeButtons() {
+  /** 模式按钮由 data.modes 生成，与小程序 / catalog 同源，避免硬编码漏同步。 */
+  const modes = data.modes || {};
+  const ids = Object.keys(modes);
+  if (!ids.length) {
+    throw new Error('data.json 缺少 modes，请运行 python3 scripts/build_all.py');
+  }
+  if (!modes[currentMode]) {
+    currentMode = ids[0];
+  }
+  els.modeGroup.innerHTML = ids
+    .map(
+      (id) =>
+        `<button type="button" class="mode-btn" data-mode="${id}">${modes[id]}</button>`
+    )
+    .join('');
+  els.modeBtns = [...els.modeGroup.querySelectorAll('.mode-btn')];
+
+  const labels = ids.map((id) => modes[id]).join('、');
+  if (els.headerSubtitle) {
+    els.headerSubtitle.textContent = `支持${labels}等起飞模式`;
+  }
 }
 
 function refreshModeButtons() {
@@ -564,15 +589,16 @@ json.dumps(run_simulation_json(_payload_json), ensure_ascii=False)
 }
 
 function bindEvents() {
-  els.modeBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      currentMode = btn.dataset.mode;
-      refreshModeButtons();
-      populateCarriers();
-      populateAircraft();
-      els.massInput.dataset.userEdited = '';
-      els.windInput.dataset.userEdited = '';
-    });
+  // 事件委托：模式按钮可能在 populateModeButtons 后重建
+  els.modeGroup.addEventListener('click', (e) => {
+    const btn = e.target.closest('.mode-btn');
+    if (!btn || !els.modeGroup.contains(btn)) return;
+    currentMode = btn.dataset.mode;
+    refreshModeButtons();
+    populateCarriers();
+    populateAircraft();
+    els.massInput.dataset.userEdited = '';
+    els.windInput.dataset.userEdited = '';
   });
 
   els.strategyBtns.forEach((btn) => {
@@ -608,7 +634,9 @@ function bindEvents() {
 }
 
 async function main() {
-  els.modeBtns = [...document.querySelectorAll('.mode-btn:not(.strategy-btn)')];
+  els.modeGroup = $('modeGroup');
+  els.headerSubtitle = $('headerSubtitle');
+  els.modeBtns = [];
   els.strategyBtns = [...document.querySelectorAll('.strategy-btn')];
   els.strategySection = $('strategySection');
   els.strategyBtnC = $('strategyBtnC');
@@ -635,6 +663,7 @@ async function main() {
 
   try {
     await loadData();
+    populateModeButtons();
   } catch (e) {
     setStatus(e.message, 'error');
     return;

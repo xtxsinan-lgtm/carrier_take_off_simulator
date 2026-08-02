@@ -18,9 +18,11 @@ description: >-
 ```
 - [ ] 相关测试已通过（至少 python3 -m pytest tests/ -m "not e2e" -q）
 - [ ] 若改动影响 Web/Pyodide/小程序：已运行 python3 scripts/build_all.py
+- [ ] 若新增起飞模式/策略：已确认 HTML（`data.modes`）、小程序、`web_simulator` 与 `frontend_catalog` 一致；必要时递增 `APP_VERSION` 与 `index.html` 的 `app.js?v=`
 - [ ] 已 git add 本次相关文件（不含日志、临时输出、密钥）
 - [ ] 已 git commit（HEREDOC 提交信息）
 - [ ] 已 git push origin HEAD
+- [ ] push 后若影响 GitHub Pages：抽查线上页是否出现新模式（CDN 可能延迟 1–3 分钟）
 - [ ] 若改动影响含 RPC/HTTP 的后端（小程序 API 等）：已按 restart-rpc-services 重启本地服务
 - [ ] 已向用户确认 push 的分支与远程 URL（及 RPC 服务是否已重启）
 ```
