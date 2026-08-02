@@ -122,19 +122,22 @@ def serve(host: str = '127.0.0.1', port: int = 8765) -> None:
             print(f'  若要重启: kill $(lsof -t -i :{port}) 后再运行本脚本')
             raise SystemExit(1) from exc
         raise
-    print(f'仿真 API（小程序 / iOS）运行于 http://{host}:{port}')
-    print('  GET  /api/data     — 航母/战斗机数据')
-    print('  POST /api/simulate — 运行仿真')
+    def _out(*args: object) -> None:
+        print(*args, flush=True)
+
+    _out(f'仿真 API（小程序 / iOS）运行于 http://{host}:{port}')
+    _out('  GET  /api/data     — 航母/战斗机数据')
+    _out('  POST /api/simulate — 运行仿真')
     if host in ('0.0.0.0', '::'):
         lan = _guess_lan_ip()
         if lan:
-            print(f'  真机调试 API 地址: http://{lan}:{port}')
-            print(f'  - 小程序: miniprogram/config.js → apiBaseUrl')
-            print(f'  - iOS:    ios/CarrierTakeOff/Config.swift → apiBaseUrl')
+            _out(f'  真机调试 API 地址: http://{lan}:{port}')
+            _out('  - 小程序: miniprogram/config.js → apiBaseUrl')
+            _out('  - iOS:    ios/CarrierTakeOff/Config.swift → apiBaseUrl')
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print('\n已停止')
+        _out('\n已停止')
         server.server_close()
 
 
