@@ -86,13 +86,6 @@
       <view class="field-label"><text>拦截弹射程</text><text class="unit">km</text></view>
       <input class="input" type="digit" value="{{samRange}}" data-key="samRange" bindinput="onField"/>
     </view>
-    <view class="btn cyan" bindtap="onEstimateDistance">◈ 估算交战距离</view>
-    <view class="note">{{distNote}}</view>
-
-    <view class="field">
-      <view class="field-label"><text>发现距离</text><text class="unit">km</text></view>
-      <input class="input" type="digit" value="{{discoveryKm}}" data-key="discoveryKm" bindinput="onField"/>
-    </view>
     <view class="field">
       <view class="field-label"><text>拦截弹数量</text><text class="unit">枚</text></view>
       <input class="input" type="number" value="{{ni}}" data-key="ni" bindinput="onField"/>
@@ -112,19 +105,25 @@
       </picker>
     </view>
     <view class="field">
-      <view class="field-label"><text>单发 Pk</text><text class="unit">0–1</text></view>
-      <input class="input" type="digit" value="{{pk}}" data-key="pk" bindinput="onField"/>
-    </view>
-    <view class="btn cyan" bindtap="onEstimatePk">◈ 估算 Pk</view>
-    <view class="note">{{pkNote}}</view>
-
-    <view class="field">
       <view class="field-label"><text>火控锁定时间</text><text class="unit">s</text></view>
       <input class="input" type="digit" value="{{tlock}}" data-key="tlock" bindinput="onField"/>
     </view>
     <view class="field">
       <view class="field-label"><text>最小交战距离</text><text class="unit">km</text></view>
       <input class="input" type="digit" value="{{minr}}" data-key="minr" bindinput="onField"/>
+    </view>
+
+    <view class="btn cyan" bindtap="onEstimateDistanceAndPk">◈ 估算交战距离与拦截率</view>
+    <view class="note">{{distNote}}</view>
+    <view class="note">{{pkNote}}</view>
+
+    <view class="field">
+      <view class="field-label"><text>雷达发现距离</text><text class="unit">km</text></view>
+      <input class="input" type="digit" value="{{discoveryKm}}" data-key="discoveryKm" bindinput="onField"/>
+    </view>
+    <view class="field">
+      <view class="field-label"><text>单发拦截成功概率</text><text class="unit">0–1</text></view>
+      <input class="input" type="digit" value="{{pk}}" data-key="pk" bindinput="onField"/>
     </view>
 
     <view class="btn" bindtap="onRun">{{running ? (statusTag === 'QUEUED' ? '已排队…' : '计算中…') : '▶ 运行仿真'}}</view>

@@ -41,32 +41,26 @@ struct SaturationStrikeView: View {
                     field("舰载天线 (m²)", text: $vm.shipArea)
                     pickerRow("舰载体制", selection: $vm.shipType, options: vm.radarOptions)
                     field("拦截弹射程 (km)", text: $vm.samRange)
+                    field("拦截弹数量", text: $vm.ni)
+                    field("拦截弹速度 (Ma)", text: $vm.vi)
+                    field("拦截弹直径 (m)", text: $vm.interceptorDia)
+                    pickerRow("制导头", selection: $vm.seekerType, options: vm.seekerOptions)
+                    field("火控锁定时间 (s)", text: $vm.tlock)
+                    field("最小交战距离 (km)", text: $vm.minr)
 
-                    Button("◈ 估算交战距离") {
-                        Task { await vm.estimateDistance() }
+                    Button("◈ 估算交战距离与拦截率") {
+                        Task { await vm.estimateDistanceAndPk() }
                     }
                     .buttonStyle(SatSecondaryButton())
                     if !vm.distNote.isEmpty {
                         Text(vm.distNote).font(.system(size: 10, design: .monospaced)).foregroundStyle(SaturationTheme.textDim)
                     }
-
-                    field("发现距离 (km)", text: $vm.discoveryKm)
-                    field("拦截弹数量", text: $vm.ni)
-                    field("拦截弹速度 (Ma)", text: $vm.vi)
-                    field("拦截弹直径 (m)", text: $vm.interceptorDia)
-                    pickerRow("制导头", selection: $vm.seekerType, options: vm.seekerOptions)
-                    field("Pk", text: $vm.pk)
-
-                    Button("◈ 估算 Pk") {
-                        Task { await vm.estimatePk() }
-                    }
-                    .buttonStyle(SatSecondaryButton())
                     if !vm.pkNote.isEmpty {
                         Text(vm.pkNote).font(.system(size: 10, design: .monospaced)).foregroundStyle(SaturationTheme.textDim)
                     }
 
-                    field("锁定时间 (s)", text: $vm.tlock)
-                    field("最小交战距离 (km)", text: $vm.minr)
+                    field("雷达发现距离 (km)", text: $vm.discoveryKm)
+                    field("单发拦截成功概率", text: $vm.pk)
 
                     Button(vm.running ? "计算中…" : "▶ 运行仿真") {
                         Task { await vm.run() }

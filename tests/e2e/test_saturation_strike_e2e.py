@@ -45,26 +45,20 @@ def test_e2e_saturation_zero_windows():
 
 @pytest.mark.e2e
 def test_e2e_saturation_estimate_paths():
-    """估算距离与 Pk 路径可用。"""
-    dist = run_saturation_json({
-        'action': 'estimate_distance',
-        'params': {
-            'rcs': 0.5, 'traj': 'high', 'awacs_area': 8, 'awacs_type': 'aesa',
-            'standoff': 150, 'ship_area': 12, 'ship_type': 'aesa', 'sam_range': 40,
-        },
-    })
+    """合并估算按钮依赖的交战距离 + 拦截率（Pk）路径均可用。"""
+    params = {
+        'rcs': 0.5, 'traj': 'high', 'awacs_area': 8, 'awacs_type': 'aesa',
+        'standoff': 150, 'ship_area': 12, 'ship_type': 'aesa', 'sam_range': 40,
+        'vm': 2.6, 'vi': 3.8, 'ecm': 2, 'interceptor_dia': 0.35,
+        'seeker_type': 'active_aesa',
+    }
+    # 与三端 onEstimateDistanceAndPk / estimateDistanceAndPk 调用顺序一致
+    dist = run_saturation_json({'action': 'estimate_distance', 'params': params})
     assert dist['success'] is True
     assert dist['engage_dist'] == pytest.approx(40.0)
     assert dist['binding']
 
-    pk = run_saturation_json({
-        'action': 'estimate_pk',
-        'params': {
-            'vm': 2.6, 'vi': 3.8, 'rcs': 0.5, 'ecm': 2, 'traj': 'high',
-            'ship_area': 12, 'ship_type': 'aesa', 'interceptor_dia': 0.35,
-            'seeker_type': 'active_aesa',
-        },
-    })
+    pk = run_saturation_json({'action': 'estimate_pk', 'params': params})
     assert pk['success'] is True
     assert 0.03 <= pk['pk'] <= 0.97
 

@@ -3,7 +3,7 @@
  */
 const PYODIDE_VERSION = '0.26.4';
 /** 与 saturation-strike.html 中 ?v= 同步递增 */
-const APP_VERSION = 5;
+const APP_VERSION = 6;
 
 /** 仅加载饱和打击相关 Python 模块（无需 numpy） */
 const SATURATION_PY_FILES = [
@@ -357,36 +357,28 @@ async function ensureEngine() {
   if (!pyReady) await initPyodide();
 }
 
-async function onEstimateDistance() {
-  const btn = $('distBtn');
+/** 一次估算交战距离与单发拦截成功概率（拦截率输入），填入按钮下方两字段。 */
+async function onEstimateDistanceAndPk() {
+  const btn = $('estimateBtn');
   btn.disabled = true;
   try {
     await ensureEngine();
-    const r = callPython('estimate_distance', collectEstimateParams());
-    if (!r.success) throw new Error(r.error || '估算失败');
-    $('D').value = Number(r.engage_dist).toFixed(1);
+    const params = collectEstimateParams();
+    const dist = callPython('estimate_distance', params);
+    if (!dist.success) throw new Error(dist.error || '交战距离估算失败');
+    $('D').value = Number(dist.engage_dist).toFixed(1);
     $('distBreakdown').textContent =
-      `预警机探测: ${r.awacs_detect.toFixed(0)}km(功率限${r.awacs_power.toFixed(0)}/视距限${r.awacs_horizon.toFixed(0)}) + 前出${r.standoff.toFixed(0)}km = 总计${r.awacs_total.toFixed(0)}km ｜ 舰载火控锁定: ${r.ship_lock.toFixed(0)}km(搜索${r.ship_search.toFixed(0)}×0.65) ｜ 拦截弹射程: ${r.sam_range.toFixed(0)}km → 取最小值＝${r.engage_dist.toFixed(1)}km（受限于：${r.binding}）— 已填入下方"雷达发现距离"，可手动修改。`;
-  } catch (e) {
-    $('distBreakdown').textContent = String(e.message || e);
-    $('statusTag').textContent = 'ERROR';
-  } finally {
-    btn.disabled = false;
-  }
-}
+      `预警机探测: ${dist.awacs_detect.toFixed(0)}km(功率限${dist.awacs_power.toFixed(0)}/视距限${dist.awacs_horizon.toFixed(0)}) + 前出${dist.standoff.toFixed(0)}km = 总计${dist.awacs_total.toFixed(0)}km ｜ 舰载火控锁定: ${dist.ship_lock.toFixed(0)}km(搜索${dist.ship_search.toFixed(0)}×0.65) ｜ 拦截弹射程: ${dist.sam_range.toFixed(0)}km → 取最小值＝${dist.engage_dist.toFixed(1)}km（受限于：${dist.binding}）— 已填入下方「雷达发现距离」，可手动修改。`;
 
-async function onEstimatePk() {
-  const btn = $('estBtn');
-  btn.disabled = true;
-  try {
-    await ensureEngine();
-    const r = callPython('estimate_pk', collectEstimateParams());
-    if (!r.success) throw new Error(r.error || '估算失败');
-    $('pk').value = Number(r.pk).toFixed(2);
+    const pkR = callPython('estimate_pk', params);
+    if (!pkR.success) throw new Error(pkR.error || '拦截率估算失败');
+    $('pk').value = Number(pkR.pk).toFixed(2);
     $('pkEstBreakdown').textContent =
-      `估算 Pk = ${r.pk.toFixed(2)}（基线0.75 × 速度系数${r.speed_factor.toFixed(2)} × 舰载雷达增益${r.ship_radar_factor.toFixed(2)} × 导引头增益${r.seeker_factor.toFixed(2)} × RCS系数${r.rcs_factor.toFixed(2)} × 抗干扰系数${r.ecm_factor.toFixed(2)} × 弹道系数${r.traj_factor.toFixed(2)}）— 已填入上方文本框，可手动修改。`;
+      `估算拦截率（单发）= ${pkR.pk.toFixed(2)}（基线0.75 × 速度系数${pkR.speed_factor.toFixed(2)} × 舰载雷达增益${pkR.ship_radar_factor.toFixed(2)} × 导引头增益${pkR.seeker_factor.toFixed(2)} × RCS系数${pkR.rcs_factor.toFixed(2)} × 抗干扰系数${pkR.ecm_factor.toFixed(2)} × 弹道系数${pkR.traj_factor.toFixed(2)}）— 已填入下方「单发拦截成功概率」，可手动修改。`;
   } catch (e) {
-    $('pkEstBreakdown').textContent = String(e.message || e);
+    const msg = String(e.message || e);
+    $('distBreakdown').textContent = msg;
+    $('pkEstBreakdown').textContent = '';
     $('statusTag').textContent = 'ERROR';
   } finally {
     btn.disabled = false;
@@ -451,8 +443,7 @@ async function main() {
     $('placeholder').textContent = String(e.message || e);
     return;
   }
-  $('distBtn').addEventListener('click', onEstimateDistance);
-  $('estBtn').addEventListener('click', onEstimatePk);
+  $('estimateBtn').addEventListener('click', onEstimateDistanceAndPk);
   $('runBtn').addEventListener('click', onRun);
   // 预加载引擎后自动跑一次默认参数
   onRun();

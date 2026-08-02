@@ -30,7 +30,7 @@
     {
       "id": "saturation",
       "name": "饱和打击 / 反导拦截仿真",
-      "subtitle": "蒙特卡洛弹药分配 · 探测距离与 Pk 估算",
+      "subtitle": "蒙特卡洛弹药分配 · 交战距离与拦截率估算",
       "html": "saturation-strike.html",
       "miniprogram_page": "/pages/saturation/saturation",
       "ios_route": "saturation"

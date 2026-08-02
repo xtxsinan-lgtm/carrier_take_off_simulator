@@ -129,28 +129,23 @@ Page({
     };
   },
 
-  onEstimateDistance() {
-    api.runSaturationSimulation({ action: 'estimate_distance', params: this.estimateParams() })
-      .then((r) => {
-        if (!r.success) throw new Error(r.error || '估算失败');
-        this.setData({
-          discoveryKm: fmt(r.engage_dist, 1),
-          distNote: `交战距离 ${fmt(r.engage_dist, 1)} km（受限于：${r.binding}）`,
+  /** 一次估算交战距离与单发拦截成功概率，填入按钮下方两字段。 */
+  onEstimateDistanceAndPk() {
+    const params = this.estimateParams();
+    api.runSaturationSimulation({ action: 'estimate_distance', params })
+      .then((dist) => {
+        if (!dist.success) throw new Error(dist.error || '交战距离估算失败');
+        return api.runSaturationSimulation({ action: 'estimate_pk', params }).then((pkR) => {
+          if (!pkR.success) throw new Error(pkR.error || '拦截率估算失败');
+          this.setData({
+            discoveryKm: fmt(dist.engage_dist, 1),
+            distNote: `交战距离 ${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`,
+            pk: fmt(pkR.pk, 2),
+            pkNote: `估算拦截率（单发）= ${fmt(pkR.pk, 2)}`,
+          });
         });
       })
-      .catch((e) => this.setData({ distNote: String(e.message || e) }));
-  },
-
-  onEstimatePk() {
-    api.runSaturationSimulation({ action: 'estimate_pk', params: this.estimateParams() })
-      .then((r) => {
-        if (!r.success) throw new Error(r.error || '估算失败');
-        this.setData({
-          pk: fmt(r.pk, 2),
-          pkNote: `估算 Pk = ${fmt(r.pk, 2)}`,
-        });
-      })
-      .catch((e) => this.setData({ pkNote: String(e.message || e) }));
+      .catch((e) => this.setData({ distNote: String(e.message || e), pkNote: '' }));
   },
 
   onRun() {

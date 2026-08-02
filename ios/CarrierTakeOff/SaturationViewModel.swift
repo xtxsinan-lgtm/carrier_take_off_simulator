@@ -120,44 +120,37 @@ final class SaturationViewModel: ObservableObject {
         ]
     }
 
-    func estimateDistance() async {
+    /// 一次估算交战距离与单发拦截成功概率，填入按钮下方两字段。
+    func estimateDistanceAndPk() async {
         statusTag = "COMPUTING"
         do {
-            let r = try await LocalSimulatorEngine.shared.runSaturation(payload: [
+            let params = estimateParams()
+            let distR = try await LocalSimulatorEngine.shared.runSaturation(payload: [
                 "action": "estimate_distance",
-                "params": estimateParams(),
+                "params": params,
             ])
-            guard r.success, let dist = r.engage_dist else {
+            guard distR.success, let dist = distR.engage_dist else {
                 throw NSError(domain: "Saturation", code: 1, userInfo: [
-                    NSLocalizedDescriptionKey: r.error ?? "估算失败",
+                    NSLocalizedDescriptionKey: distR.error ?? "交战距离估算失败",
+                ])
+            }
+            let pkR = try await LocalSimulatorEngine.shared.runSaturation(payload: [
+                "action": "estimate_pk",
+                "params": params,
+            ])
+            guard pkR.success, let value = pkR.pk else {
+                throw NSError(domain: "Saturation", code: 1, userInfo: [
+                    NSLocalizedDescriptionKey: pkR.error ?? "拦截率估算失败",
                 ])
             }
             discoveryKm = String(format: "%.1f", dist)
-            distNote = "交战距离 \(String(format: "%.1f", dist)) km（\(r.binding ?? "")）"
+            distNote = "交战距离 \(String(format: "%.1f", dist)) km（\(distR.binding ?? "")）"
+            pk = String(format: "%.2f", value)
+            pkNote = "估算拦截率（单发）= \(String(format: "%.2f", value))"
             statusTag = "READY"
         } catch {
             distNote = error.localizedDescription
-            statusTag = "ERROR"
-        }
-    }
-
-    func estimatePk() async {
-        statusTag = "COMPUTING"
-        do {
-            let r = try await LocalSimulatorEngine.shared.runSaturation(payload: [
-                "action": "estimate_pk",
-                "params": estimateParams(),
-            ])
-            guard r.success, let value = r.pk else {
-                throw NSError(domain: "Saturation", code: 1, userInfo: [
-                    NSLocalizedDescriptionKey: r.error ?? "估算失败",
-                ])
-            }
-            pk = String(format: "%.2f", value)
-            pkNote = "估算 Pk = \(String(format: "%.2f", value))"
-            statusTag = "READY"
-        } catch {
-            pkNote = error.localizedDescription
+            pkNote = ""
             statusTag = "ERROR"
         }
     }
