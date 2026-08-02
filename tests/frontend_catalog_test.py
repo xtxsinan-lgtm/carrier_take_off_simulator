@@ -39,6 +39,7 @@ def test_build_catalog_payload_modes():
 
 def test_docs_saturation_page_exists_and_links():
     """饱和打击 HTML 页存在，并与起飞页互链。"""
+    import re
     from utils.paths import ROOT
 
     sat = ROOT / 'docs' / 'saturation-strike.html'
@@ -48,10 +49,16 @@ def test_docs_saturation_page_exists_and_links():
     assert (ROOT / 'docs' / 'css' / 'saturation.css').is_file()
     sat_html = sat.read_text(encoding='utf-8')
     index_html = index.read_text(encoding='utf-8')
+    sat_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
     assert 'saturation.js' in sat_html
     assert 'index.html' in sat_html
     assert 'saturation-strike.html' in index_html
-    assert 'run_saturation_json' in (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
+    assert 'run_saturation_json' in sat_js
+    assert 'rerunRequested' in sat_js
+    ver_js = re.search(r'const APP_VERSION\s*=\s*(\d+)', sat_js)
+    ver_html = re.search(r'saturation\.js\?v=(\d+)', sat_html)
+    assert ver_js and ver_html
+    assert ver_js.group(1) == ver_html.group(1)
 
 
 def test_web_simulator_modes_match_frontend_catalog():

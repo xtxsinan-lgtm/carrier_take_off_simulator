@@ -154,6 +154,12 @@ Page({
   },
 
   onRun() {
+    if (this.data.running) {
+      this._rerunRequested = true;
+      this.setData({ statusTag: 'QUEUED', statusText: '已排队，当前轮结束后用新参数重算…' });
+      return;
+    }
+    this._rerunRequested = false;
     const d = this.data;
     this.setData({ running: true, statusText: '计算中…', statusTag: 'COMPUTING' });
     const payload = {
@@ -173,6 +179,10 @@ Page({
       .then((r) => {
         if (!r.success) throw new Error(r.error || '仿真失败');
         this.applyResult(r);
+        if (this._rerunRequested) {
+          this._rerunRequested = false;
+          this.onRun();
+        }
       })
       .catch((e) => {
         this.setData({
@@ -181,6 +191,10 @@ Page({
           statusText: String(e.message || e),
           hasResult: false,
         });
+        if (this._rerunRequested) {
+          this._rerunRequested = false;
+          this.onRun();
+        }
       });
   },
 

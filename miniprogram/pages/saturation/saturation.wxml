@@ -127,7 +127,7 @@
       <input class="input" type="digit" value="{{minr}}" data-key="minr" bindinput="onField"/>
     </view>
 
-    <view class="btn" bindtap="onRun" disabled="{{running}}">{{running ? '计算中…' : '▶ 运行仿真'}}</view>
+    <view class="btn" bindtap="onRun">{{running ? (statusTag === 'QUEUED' ? '已排队…' : '计算中…') : '▶ 运行仿真'}}</view>
     <view class="note">{{statusText}}</view>
   </view>
 

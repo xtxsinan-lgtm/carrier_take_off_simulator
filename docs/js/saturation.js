@@ -3,7 +3,7 @@
  */
 const PYODIDE_VERSION = '0.26.4';
 /** 与 saturation-strike.html 中 ?v= 同步递增 */
-const APP_VERSION = 1;
+const APP_VERSION = 2;
 
 /** 仅加载饱和打击相关 Python 模块（无需 numpy） */
 const SATURATION_PY_FILES = [
@@ -31,6 +31,9 @@ let data = null;
 let pyodide = null;
 let pyReady = false;
 let chartRef = null;
+/** 防止重入；计算中再次点击则排队用最新参数再跑一轮 */
+let runLock = false;
+let rerunRequested = false;
 
 function $(id) {
   return document.getElementById(id);
@@ -155,6 +158,18 @@ json.dumps(run_saturation_json(_sat_payload), ensure_ascii=False)
   return JSON.parse(raw);
 }
 
+/** 异步调用 Python，便于在计算前刷新「计算中」UI */
+async function callPythonAsync(action, params) {
+  const payload = JSON.stringify({ action, params });
+  pyodide.globals.set('_sat_payload', payload);
+  const raw = await pyodide.runPythonAsync(`
+import json
+from apps.saturation_strike_web import run_saturation_json
+json.dumps(run_saturation_json(_sat_payload), ensure_ascii=False)
+`);
+  return JSON.parse(raw);
+}
+
 function collectEstimateParams() {
   return {
     rcs: +$('rcs').value,
@@ -270,56 +285,66 @@ function renderResults(r) {
   }
   tbodyP.innerHTML = rows;
 
-  const ctx = $('survivorChart').getContext('2d');
-  if (chartRef) chartRef.destroy();
-  const labels = ['发现'].concat(windows.map((w) => '窗口#' + w.round + '后'));
-  chartRef = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '预期剩余来袭导弹数',
-          data: avgSurvivors,
-          borderColor: '#ff4d4f',
-          backgroundColor: 'rgba(255,77,79,0.12)',
-          fill: true,
-          tension: 0.25,
-          pointRadius: 3,
-          pointBackgroundColor: '#ff4d4f',
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#7b8e92', font: { family: 'monospace', size: 10 } } } },
-      scales: {
-        x: { ticks: { color: '#7b8e92', font: { family: 'monospace', size: 9 } }, grid: { color: '#1c2b30' } },
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#7b8e92', font: { family: 'monospace', size: 9 } },
-          grid: { color: '#1c2b30' },
+  const canvas = $('survivorChart');
+  if (chartRef) {
+    chartRef.destroy();
+    chartRef = null;
+  }
+  if (canvas && typeof Chart !== 'undefined' && avgSurvivors.length) {
+    const ctx = canvas.getContext('2d');
+    const labels = ['发现'].concat(windows.map((w) => '窗口#' + w.round + '后'));
+    chartRef = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: '预期剩余来袭导弹数',
+            data: avgSurvivors,
+            borderColor: '#ff4d4f',
+            backgroundColor: 'rgba(255,77,79,0.12)',
+            fill: true,
+            tension: 0.25,
+            pointRadius: 3,
+            pointBackgroundColor: '#ff4d4f',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#7b8e92', font: { family: 'monospace', size: 10 } } } },
+        scales: {
+          x: { ticks: { color: '#7b8e92', font: { family: 'monospace', size: 9 } }, grid: { color: '#1c2b30' } },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#7b8e92', font: { family: 'monospace', size: 9 } },
+            grid: { color: '#1c2b30' },
+          },
         },
       },
-    },
-  });
+    });
+  }
 
   const theadS = document.querySelector('#strategyTable thead');
   const tbodyS = document.querySelector('#strategyTable tbody');
   theadS.innerHTML = '<tr><th>策略</th><th>各轮弹药分配</th><th>期望突防导弹数</th><th>相对最优方案</th></tr>';
-  const minScore = allCandidates[0].expected_leak;
-  const bestKey = best.plan.join(',');
-  tbodyS.innerHTML = allCandidates
-    .map((c) => {
-      const isBest = c.name === best.name && c.plan.join(',') === bestKey;
-      return `<tr class="${isBest ? 'best' : ''}">
+  if (!allCandidates.length) {
+    tbodyS.innerHTML = '';
+  } else {
+    const minScore = allCandidates[0].expected_leak;
+    const bestKey = best.plan.join(',');
+    tbodyS.innerHTML = allCandidates
+      .map((c) => {
+        const isBest = c.name === best.name && c.plan.join(',') === bestKey;
+        return `<tr class="${isBest ? 'best' : ''}">
         <td>${isBest ? '★ ' : ''}${c.name}</td>
         <td>[${c.plan.join(', ')}]</td>
         <td>${fmt(c.expected_leak, 2)}</td>
         <td>${isBest ? '—' : '+' + fmt(c.expected_leak - minScore, 2)}</td>
       </tr>`;
-    })
-    .join('');
+      })
+      .join('');
+  }
 
   $('finalNote').textContent = r.note || '';
 }
@@ -366,12 +391,27 @@ async function onEstimatePk() {
 
 async function onRun() {
   const btn = $('runBtn');
+  // 计算进行中再次点击：排队，结束后用最新表单参数再跑
+  if (runLock) {
+    rerunRequested = true;
+    $('statusTag').textContent = 'QUEUED';
+    btn.textContent = '▶ 已排队，稍后重算…';
+    return;
+  }
+  runLock = true;
+  rerunRequested = false;
   btn.disabled = true;
-  btn.textContent = '▶ 计算中...';
-  $('statusTag').textContent = 'COMPUTING';
   try {
-    await ensureEngine();
-    const r = callPython('simulate', collectSimParams());
+    if (!pyReady) {
+      btn.textContent = '▶ 加载引擎中…';
+      $('statusTag').textContent = 'LOADING';
+      await ensureEngine();
+    }
+    btn.textContent = '▶ 计算中…';
+    $('statusTag').textContent = 'COMPUTING';
+    // 让浏览器先绘制按钮/状态，再进入阻塞式蒙特卡洛
+    await new Promise((r) => setTimeout(r, 40));
+    const r = await callPythonAsync('simulate', collectSimParams());
     if (!r.success) throw new Error(r.error || '仿真失败');
     renderResults(r);
   } catch (e) {
@@ -380,8 +420,14 @@ async function onRun() {
     $('placeholder').textContent = String(e.message || e);
     $('resultsBody').style.display = 'none';
   } finally {
+    runLock = false;
     btn.disabled = false;
     btn.textContent = '▶ 运行仿真 / RUN';
+    if (rerunRequested) {
+      rerunRequested = false;
+      // 用用户改过的最新参数再跑一轮
+      setTimeout(() => onRun(), 0);
+    }
   }
 }
 
