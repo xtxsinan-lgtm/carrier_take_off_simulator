@@ -21,7 +21,8 @@ description: >-
 - [ ] 已 git add 本次相关文件（不含日志、临时输出、密钥）
 - [ ] 已 git commit（HEREDOC 提交信息）
 - [ ] 已 git push origin HEAD
-- [ ] 已向用户确认 push 的分支与远程 URL
+- [ ] 若改动影响含 RPC/HTTP 的后端（小程序 API 等）：已按 restart-rpc-services 重启本地服务
+- [ ] 已向用户确认 push 的分支与远程 URL（及 RPC 服务是否已重启）
 ```
 
 ## 工作流
@@ -105,6 +106,7 @@ git push -u origin HEAD
 ## 与其他规范的关系
 
 - 与 `simulator-dev-rules` 同时生效：先满足测试与中文注释，再 push
+- 与 `restart-rpc-services` 同时生效：若改动了小程序所依赖的后端，push 后还须重启含 RPC 的本地 API
 - 本 skill 的 push 要求**优先于**「未明确要求则不 commit/push」的通用规则（仅限本仓库）
 
 ## 反例（禁止）

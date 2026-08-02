@@ -23,6 +23,7 @@ description: >-
 - [ ] 注释、docstring、行内说明均为中文（模块 docstring 亦用中文）
 - [ ] 若改了 utils/simulators/CSV：已运行 python3 scripts/build_all.py
 - [ ] 已运行 python3 -m pytest tests/ -m "not e2e" -q（含前端产物同步检查）
+- [ ] 若改动影响含 RPC 的后端（小程序 API）：按 restart-rpc-services 重启本地服务
 ```
 
 **禁止手改**（一律由 build 生成）：
