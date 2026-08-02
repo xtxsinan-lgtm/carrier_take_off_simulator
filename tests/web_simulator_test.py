@@ -1,0 +1,119 @@
+"""Unit tests for web_simulator.py."""
+import json
+
+import pytest
+
+from apps.web_simulator import (
+    compute_aircraft_aero,
+    filter_aircraft_for_mode,
+    filter_carriers_for_mode,
+    resolve_ski_jump_geom,
+    run_simulation,
+    run_simulation_json,
+)
+from utils.database_csv import load_aircraft_csv, load_carriers_csv
+from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV
+
+
+@pytest.fixture(scope='module')
+def aircraft():
+    return load_aircraft_csv(AIRCRAFT_CSV)
+
+
+@pytest.fixture(scope='module')
+def carriers():
+    return load_carriers_csv(CARRIERS_CSV)
+
+
+def test_resolve_ski_jump_from_height():
+    geom = resolve_ski_jump_geom(12.0, height_m=5.099)
+    assert geom['lip_height_m'] == pytest.approx(5.099)
+    assert geom['arc_length_m'] > 0
+
+
+def test_resolve_ski_jump_from_arc_length():
+    geom = resolve_ski_jump_geom(12.0, arc_length_m=41.9)
+    assert geom['arc_length_m'] == pytest.approx(41.9)
+    assert geom['lip_height_m'] > 0
+
+
+def test_filter_carriers_ski_jump_mode(carriers):
+    ids = {c.id for c in filter_carriers_for_mode('ski_jump', carriers)}
+    assert 'SHANDONG' in ids
+    assert 'WASP' not in ids
+
+
+def test_filter_aircraft_short_takeoff(aircraft):
+    ac = filter_aircraft_for_mode('short_takeoff', list(aircraft.values()))
+    assert len(ac) == 2
+    ids = {a.id for a in ac}
+    assert ids == {'F-35B', 'AV-8B'}
+
+
+def test_compute_aircraft_aero_j15(aircraft):
+    aero = compute_aircraft_aero(aircraft['J-15'])
+    assert aero['aspect_ratio'] == pytest.approx(14.7 ** 2 / 67.84)
+    assert aero['cl_20deg'] > aero['cl_taxi']
+
+
+def test_run_simulation_ski_jump_j15(aircraft, carriers):
+    carrier = next(c for c in carriers if c.id == 'SHANDONG')
+    ac = aircraft['J-15']
+    result = run_simulation(
+        'ski_jump', ac, carrier, ac.a2a_mass_kg, 30.0, carrier.max_speed_kt,
+    )
+    assert result['success'] is True
+    assert result['distance_m'] == pytest.approx(85.6, rel=0.02)
+    assert result['deck_launch_ok'] is True
+    assert result['plume_applicable'] is False
+    assert result['min_plume_trailing_edge_m'] is None
+    assert result['trajectory']
+    assert result['deck_profile']
+    assert result['trajectory'][0]['phase'] == 'flat'
+    assert any(p['phase'] == 'arc' for p in result['trajectory'])
+
+
+def test_run_simulation_short_takeoff_no_trajectory(aircraft, carriers):
+    carrier = next(c for c in carriers if c.id == 'WASP')
+    ac = aircraft['F-35B']
+    result = run_simulation(
+        'short_takeoff', ac, carrier, ac.a2a_mass_kg, 30.0, 22.0,
+    )
+    assert result['success'] is True
+    assert result['plume_applicable'] is True
+    assert result['min_plume_trailing_edge_m'] is not None
+    assert result['trajectory'] is None
+    assert result['deck_profile'] is None
+
+
+def test_run_simulation_json_string(aircraft, carriers):
+    carrier = next(c for c in carriers if c.id == 'WASP')
+    ac = aircraft['F-35B']
+    payload = {
+        'mode': 'short_takeoff',
+        'aircraft': {
+            'id': ac.id, 'name': ac.name, 'type_label': ac.type_label,
+            'mtow_kg': ac.mtow_kg, 'empty_kg': ac.empty_kg,
+            'internal_fuel_kg': ac.internal_fuel_kg,
+            'bvr_missile': ac.bvr_missile, 'missile_mass_kg': ac.missile_mass_kg,
+            'sweep_le_deg': ac.sweep_le_deg, 'wingspan_m': ac.wingspan_m,
+            'wing_area_m2': ac.wing_area_m2, 'wing_height_m': ac.wing_height_m,
+            'cd0': ac.cd0,
+            't_main_stovl_sl_n': ac.t_main_stovl_sl_n,
+            't_liftfan_sl_n': ac.t_liftfan_sl_n,
+            't_rollposts_sl_n': ac.t_rollposts_sl_n,
+        },
+        'carrier': {
+            'id': carrier.id, 'name': carrier.name, 'nation': carrier.nation,
+            'max_speed_kt': carrier.max_speed_kt, 'ski_jump': carrier.ski_jump,
+            'total_deck_length_m': carrier.total_deck_length_m,
+            'ski_jump_angle_deg': carrier.ski_jump_angle_deg,
+            'f35b_capable': carrier.f35b_capable,
+        },
+        'mass_kg': ac.a2a_mass_kg,
+        'temp_c': 30.0,
+        'wind_kt': 22.0,
+    }
+    result = run_simulation_json(json.dumps(payload))
+    assert result['success'] is True
+    assert result['distance_m'] == pytest.approx(52.4, rel=0.05)
