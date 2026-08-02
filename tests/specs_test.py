@@ -35,6 +35,19 @@ def test_max_payload_kg_wikipedia_sourced_types():
     assert aircraft['F-14'].max_payload_kg == 6700
 
 
+def test_carrier_deck_wind_defaults_to_max_speed():
+    """默认甲板风等于航母最大航速。"""
+    from utils.database_csv import load_carriers_csv
+    from utils.paths import CARRIERS_CSV
+
+    wasp = next(c for c in load_carriers_csv(CARRIERS_CSV) if c.id == 'WASP')
+    assert wasp.ski_jump is False
+    assert wasp.deck_wind_kt() == wasp.max_speed_kt
+
+    shandong = next(c for c in load_carriers_csv(CARRIERS_CSV) if c.id == 'SHANDONG')
+    assert shandong.deck_wind_kt() == shandong.max_speed_kt
+
+
 def test_carrier_ski_jump_geom():
     from utils.database_csv import load_carriers_csv
     from utils.paths import CARRIERS_CSV

@@ -133,6 +133,12 @@ function modeHasTrajectory(mode) {
   return mode === 'ski_jump' || mode === 'short_ski_jump';
 }
 
+/** 默认甲板风 = 航母最大航速 (kt) */
+function defaultDeckWindKt(carrier) {
+  if (!carrier || carrier.max_speed_kt == null || carrier.max_speed_kt === '') return null;
+  return Number(carrier.max_speed_kt);
+}
+
 module.exports = {
   computeSkiJumpArc,
   resolveCarrierSkiJump,
@@ -149,4 +155,5 @@ module.exports = {
   fmtInt,
   modeNeedsSkiJump,
   modeHasTrajectory,
+  defaultDeckWindKt,
 };

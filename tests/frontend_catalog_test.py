@@ -39,6 +39,14 @@ def test_render_esm_and_cjs_contain_injected_constants():
     assert '请勿手改' in esm and '请勿手改' in cjs
 
 
+def test_render_includes_default_deck_wind_helper():
+    from scripts.generate_frontend_physics import render_cjs
+
+    text = render_cjs()
+    assert 'function defaultDeckWindKt' in text
+    assert 'max_speed_kt' in text
+
+
 def test_load_constants_positive():
     c = _load_constants()
     assert c['SKI_JUMP_REF_RADIUS_M'] > 0

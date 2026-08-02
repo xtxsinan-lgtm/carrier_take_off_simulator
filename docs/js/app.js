@@ -2,6 +2,7 @@ import {
   a2aMassKg,
   computeAircraftAero,
   computeSkiJumpArc,
+  defaultDeckWindKt,
   filterAircraftForMode,
   filterCarriersForMode,
   fmtInt,
@@ -11,7 +12,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 10;
+const APP_VERSION = 11;
 
 let data = null;
 let pyodide = null;
@@ -163,8 +164,9 @@ function updateCarrierInfo() {
     !modeNeedsSkiJump(currentMode) || !c.ski_jump
   );
 
-  if (c.ski_jump && !els.windInput.dataset.userEdited) {
-    els.windInput.value = c.max_speed_kt;
+  if (!els.windInput.dataset.userEdited) {
+    const wind = defaultDeckWindKt(c);
+    if (wind != null) els.windInput.value = wind;
   }
 }
 

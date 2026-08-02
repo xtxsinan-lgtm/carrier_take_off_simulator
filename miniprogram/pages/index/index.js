@@ -11,6 +11,7 @@ const {
   fmtInt,
   modeNeedsSkiJump,
   modeHasTrajectory,
+  defaultDeckWindKt,
 } = require('../../utils/physics.js');
 const { trajectoryCanvasHeightRpx } = require('../../utils/responsive.js');
 const config = require('../../config.js');
@@ -34,7 +35,7 @@ Page({
     skiArcLength: '',
     skiHeight: '',
     skiHorizontal: '—',
-    windKt: '30',
+    windKt: '',
     tempC: '30',
     massKg: '',
     statusText: '',
@@ -183,8 +184,9 @@ Page({
       ...skiPatch,
     };
 
-    if (c.ski_jump && !this._windUserEdited) {
-      patch.windKt = String(c.max_speed_kt);
+    if (!this._windUserEdited) {
+      const wind = defaultDeckWindKt(c);
+      if (wind != null) patch.windKt = String(wind);
     }
 
     this.setData(patch, () => {
