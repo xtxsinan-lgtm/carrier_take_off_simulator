@@ -11,7 +11,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 9;
+const APP_VERSION = 10;
 
 let data = null;
 let pyodide = null;
@@ -243,6 +243,23 @@ function hideTrajectory() {
   if (els.trajectoryMeta) els.trajectoryMeta.textContent = '';
 }
 
+function xAxisStepM(maxX) {
+  if (maxX <= 80) return 10;
+  if (maxX <= 200) return 20;
+  if (maxX <= 400) return 50;
+  return 100;
+}
+
+function resolveTakeoffX(result, deckPts, traj) {
+  const deckExit = traj.find((p) => p.phase === 'deck_exit');
+  if (deckExit) return deckExit.x;
+  if (result.deck_profile?.takeoff_distance_m != null) {
+    return result.deck_profile.takeoff_distance_m;
+  }
+  if (result.distance_m != null) return result.distance_m;
+  return deckPts[deckPts.length - 1][0];
+}
+
 function paintTrajectoryCanvas(result) {
   const canvas = els.trajectoryCanvas;
   const ctx = canvas.getContext('2d');
@@ -256,16 +273,19 @@ function paintTrajectoryCanvas(result) {
 
   const deckPts = result.deck_profile.points;
   const traj = result.trajectory;
-  const deckLen = result.deck_profile.total_deck_length_m || deckPts[deckPts.length - 1][0];
+  const takeoffX = resolveTakeoffX(result, deckPts, traj);
+  const takeoffLabelM = result.distance_m ?? result.deck_profile?.takeoff_distance_m ?? takeoffX;
+  const carrierDeckM = result.deck_profile.total_deck_length_m;
 
-  const xs = [...deckPts.map((p) => p[0]), ...traj.map((p) => p.x), deckLen];
+  const xs = [...deckPts.map((p) => p[0]), ...traj.map((p) => p.x), takeoffX];
+  if (carrierDeckM) xs.push(carrierDeckM);
   const ys = [...deckPts.map((p) => p[1]), ...traj.map((p) => p.y)];
   const minX = 0;
-  const maxX = Math.max(...xs, 1) * 1.05;
+  const maxX = Math.max(...xs, 1) * 1.08;
   const minY = Math.min(0, ...ys) - 2;
   const maxY = Math.max(...ys, result.deck_profile.lip_height_m || 0, 1) + 8;
 
-  const pad = { l: 48, r: 16, t: 16, b: 36 };
+  const pad = { l: 48, r: 16, t: 28, b: 44 };
   const plotW = cssW - pad.l - pad.r;
   const plotH = cssH - pad.t - pad.b;
 
@@ -278,7 +298,8 @@ function paintTrajectoryCanvas(result) {
 
   ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
   ctx.lineWidth = 1;
-  for (let gx = 0; gx <= maxX; gx += 20) {
+  const xStep = xAxisStepM(maxX);
+  for (let gx = 0; gx <= maxX; gx += xStep) {
     ctx.beginPath();
     ctx.moveTo(toX(gx), pad.t);
     ctx.lineTo(toX(gx), pad.t + plotH);
@@ -294,7 +315,13 @@ function paintTrajectoryCanvas(result) {
   ctx.fillStyle = '#94a3b8';
   ctx.font = '11px system-ui, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('水平距离 (m)', pad.l + plotW / 2, cssH - 8);
+  ctx.textBaseline = 'top';
+  for (let gx = 0; gx <= maxX; gx += xStep) {
+    ctx.fillText(String(Math.round(gx)), toX(gx), pad.t + plotH + 6);
+  }
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('水平距离 (m)', pad.l + plotW / 2, cssH - 6);
   ctx.save();
   ctx.translate(14, pad.t + plotH / 2);
   ctx.rotate(-Math.PI / 2);
@@ -311,10 +338,16 @@ function paintTrajectoryCanvas(result) {
   ctx.lineWidth = 1.5;
   ctx.setLineDash([4, 4]);
   ctx.beginPath();
-  ctx.moveTo(toX(deckLen), pad.t);
-  ctx.lineTo(toX(deckLen), pad.t + plotH);
+  ctx.moveTo(toX(takeoffX), pad.t);
+  ctx.lineTo(toX(takeoffX), pad.t + plotH);
   ctx.stroke();
   ctx.setLineDash([]);
+
+  ctx.fillStyle = '#f87171';
+  ctx.font = '600 11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(`滑跑 ${fmtNum(takeoffLabelM, 1)} m`, toX(takeoffX), pad.t - 6);
 
   ctx.strokeStyle = '#64748b';
   ctx.lineWidth = 3;
@@ -346,9 +379,11 @@ function paintTrajectoryCanvas(result) {
   ctx.stroke();
 
   const first = traj[0];
+  const deckExit = traj.find((p) => p.phase === 'deck_exit');
   const last = traj[traj.length - 1];
   for (const [pt, color] of [
     [first, '#4ade80'],
+    ...(deckExit ? [[deckExit, '#fb923c']] : []),
     [last, '#fbbf24'],
   ]) {
     ctx.fillStyle = color;
@@ -369,9 +404,13 @@ function drawTrajectory(result) {
   }
 
   els.trajectorySection.classList.remove('hidden');
+  const deckPts = result.deck_profile.points;
+  const takeoffX = resolveTakeoffX(result, deckPts, result.trajectory);
+  const takeoffLabelM = result.distance_m ?? result.deck_profile?.takeoff_distance_m ?? takeoffX;
   if (els.trajectoryMeta) {
     els.trajectoryMeta.textContent =
-      `共 ${result.trajectory.length} 个采样点，` +
+      `滑跑距离 ${fmtNum(takeoffLabelM, 1)} m · ` +
+      `${result.trajectory.length} 个采样点 · ` +
       `最大高度 ${fmtNum(Math.max(...result.trajectory.map((p) => p.y)), 1)} m`;
   }
 

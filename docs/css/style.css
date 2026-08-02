@@ -341,3 +341,21 @@ footer {
   height: 0.65rem;
   width: 0.35rem;
 }
+
+.swatch.marker {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+}
+
+.swatch.marker.start {
+  background: #4ade80;
+}
+
+.swatch.marker.exit {
+  background: #fb923c;
+}
+
+.swatch.marker.end {
+  background: #fbbf24;
+}

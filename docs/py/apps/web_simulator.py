@@ -252,6 +252,11 @@ def _capture_trajectory(mode: str, mod, result: dict, deck_length_m: float) -> t
         )
     deck = build_deck_profile(flat_m, mod.SKI_JUMP_ARC)
     deck['total_deck_length_m'] = float(deck_length_m)
+    takeoff_m = result.get('distance_m') or result.get('total_m')
+    if takeoff_m is not None:
+        deck['takeoff_distance_m'] = float(takeoff_m)
+    elif deck['points']:
+        deck['takeoff_distance_m'] = float(deck['points'][-1][0])
     return traj, deck
 
 

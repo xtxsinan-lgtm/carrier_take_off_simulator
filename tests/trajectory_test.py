@@ -74,7 +74,9 @@ def test_capture_trajectory_ski_jump(aircraft, carriers):
     assert traj
     assert len(traj) >= 5
     assert deck['total_deck_length_m'] == carrier.total_deck_length_m
+    assert deck['takeoff_distance_m'] == pytest.approx(result['total_m'], rel=0.001)
     assert deck['points'][0] == [0.0, 0.0]
+    assert deck['points'][-1][0] == pytest.approx(deck['takeoff_distance_m'], rel=0.01)
 
 
 def test_capture_trajectory_non_ski_mode():
