@@ -1,13 +1,14 @@
 /**
- * 与 takeoff_physics.py 一致的气动与滑跃几何（浏览器端即时显示用）。
- * 从 docs/js/physics.js 移植，供小程序本地参数预览。
+ * 前端气动与滑跃几何预览 — 由 scripts/generate_frontend_physics.py 自动生成。
+ * 请勿手改；修改物理请改 Python（utils/）后运行 python3 scripts/build_all.py。
  */
-const SKI_JUMP_REF_RADIUS_M = 200;
-const FLAP_DEFLECTION_DEG = 20;
+const SKI_JUMP_REF_RADIUS_M = 200.0;
+const FLAP_DEFLECTION_DEG = 20.0;
 const FLAP_EFFICIENCY = 0.5;
-const WING_INCIDENCE_DEG = 2;
-const PILOT_LOAD_KG = 100;
+const WING_INCIDENCE_DEG = 2.0;
+const PILOT_LOAD_KG = 100.0;
 const A2A_MISSILE_COUNT = 4;
+const PITCH_MAX_DEG = 20.0;
 
 function computeSkiJumpArc(angleDeg, lipHeightM = null, arcLengthM = null) {
   if (angleDeg <= 0) throw new Error('滑跃角必须为正');
@@ -78,13 +79,18 @@ function computeAircraftAero(ac) {
     cl_alpha_per_rad: clAlpha,
     taxi_alpha_deg: alphaTaxi,
     cl_taxi: calcClFromAlphaDeg(alphaTaxi, clAlpha),
-    cl_20deg: calcClFromAlphaDeg(20, clAlpha),
+    cl_20deg: calcClFromAlphaDeg(PITCH_MAX_DEG, clAlpha),
     cd0: ac.cd0,
   };
 }
 
 function a2aMassKg(ac) {
-  return ac.empty_kg + ac.internal_fuel_kg + A2A_MISSILE_COUNT * ac.missile_mass_kg + PILOT_LOAD_KG;
+  return (
+    ac.empty_kg +
+    ac.internal_fuel_kg +
+    A2A_MISSILE_COUNT * ac.missile_mass_kg +
+    PILOT_LOAD_KG
+  );
 }
 
 function maxPayloadKg(ac) {
@@ -130,6 +136,10 @@ function modeHasTrajectory(mode) {
 module.exports = {
   computeSkiJumpArc,
   resolveCarrierSkiJump,
+  calcOswaldE,
+  calcClAlpha,
+  calcClFromAlphaDeg,
+  taxiAlphaDeg,
   computeAircraftAero,
   a2aMassKg,
   maxPayloadKg,

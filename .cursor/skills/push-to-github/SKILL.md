@@ -17,7 +17,7 @@ description: >-
 
 ```
 - [ ] 相关测试已通过（至少 python3 -m pytest tests/ -m "not e2e" -q）
-- [ ] 若改动影响 Web/Pyodide：已运行 python3 scripts/build_docs.py
+- [ ] 若改动影响 Web/Pyodide/小程序：已运行 python3 scripts/build_all.py
 - [ ] 已 git add 本次相关文件（不含日志、临时输出、密钥）
 - [ ] 已 git commit（HEREDOC 提交信息）
 - [ ] 已 git push origin HEAD
@@ -38,18 +38,23 @@ python3 -m pytest tests/ -m "not e2e" -q
 python3 run_tests.py
 ```
 
-### 2. 同步静态站点（按需）
+### 2. 同步静态产物（按需，推荐一键）
 
-以下任一情况必须重建 `docs/data.json` 后再提交：
+以下任一情况必须重建前端产物后再提交：
 
 - 修改了 `apps/`、`simulators/`、`utils/` 下 Python
 - 修改了 `data/aircraft_database.csv` 或 `data/carriers_database.csv`
-- 修改了 Web 前端且需与后端一致
+- 修改了前端预览物理逻辑（应改 Python 常量/公式，**勿手改** `docs/js/physics.js` / `miniprogram/utils/physics.js`）
 
 ```bash
-python3 scripts/build_docs.py
+python3 scripts/build_all.py
 ```
 
+这会依次：从 Python 生成两份 `physics.js` → 构建 `docs/data.json` + `docs/py` → 构建 `miniprogram/data/data.json`。
+
+也可单独运行：`generate_frontend_physics.py` / `build_docs.py` / `build_miniprogram.py`。
+
+测试会校验这些产物是否与源码同步；过期则 `pytest` 失败。
 ### 3. 提交
 
 并行查看状态：
@@ -106,4 +111,4 @@ git push -u origin HEAD
 
 - 改完代码、跑完测试，但不 commit/push 就结束对话
 - 只告诉用户「你可以自己 push」
-- push 前未运行 `build_docs.py` 导致 GitHub Pages 仍是旧版 Web
+- push 前未运行 `build_all.py` 导致 GitHub Pages / 小程序仍是旧版

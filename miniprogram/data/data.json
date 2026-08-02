@@ -2,7 +2,7 @@
   "version": 8,
   "pilot_load_kg": 100.0,
   "a2a_missile_count": 4,
-  "pitch_max_deg": 20,
+  "pitch_max_deg": 20.0,
   "modes": {
     "ski_jump": "滑跃起飞",
     "short_takeoff": "短距起飞",

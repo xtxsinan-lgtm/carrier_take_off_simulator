@@ -21,8 +21,16 @@ description: >-
 - [ ] 新增/修改的每个 function 都有对应 unit test
 - [ ] 若是功能改动，已补充 e2e test
 - [ ] 注释、docstring、行内说明均为中文（模块 docstring 亦用中文）
-- [ ] 已运行 python3 run_tests.py
+- [ ] 若改了 utils/simulators/CSV：已运行 python3 scripts/build_all.py
+- [ ] 已运行 python3 -m pytest tests/ -m "not e2e" -q（含前端产物同步检查）
 ```
+
+**禁止手改**（一律由 build 生成）：
+
+- `docs/js/physics.js`
+- `miniprogram/utils/physics.js`
+- `docs/data.json` / `docs/py/**`（由 `build_docs` 生成）
+- `miniprogram/data/data.json`（由 `build_miniprogram` 生成）
 
 ## 1. 单元测试
 

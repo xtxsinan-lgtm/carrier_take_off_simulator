@@ -16,11 +16,13 @@ miniprogram/
 
 ## 快速开始
 
-### 1. 生成数据
+### 1. 一键构建（推荐）
 
 ```bash
-python3 scripts/build_miniprogram.py
+python3 scripts/build_all.py
 ```
+
+会生成：`physics.js`（Web + 小程序）、`docs/data.json`、`miniprogram/data/data.json`。
 
 ### 2. 启动仿真 API（小程序无法运行 Pyodide，需后端）
 
@@ -51,6 +53,14 @@ module.exports = {
 - 将 `apiBaseUrl` 改为 **HTTPS 已备案域名**
 - 在微信公众平台配置 **request 合法域名**
 - 在 `project.config.json` 中填写真实 `appid`
+
+## 与 Web / Python 的同步
+
+- **仿真数值**：小程序 API 与网页 Pyodide 均调用同一 `apps/web_simulator.run_simulation_json`
+- **机库数据**：来自 `data/*.csv`，由 `build_all.py` 写入两端 `data.json`
+- **参数预览物理**：由 `generate_frontend_physics.py` 从 Python 常量生成，**禁止手改** `utils/physics.js`
+
+详见仓库根目录构建脚本与 `tests/frontend_build_sync_test.py`。
 
 ## 屏幕适配说明
 
