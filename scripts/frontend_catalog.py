@@ -11,6 +11,7 @@ MODES = {
     'ski_jump': '滑跃起飞',
     'short_takeoff': '短距起飞',
     'short_ski_jump': '短距滑跃起飞',
+    'tiltrotor_short_takeoff': '倾转短距起飞',
 }
 
 STOVL_STRATEGIES = {
@@ -19,14 +20,20 @@ STOVL_STRATEGIES = {
     'C': '策略 C — 尾流约束最优偏转',
 }
 
+TILTROTOR_STRATEGIES = {
+    'A': '策略 A — 延迟倾转短舱',
+    'B': '策略 B — 全程固定短舱角',
+}
+
 # data.json 结构版本；字段变更时递增
-DATA_VERSION = 10
+DATA_VERSION = 11
 
 _AIRCRAFT_KEYS = (
     'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg', 'max_payload_kg',
     'bvr_missile', 'missile_mass_kg', 'sweep_le_deg', 'wingspan_m', 'wing_area_m2',
     'wing_height_m', 'cd0', 't_max_sl_n', 't_main_stovl_sl_n', 't_liftfan_sl_n',
-    't_rollposts_sl_n', 'exhaust_mdot_kg_s', 'exhaust_d0_m', 'exhaust_height_m', 'notes',
+    't_rollposts_sl_n', 'exhaust_mdot_kg_s', 'exhaust_d0_m', 'exhaust_height_m',
+    'shaft_power_sl_w', 'prop_diameter_m', 'nacelle_blockage_frac', 'notes',
 )
 
 
@@ -62,6 +69,7 @@ def build_catalog_payload(aircraft: dict, carriers: list) -> dict:
         'pitch_max_deg': float(PITCH_MAX_DEG),
         'modes': dict(MODES),
         'stovl_strategies': dict(STOVL_STRATEGIES),
+        'tiltrotor_strategies': dict(TILTROTOR_STRATEGIES),
         'aircraft': [aircraft_to_dict(ac) for ac in aircraft.values()],
         'carriers': [carrier_to_dict(c) for c in carriers],
     }

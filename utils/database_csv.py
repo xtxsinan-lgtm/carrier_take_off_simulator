@@ -12,7 +12,8 @@ AIRCRAFT_CSV_COLUMNS = (
     'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg', 'max_payload_kg',
     'bvr_missile', 'missile_mass_kg', 'sweep_le_deg', 'wingspan_m', 'wing_area_m2',
     'wing_height_m', 'cd0', 't_max_sl_n', 't_main_stovl_sl_n', 't_liftfan_sl_n',
-    't_rollposts_sl_n', 'exhaust_mdot_kg_s', 'exhaust_d0_m', 'exhaust_height_m', 'notes',
+    't_rollposts_sl_n', 'exhaust_mdot_kg_s', 'exhaust_d0_m', 'exhaust_height_m',
+    'shaft_power_sl_w', 'prop_diameter_m', 'nacelle_blockage_frac', 'notes',
 )
 
 CARRIERS_CSV_COLUMNS = (
@@ -111,6 +112,9 @@ def load_aircraft_csv(path: str | Path) -> dict[str, 'AircraftSpec']:
             exhaust_mdot_kg_s=_parse_optional_float(row.get('exhaust_mdot_kg_s', '')),
             exhaust_d0_m=_parse_optional_float(row.get('exhaust_d0_m', '')),
             exhaust_height_m=_parse_optional_float(row.get('exhaust_height_m', '')),
+            shaft_power_sl_w=_parse_optional_float(row.get('shaft_power_sl_w', '')),
+            prop_diameter_m=_parse_optional_float(row.get('prop_diameter_m', '')),
+            nacelle_blockage_frac=_parse_optional_float(row.get('nacelle_blockage_frac', '')),
             notes=row.get('notes', '').strip(),
         )
     if not aircraft:

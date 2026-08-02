@@ -23,11 +23,13 @@ PY_LOAD_ORDER = [
     'utils/search_utils.py',
     'utils/deck_config.py',
     'utils/exhaust_plume.py',
+    'utils/propeller_thrust.py',
     'utils/specs.py',
     'simulators/__init__.py',
     'simulators/short_take_off.py',
     'simulators/short_ski_jump_take_off.py',
     'simulators/ski_jump_take_off.py',
+    'simulators/tiltrotor_short_take_off.py',
     'apps/__init__.py',
     'apps/web_simulator.py',
 ]
@@ -40,10 +42,12 @@ PY_IMPORT_ORDER = [
     'utils.search_utils',
     'utils.deck_config',
     'utils.exhaust_plume',
+    'utils.propeller_thrust',
     'utils.specs',
     'simulators.short_take_off',
     'simulators.short_ski_jump_take_off',
     'simulators.ski_jump_take_off',
+    'simulators.tiltrotor_short_take_off',
     'apps.web_simulator',
 ]
 

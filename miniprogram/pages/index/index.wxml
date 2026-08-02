@@ -1,7 +1,7 @@
 <scroll-view class="page" scroll-y enhanced show-scrollbar="{{false}}">
   <view class="page-header">
     <text class="page-title">航母舰载机起飞仿真</text>
-    <text class="page-subtitle">支持滑跃、短距、短距滑跃三种模式 · 手机端自适应布局</text>
+    <text class="page-subtitle">支持滑跃、短距、短距滑跃、倾转短距 · 手机端自适应布局</text>
   </view>
 
   <view class="status-bar {{statusClass}}" wx:if="{{statusText}}" style="margin: 0 0 24rpx;">{{statusText}}</view>
@@ -11,11 +11,11 @@
     <text class="card-title">1. 起飞模式</text>
     <mode-selector modeList="{{modeList}}" current="{{currentMode}}" bind:change="onModeChange" />
     <text class="card-hint">
-      滑跃 / 短距滑跃需滑跃甲板航母；短距起飞需 STOVL 战斗机 + 平直甲板。
-      起飞轨迹图仅在滑跃起飞与短距滑跃起飞成功后显示（策略 C 暂无轨迹）。
+      滑跃 / 短距滑跃需滑跃甲板；短距 / 倾转短距需平直甲板。
+      倾转短距仅策略 A/B；轨迹图仅滑跃与短距滑跃成功后显示。
     </text>
     <block wx:if="{{showStrategy}}">
-      <text class="card-title" style="margin-top: 24rpx;">喷口策略</text>
+      <text class="card-title" style="margin-top: 24rpx;">{{strategyTitle}}</text>
       <mode-selector modeList="{{strategyList}}" current="{{currentStrategy}}" bind:change="onStrategyChange" />
     </block>
   </view>

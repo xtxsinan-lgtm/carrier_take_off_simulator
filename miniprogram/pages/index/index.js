@@ -23,6 +23,7 @@ Page({
     currentMode: 'ski_jump',
     currentStrategy: 'A',
     showStrategy: false,
+    strategyTitle: '喷口策略',
     carriers: [],
     aircraft: [],
     carrierNames: [],
@@ -74,13 +75,18 @@ Page({
         throw new Error('数据格式无效：缺少 carriers / aircraft');
       }
       this._data = data;
+      this._stovlStrategies = data.stovl_strategies || {
+        A: '策略 A — 延迟偏转喷口',
+        B: '策略 B — 全程固定喷口',
+        C: '策略 C — 尾流约束最优偏转',
+      };
+      this._tiltrotorStrategies = data.tiltrotor_strategies || {
+        A: '策略 A — 延迟倾转短舱',
+        B: '策略 B — 全程固定短舱角',
+      };
       this.setData({
         modeList: modesToList(data.modes),
-        strategyList: modesToList(data.stovl_strategies || {
-          A: '策略 A — 延迟偏转喷口',
-          B: '策略 B — 全程固定喷口',
-          C: '策略 C — 尾流约束最优偏转',
-        }),
+        strategyList: modesToList(this._stovlStrategies),
       });
       this.applyMode('ski_jump');
       const hint = config.apiBaseUrl
@@ -100,12 +106,22 @@ Page({
     if (!this._data) return;
     const carriers = filterCarriersForMode(mode, this._data.carriers);
     const aircraft = filterAircraftForMode(mode, this._data.aircraft);
-    const showStrategy = mode === 'short_takeoff' || mode === 'short_ski_jump';
+    const showStrategy =
+      mode === 'short_takeoff' ||
+      mode === 'short_ski_jump' ||
+      mode === 'tiltrotor_short_takeoff';
+    const isTilt = mode === 'tiltrotor_short_takeoff';
+    const strategyMap = isTilt ? this._tiltrotorStrategies : this._stovlStrategies;
+    let currentStrategy = this.data.currentStrategy;
+    if (isTilt && currentStrategy === 'C') currentStrategy = 'A';
     this._windUserEdited = false;
     this._massUserEdited = false;
     this.setData({
       currentMode: mode,
       showStrategy,
+      strategyTitle: isTilt ? '短舱倾转策略' : '喷口策略',
+      strategyList: modesToList(strategyMap || {}),
+      currentStrategy,
       carriers,
       aircraft,
       carrierNames: carriers.map((c) => `${c.name}（${c.nation}）`),
@@ -218,13 +234,17 @@ Page({
 
     const aero = computeAircraftAero(ac);
     const isVtol = ac.type_label === 'v/stol';
+    const isTilt = ac.type_label === 'tiltrotor';
     const specs = [
       { label: '最大起飞重量 (MTOW)', value: `${fmtInt(ac.mtow_kg)} kg` },
       { label: '最大内油', value: `${fmtInt(ac.internal_fuel_kg)} kg` },
       { label: '中距弹型号', value: ac.bvr_missile },
       { label: '中距弹重量', value: `${fmtNum(ac.missile_mass_kg, 1)} kg/枚` },
       { label: '最大载弹量', value: `${fmtInt(maxPayloadKg(ac))} kg` },
-      { label: '4枚中距弹满内油空战起飞重量', value: `${fmtInt(a2aMassKg(ac))} kg` },
+      {
+        label: isTilt ? '默认起飞重量（空重+内油+机组）' : '4枚中距弹满内油空战起飞重量',
+        value: `${fmtInt(a2aMassKg(ac))} kg`,
+      },
       { label: '翼展', value: `${fmtNum(ac.wingspan_m, 2)} m` },
       { label: '翼面积', value: `${fmtNum(ac.wing_area_m2, 2)} m²` },
     ];
@@ -234,6 +254,15 @@ Page({
         { label: '主喷管推力 (15°C SL)', value: `${fmtNum(ac.t_main_stovl_sl_n / 1000, 1)} kN` },
         { label: '升力风扇推力', value: `${fmtNum(ac.t_liftfan_sl_n / 1000, 1)} kN` },
         { label: '滚转喷管推力', value: `${fmtNum(ac.t_rollposts_sl_n / 1000, 1)} kN` }
+      );
+    } else if (isTilt) {
+      specs.push(
+        { label: '总轴功率 (15°C SL)', value: `${fmtNum(ac.shaft_power_sl_w / 1e6, 2)} MW` },
+        { label: '桨盘直径', value: `${fmtNum(ac.prop_diameter_m, 2)} m` },
+        {
+          label: '短舱遮挡比',
+          value: `${fmtNum((ac.nacelle_blockage_frac ?? 0.1) * 100, 0)} %`,
+        }
       );
     } else {
       specs.push({

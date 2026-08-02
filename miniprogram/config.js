@@ -7,5 +7,5 @@ module.exports = {
   /** 仿真 API 根地址，末尾不要斜杠。空字符串表示使用本地 data/data.json + 需配置后端 */
   apiBaseUrl: 'http://127.0.0.1:8765',
   /** 内置数据版本（与 data/data.json 中 version 对应） */
-  dataVersion: 10,
+  dataVersion: 11,
 };

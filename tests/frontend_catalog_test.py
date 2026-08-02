@@ -26,7 +26,11 @@ def test_build_catalog_payload_modes():
         load_carriers_csv(CARRIERS_CSV),
     )
     assert payload['modes'] == MODES
+    assert 'tiltrotor_short_takeoff' in payload['modes']
+    assert 'tiltrotor_strategies' in payload
+    assert set(payload['tiltrotor_strategies']) == {'A', 'B'}
     assert 'py_sources' not in payload
+    assert any(a['id'] == 'MV-22' for a in payload['aircraft'])
 
 
 def test_render_esm_and_cjs_contain_injected_constants():

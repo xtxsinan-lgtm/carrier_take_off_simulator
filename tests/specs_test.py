@@ -1,4 +1,6 @@
 """AircraftSpec / 载弹量字段单元测试。"""
+import pytest
+
 from utils.database_csv import load_aircraft_csv
 from utils.paths import AIRCRAFT_CSV
 from utils.specs import (
@@ -64,11 +66,27 @@ def test_is_vtol_aircraft():
     assert is_vtol_aircraft(aircraft['J-15']) is False
 
 
+def test_mv22_tiltrotor_spec_from_wikipedia():
+    from utils.specs import is_tiltrotor_aircraft
+
+    ac = load_aircraft_csv(AIRCRAFT_CSV)['MV-22']
+    assert ac.is_tiltrotor is True
+    assert is_tiltrotor_aircraft(ac) is True
+    assert ac.mtow_kg == pytest.approx(25855)
+    assert ac.shaft_power_sl_w == pytest.approx(9180000)
+    assert ac.prop_diameter_m == pytest.approx(11.61)
+    assert ac.nacelle_blockage_frac == pytest.approx(0.10)
+    assert ac.t_liftfan_sl_n is None
+    assert ac.t_rollposts_sl_n is None
+
+
 def test_simulation_uses_plume_model_only_vtol_short_modes():
     aircraft = load_aircraft_csv(AIRCRAFT_CSV)
     f35b = aircraft['F-35B']
     j15 = aircraft['J-15']
+    mv22 = aircraft['MV-22']
     assert simulation_uses_plume_model('short_takeoff', f35b) is True
     assert simulation_uses_plume_model('short_ski_jump', f35b) is True
     assert simulation_uses_plume_model('ski_jump', j15) is False
     assert simulation_uses_plume_model('short_takeoff', j15) is False
+    assert simulation_uses_plume_model('tiltrotor_short_takeoff', mv22) is False

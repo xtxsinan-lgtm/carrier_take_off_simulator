@@ -9,9 +9,17 @@ from typing import Any
 import simulators.short_ski_jump_take_off as ski_stovl
 import simulators.short_take_off as flat_stovl
 import simulators.ski_jump_take_off as ski_conv
+import simulators.tiltrotor_short_take_off as tilt_stovl
 from utils.ski_jump_geometry import SKI_JUMP_REF_RADIUS_M, compute_ski_jump_arc
 from utils.trajectory import build_deck_profile
-from utils.specs import AircraftSpec, CarrierSpec, simulation_uses_plume_model
+from utils.specs import (
+    AircraftSpec,
+    CarrierSpec,
+    CONVENTIONAL_TYPE_LABEL,
+    TILTROTOR_TYPE_LABEL,
+    VTOL_TYPE_LABEL,
+    simulation_uses_plume_model,
+)
 from utils.takeoff_physics import (
     FLAP_DEFLECTION_DEG,
     FLAP_EFFICIENCY,
@@ -27,6 +35,7 @@ MODES = {
     'ski_jump': '滑跃起飞',
     'short_takeoff': '短距起飞',
     'short_ski_jump': '短距滑跃起飞',
+    'tiltrotor_short_takeoff': '倾转短距起飞',
 }
 
 # STOVL 短距 / 短距滑跃可选喷口策略
@@ -34,6 +43,12 @@ STOVL_STRATEGIES = {
     'A': '策略 A — 延迟偏转喷口',
     'B': '策略 B — 全程固定喷口',
     'C': '策略 C — 尾流约束最优偏转',
+}
+
+# 倾转旋翼短距仅 A/B（暂不计尾流）
+TILTROTOR_STRATEGIES = {
+    'A': '策略 A — 延迟倾转短舱',
+    'B': '策略 B — 全程固定短舱角',
 }
 
 
@@ -60,6 +75,9 @@ def aircraft_from_dict(d: dict[str, Any]) -> AircraftSpec:
         exhaust_mdot_kg_s=_opt_float(d.get('exhaust_mdot_kg_s')),
         exhaust_d0_m=_opt_float(d.get('exhaust_d0_m')),
         exhaust_height_m=_opt_float(d.get('exhaust_height_m')),
+        shaft_power_sl_w=_opt_float(d.get('shaft_power_sl_w')),
+        prop_diameter_m=_opt_float(d.get('prop_diameter_m')),
+        nacelle_blockage_frac=_opt_float(d.get('nacelle_blockage_frac')),
         notes=d.get('notes', ''),
     )
 
@@ -96,6 +114,16 @@ def normalize_stovl_strategy(strategy: str | None) -> str:
     return key
 
 
+def normalize_tiltrotor_strategy(strategy: str | None) -> str:
+    """规范化倾转旋翼策略代号；缺省为 A，仅允许 A/B。"""
+    if strategy is None or strategy == '':
+        return 'A'
+    key = str(strategy).strip().upper()
+    if key not in TILTROTOR_STRATEGIES:
+        raise ValueError(f'未知倾转旋翼策略: {strategy}（可选 A/B）')
+    return key
+
+
 def run_stovl_strategy_search(mod, strategy: str):
     """按策略调用对应搜索入口，返回结果 dict 或 None。"""
     strategy = normalize_stovl_strategy(strategy)
@@ -104,6 +132,14 @@ def run_stovl_strategy_search(mod, strategy: str):
     if strategy == 'B':
         return mod.run_strategy_b_search()
     return mod.run_strategy_c_search()
+
+
+def run_tiltrotor_strategy_search(mod, strategy: str):
+    """倾转旋翼策略搜索（仅 A/B）。"""
+    strategy = normalize_tiltrotor_strategy(strategy)
+    if strategy == 'A':
+        return mod.run_strategy_a_search()
+    return mod.run_strategy_b_search()
 
 
 def resolve_ski_jump_geom(
@@ -154,7 +190,7 @@ def compute_aircraft_aero(ac: AircraftSpec) -> dict[str, float]:
 def filter_carriers_for_mode(mode: str, carriers: list[CarrierSpec]) -> list[CarrierSpec]:
     if mode == 'ski_jump':
         return [c for c in carriers if c.ski_jump]
-    if mode == 'short_takeoff':
+    if mode in ('short_takeoff', 'tiltrotor_short_takeoff'):
         return [c for c in carriers if c.f35b_capable and not c.ski_jump]
     if mode == 'short_ski_jump':
         return [c for c in carriers if c.f35b_capable and c.ski_jump]
@@ -162,12 +198,12 @@ def filter_carriers_for_mode(mode: str, carriers: list[CarrierSpec]) -> list[Car
 
 
 def filter_aircraft_for_mode(mode: str, aircraft: list[AircraftSpec]) -> list[AircraftSpec]:
-    from utils.specs import VTOL_TYPE_LABEL
-
     if mode == 'ski_jump':
-        return [a for a in aircraft if a.type_label != VTOL_TYPE_LABEL]
+        return [a for a in aircraft if a.type_label == CONVENTIONAL_TYPE_LABEL]
     if mode in ('short_takeoff', 'short_ski_jump'):
         return [a for a in aircraft if a.type_label == VTOL_TYPE_LABEL]
+    if mode == 'tiltrotor_short_takeoff':
+        return [a for a in aircraft if a.type_label == TILTROTOR_TYPE_LABEL]
     raise ValueError(f'未知模式: {mode}')
 
 
@@ -218,23 +254,43 @@ def _configure_ski_conv(ac: AircraftSpec, mass_kg: float, temp_c: float, wind_kt
     return ski_conv
 
 
+def _configure_tiltrotor(ac: AircraftSpec, mass_kg: float, temp_c: float, wind_kt: float):
+    """配置倾转旋翼短距模块（轴功率 → 推力）。"""
+    if not ac.shaft_power_sl_w or not ac.prop_diameter_m:
+        raise ValueError(f'{ac.id} 缺少轴功率或桨盘直径，无法进行倾转短距仿真')
+    geom = dict(mass_kg=mass_kg, s_ref_m2=ac.wing_area_m2, wingspan_m=ac.wingspan_m,
+                wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg, cd0=ac.cd0)
+    tilt_stovl.apply_thrust_temperature(temp_c)
+    tilt_stovl.apply_propulsion_sl(
+        ac.shaft_power_sl_w,
+        ac.prop_diameter_m,
+        nacelle_blockage_frac=ac.nacelle_blockage_frac,
+    )
+    tilt_stovl.apply_wind_knots(wind_kt)
+    tilt_stovl.apply_aircraft_geometry(**geom)
+    return tilt_stovl
+
+
 def _format_f35b_output(result: dict, deck_length_m: float, mode_label: str,
-                        strategy: str | None = None) -> list[str]:
+                        strategy: str | None = None,
+                        strategy_labels: dict[str, str] | None = None,
+                        angle_label: str = '喷管最终角') -> list[str]:
     pitch = '—' if result.get('pitch_deg') is None else f"{result['pitch_deg']}°"
     dist = result.get('distance_m') or result.get('total_m')
     flat_m = result.get('flat_m', result.get('x_m'))
+    labels = strategy_labels or STOVL_STRATEGIES
     lines = [
         f'模式: {mode_label}',
     ]
     if strategy:
-        lines.append(f'  喷口策略:       {STOVL_STRATEGIES.get(strategy, strategy)}')
+        lines.append(f'  喷口策略:       {labels.get(strategy, strategy)}')
     lines += [
         f"  重量:             {result.get('mass_kg', '—')} kg",
         f"  最小总距离:       {dist:.1f} m" if dist is not None else '  最小总距离:       —',
         f"  飞行甲板总长:     {deck_length_m:.0f} m",
         f"  甲板起飞:         {_deck_launch_label(True, dist, deck_length_m)}",
         f"  平直段:           {flat_m:.0f} m" if flat_m is not None else '  平直段:           —',
-        f"  喷管最终角:       {result.get('nozzle_deg')}°",
+        f"  {angle_label}:       {result.get('nozzle_deg')}°",
         f"  开始偏转地速:     {result.get('v_trans_mps')} m/s",
     ]
     plume = result.get('min_plume_trailing_edge_m')
@@ -371,7 +427,7 @@ def run_simulation(
             elif mode == 'ski_jump':
                 if not carrier.ski_jump:
                     raise ValueError('滑跃起飞需要滑跃甲板航母')
-                if aircraft.type_label == 'v/stol':
+                if aircraft.type_label != CONVENTIONAL_TYPE_LABEL:
                     raise ValueError('滑跃起飞模式请选择常规固定翼舰载机')
                 angle = ski_jump_angle_deg if ski_jump_angle_deg is not None else carrier.ski_jump_angle_deg
                 geom = resolve_ski_jump_geom(angle, ski_jump_height_m, ski_jump_arc_length_m)
@@ -386,6 +442,27 @@ def run_simulation(
                     raise ValueError(f"俯仰角 {result['pitch_deg']}° 超过硬上限 {PITCH_MAX_DEG}°")
                 result['mass_kg'] = mass_kg
                 lines = _format_conv_output(result, deck_length)
+
+            elif mode == 'tiltrotor_short_takeoff':
+                if aircraft.type_label != TILTROTOR_TYPE_LABEL:
+                    raise ValueError('倾转短距起飞仅适用于倾转旋翼机')
+                if carrier.ski_jump:
+                    raise ValueError('倾转短距起飞需要平直甲板航母')
+                stovl_strategy = normalize_tiltrotor_strategy(strategy)
+                mod = _configure_tiltrotor(aircraft, mass_kg, temp_c, wind_kt)
+                mod.print_config_summary()
+                print()
+                result = run_tiltrotor_strategy_search(mod, stovl_strategy)
+                if result is None:
+                    return _fail('未能找到可行解', buf.getvalue(), mode)
+                result['mass_kg'] = mass_kg
+                result['distance_m'] = float(result['x_m'])
+                result['strategy'] = stovl_strategy
+                lines = _format_f35b_output(
+                    result, deck_length, MODES[mode], stovl_strategy,
+                    strategy_labels=TILTROTOR_STRATEGIES,
+                    angle_label='短舱倾转角',
+                )
 
             else:
                 raise ValueError(f'未知模式: {mode}')

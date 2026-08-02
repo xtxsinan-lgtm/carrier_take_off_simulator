@@ -50,6 +50,14 @@ def test_filter_aircraft_short_takeoff(aircraft):
     assert ids == {'F-35B', 'AV-8B'}
 
 
+def test_filter_aircraft_tiltrotor_and_ski_jump_excludes_tiltrotor(aircraft):
+    tilt = filter_aircraft_for_mode('tiltrotor_short_takeoff', list(aircraft.values()))
+    assert {a.id for a in tilt} == {'MV-22'}
+    ski = filter_aircraft_for_mode('ski_jump', list(aircraft.values()))
+    assert all(a.type_label == 'conventional' for a in ski)
+    assert 'MV-22' not in {a.id for a in ski}
+
+
 def test_compute_aircraft_aero_j15(aircraft):
     aero = compute_aircraft_aero(aircraft['J-15'])
     assert aero['aspect_ratio'] == pytest.approx(14.7 ** 2 / 67.84)

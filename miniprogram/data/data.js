@@ -3,19 +3,24 @@
  * 请勿手改；修改 CSV 后运行 python3 scripts/build_all.py。
  */
 module.exports = {
-  "version": 10,
+  "version": 11,
   "pilot_load_kg": 100.0,
   "a2a_missile_count": 4,
   "pitch_max_deg": 20.0,
   "modes": {
     "ski_jump": "滑跃起飞",
     "short_takeoff": "短距起飞",
-    "short_ski_jump": "短距滑跃起飞"
+    "short_ski_jump": "短距滑跃起飞",
+    "tiltrotor_short_takeoff": "倾转短距起飞"
   },
   "stovl_strategies": {
     "A": "策略 A — 延迟偏转喷口",
     "B": "策略 B — 全程固定喷口",
     "C": "策略 C — 尾流约束最优偏转"
+  },
+  "tiltrotor_strategies": {
+    "A": "策略 A — 延迟倾转短舱",
+    "B": "策略 B — 全程固定短舱角"
   },
   "aircraft": [
     {
@@ -40,6 +45,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "STOVL 推力为垂起模式海平面标定值（15°C）；含升力风扇；载弹量 6800 kg（Lockheed 15"
     },
     {
@@ -64,6 +72,9 @@ module.exports = {
       "exhaust_mdot_kg_s": 195.95,
       "exhaust_d0_m": 1.219,
       "exhaust_height_m": 1.55,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "Pegasus F402-408 23500 lbf；载弹量 4200 kg（Wikipedia 9"
     },
     {
@@ -88,6 +99,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "WS-10H/AL-31 双发最大加力约 251 kN；最大载弹量 6500 kg"
     },
     {
@@ -112,6 +126,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "弹射型，滑跃舰上仍按 STOBAR 仿真；最大载弹量 8000 kg"
     },
     {
@@ -136,6 +153,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "WS-21 级双发加力约 186 kN；最大载弹量 8000 kg"
     },
     {
@@ -160,6 +180,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "2×RD-33MK；载弹量 5500 kg（Wikipedia combat payload）"
     },
     {
@@ -184,6 +207,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "2×M88-2/E4；外挂 9500 kg（Dassault / Wikipedia 9.5 t）"
     },
     {
@@ -208,6 +234,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "2×F414-GE-400；外挂 8050 kg（17"
     },
     {
@@ -232,6 +261,9 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "2×F404-GE-402；外挂 6215 kg（13"
     },
     {
@@ -256,7 +288,37 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
+      "shaft_power_sl_w": null,
+      "prop_diameter_m": null,
+      "nacelle_blockage_frac": null,
       "notes": "F-14B/D；外挂约 6700 kg（Wikipedia over 6"
+    },
+    {
+      "id": "MV-22",
+      "name": "MV-22B Osprey",
+      "type_label": "tiltrotor",
+      "mtow_kg": 25855.0,
+      "empty_kg": 14432.0,
+      "internal_fuel_kg": 6295.0,
+      "max_payload_kg": 9100.0,
+      "bvr_missile": "—",
+      "missile_mass_kg": 0.0,
+      "sweep_le_deg": 0.0,
+      "wingspan_m": 13.97,
+      "wing_area_m2": 28.0,
+      "wing_height_m": 2.6,
+      "cd0": 0.062,
+      "t_max_sl_n": null,
+      "t_main_stovl_sl_n": null,
+      "t_liftfan_sl_n": null,
+      "t_rollposts_sl_n": null,
+      "exhaust_mdot_kg_s": null,
+      "exhaust_d0_m": null,
+      "exhaust_height_m": null,
+      "shaft_power_sl_w": 9180000.0,
+      "prop_diameter_m": 11.61,
+      "nacelle_blockage_frac": 0.1,
+      "notes": "Wikipedia：2×T406 6150 hp、桨盘 ⌀38 ft 1 in、翼展 45 ft 10 in、机翼 301.4 ft²；内油约 13850 lb；CD0/机翼高度为短距构型估计；短舱遮挡 10%"
     }
   ],
   "carriers": [

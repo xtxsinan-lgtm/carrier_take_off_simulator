@@ -8,8 +8,10 @@ from utils.ski_jump_geometry import compute_ski_jump_arc
 PILOT_LOAD_KG = 100.0
 A2A_MISSILE_COUNT = 4
 
-# 数据库 type_label：垂直/短距起降（VTOL/STOVL）
+# 数据库 type_label：垂直/短距起降（VTOL/STOVL）与倾转旋翼
 VTOL_TYPE_LABEL = 'v/stol'
+TILTROTOR_TYPE_LABEL = 'tiltrotor'
+CONVENTIONAL_TYPE_LABEL = 'conventional'
 
 # 需要主喷管尾流波及模型的 Web/仿真模式（须配合 VTOL 机型）
 PLUME_SIMULATION_MODES = frozenset({'short_takeoff', 'short_ski_jump'})
@@ -21,6 +23,18 @@ def is_vtol_aircraft(aircraft: AircraftSpec | str) -> bool:
     return label == VTOL_TYPE_LABEL
 
 
+def is_tiltrotor_aircraft(aircraft: AircraftSpec | str) -> bool:
+    """是否为倾转旋翼机型（type_label == 'tiltrotor'）。"""
+    label = aircraft if isinstance(aircraft, str) else aircraft.type_label
+    return label == TILTROTOR_TYPE_LABEL
+
+
+def is_conventional_aircraft(aircraft: AircraftSpec | str) -> bool:
+    """是否为常规固定翼舰载机。"""
+    label = aircraft if isinstance(aircraft, str) else aircraft.type_label
+    return label == CONVENTIONAL_TYPE_LABEL
+
+
 def simulation_uses_plume_model(mode: str, aircraft: AircraftSpec) -> bool:
     """当前仿真是否应计算主喷管尾流波及范围（仅 VTOL + 短距模式）。"""
     return mode in PLUME_SIMULATION_MODES and is_vtol_aircraft(aircraft)
@@ -30,7 +44,7 @@ def simulation_uses_plume_model(mode: str, aircraft: AircraftSpec) -> bool:
 class AircraftSpec:
     id: str
     name: str
-    type_label: str  # 'conventional' | 'v/stol'
+    type_label: str  # 'conventional' | 'v/stol' | 'tiltrotor'
     mtow_kg: float
     empty_kg: float
     internal_fuel_kg: float
@@ -49,12 +63,21 @@ class AircraftSpec:
     exhaust_mdot_kg_s: float | None = None
     exhaust_d0_m: float | None = None
     exhaust_height_m: float | None = None
+    # 倾转旋翼 / 涡桨：海平面总轴功率与桨盘直径（推力由功率换算）
+    shaft_power_sl_w: float | None = None
+    prop_diameter_m: float | None = None
+    nacelle_blockage_frac: float | None = None
     notes: str = ''
 
     @property
     def is_vtol(self) -> bool:
         """VTOL/STOVL 机型（如 F-35B、AV-8B）。"""
         return is_vtol_aircraft(self)
+
+    @property
+    def is_tiltrotor(self) -> bool:
+        """倾转旋翼机型（如 MV-22）。"""
+        return is_tiltrotor_aircraft(self)
 
     @property
     def has_lift_fan(self) -> bool:

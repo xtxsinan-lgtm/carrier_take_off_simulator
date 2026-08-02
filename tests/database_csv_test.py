@@ -7,12 +7,13 @@ from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV
 
 def test_load_aircraft_csv_count():
     aircraft = load_aircraft_csv(AIRCRAFT_CSV)
-    assert len(aircraft) >= 10
+    assert len(aircraft) >= 11
     assert 'F-35B' in aircraft
     assert 'AV-8B' in aircraft
     assert 'J-15' in aircraft
     assert 'F-14' in aircraft
     assert 'FA-18C' in aircraft
+    assert 'MV-22' in aircraft
 
 
 def test_load_carriers_csv_count():

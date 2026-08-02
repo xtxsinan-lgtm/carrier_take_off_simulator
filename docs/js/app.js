@@ -12,7 +12,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 12;
+const APP_VERSION = 13;
 let data = null;
 let pyodide = null;
 let pyReady = false;
@@ -83,6 +83,14 @@ function modeNeedsSkiJump(mode) {
 }
 
 function modeNeedsStovlStrategy(mode) {
+  return (
+    mode === 'short_takeoff' ||
+    mode === 'short_ski_jump' ||
+    mode === 'tiltrotor_short_takeoff'
+  );
+}
+
+function modeAllowsStrategyC(mode) {
   return mode === 'short_takeoff' || mode === 'short_ski_jump';
 }
 
@@ -97,7 +105,24 @@ function refreshModeButtons() {
 function refreshStrategySection() {
   const show = modeNeedsStovlStrategy(currentMode);
   els.strategySection.classList.toggle('hidden', !show);
+  const allowC = modeAllowsStrategyC(currentMode);
+  if (els.strategyBtnC) {
+    els.strategyBtnC.classList.toggle('hidden', !allowC);
+  }
+  if (els.strategyTitle) {
+    els.strategyTitle.textContent =
+      currentMode === 'tiltrotor_short_takeoff'
+        ? '短舱倾转策略（倾转短距，无策略 C）'
+        : '喷口策略（短距 / 短距滑跃）';
+  }
+  if (!allowC && currentStrategy === 'C') {
+    currentStrategy = 'A';
+  }
   els.strategyBtns.forEach((btn) => {
+    if (btn.dataset.strategy === 'C' && !allowC) {
+      btn.classList.remove('active');
+      return;
+    }
     btn.classList.toggle('active', btn.dataset.strategy === currentStrategy);
   });
 }
@@ -192,6 +217,7 @@ function updateAircraftInfo() {
 
   const aero = computeAircraftAero(ac);
   const isVtol = ac.type_label === 'v/stol';
+  const isTilt = ac.type_label === 'tiltrotor';
 
   let thrustRows = '';
   if (isVtol) {
@@ -200,9 +226,19 @@ function updateAircraftInfo() {
       <tr><th>升力风扇推力</th><td>${fmtNum(ac.t_liftfan_sl_n / 1000, 1)} kN</td></tr>
       <tr><th>滚转喷管推力</th><td>${fmtNum(ac.t_rollposts_sl_n / 1000, 1)} kN</td></tr>
     `;
+  } else if (isTilt) {
+    thrustRows = `
+      <tr><th>总轴功率 (15°C SL)</th><td>${fmtNum(ac.shaft_power_sl_w / 1e6, 2)} MW</td></tr>
+      <tr><th>桨盘直径</th><td>${fmtNum(ac.prop_diameter_m, 2)} m</td></tr>
+      <tr><th>短舱遮挡比</th><td>${fmtNum((ac.nacelle_blockage_frac ?? 0.1) * 100, 0)} %</td></tr>
+    `;
   } else {
     thrustRows = `<tr><th>最大加力推力 (15°C SL)</th><td>${fmtNum(ac.t_max_sl_n / 1000, 1)} kN</td></tr>`;
   }
+
+  const massLabel = isTilt
+    ? '默认起飞重量（空重+内油+机组）'
+    : '4枚中距弹满内油空战起飞重量';
 
   els.aircraftSpecs.innerHTML = `
     <tr><th>最大起飞重量 (MTOW)</th><td>${fmtInt(ac.mtow_kg)} kg</td></tr>
@@ -210,7 +246,7 @@ function updateAircraftInfo() {
     <tr><th>中距弹型号</th><td>${ac.bvr_missile}</td></tr>
     <tr><th>中距弹重量</th><td>${fmtNum(ac.missile_mass_kg, 1)} kg/枚</td></tr>
     <tr><th>最大载弹量</th><td>${fmtInt(maxPayloadKg(ac))} kg</td></tr>
-    <tr><th>4枚中距弹满内油空战起飞重量</th><td>${fmtInt(a2aMassKg(ac))} kg</td></tr>
+    <tr><th>${massLabel}</th><td>${fmtInt(a2aMassKg(ac))} kg</td></tr>
     <tr><th>翼展</th><td>${fmtNum(ac.wingspan_m, 2)} m</td></tr>
     <tr><th>翼面积</th><td>${fmtNum(ac.wing_area_m2, 2)} m²</td></tr>
     ${thrustRows}
@@ -567,6 +603,8 @@ async function main() {
   els.modeBtns = [...document.querySelectorAll('.mode-btn:not(.strategy-btn)')];
   els.strategyBtns = [...document.querySelectorAll('.strategy-btn')];
   els.strategySection = $('strategySection');
+  els.strategyBtnC = $('strategyBtnC');
+  els.strategyTitle = $('strategyTitle');
   els.carrierSelect = $('carrierSelect');
   els.aircraftSelect = $('aircraftSelect');
   els.carrierSpecs = $('carrierSpecs');

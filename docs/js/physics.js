@@ -99,15 +99,20 @@ function maxPayloadKg(ac) {
 
 function filterCarriersForMode(mode, carriers) {
   if (mode === 'ski_jump') return carriers.filter((c) => c.ski_jump);
-  if (mode === 'short_takeoff') return carriers.filter((c) => c.f35b_capable && !c.ski_jump);
+  if (mode === 'short_takeoff' || mode === 'tiltrotor_short_takeoff') {
+    return carriers.filter((c) => c.f35b_capable && !c.ski_jump);
+  }
   if (mode === 'short_ski_jump') return carriers.filter((c) => c.f35b_capable && c.ski_jump);
   return [];
 }
 
 function filterAircraftForMode(mode, aircraft) {
-  if (mode === 'ski_jump') return aircraft.filter((a) => a.type_label !== 'v/stol');
+  if (mode === 'ski_jump') return aircraft.filter((a) => a.type_label === 'conventional');
   if (mode === 'short_takeoff' || mode === 'short_ski_jump') {
     return aircraft.filter((a) => a.type_label === 'v/stol');
+  }
+  if (mode === 'tiltrotor_short_takeoff') {
+    return aircraft.filter((a) => a.type_label === 'tiltrotor');
   }
   return [];
 }
