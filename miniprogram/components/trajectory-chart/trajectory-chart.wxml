@@ -5,7 +5,7 @@
     type="2d"
     id="trajCanvas"
     class="trajectory-canvas"
-    style="width: 100%; height: {{heightRpx}}rpx;"
+    style="width: {{canvasWidthPx}}px; height: {{canvasHeightPx}}px;"
   ></canvas>
   <view class="legend">
     <text class="legend-item deck">甲板</text>

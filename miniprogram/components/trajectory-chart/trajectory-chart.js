@@ -1,4 +1,5 @@
 const { paintTrajectory, buildTrajectoryMeta } = require('../../utils/trajectory.js');
+const { getWindowMetrics, rpxToPx } = require('../../utils/responsive.js');
 
 Component({
   properties: {
@@ -16,77 +17,110 @@ Component({
   data: {
     metaText: '',
     hasData: false,
+    canvasWidthPx: 300,
+    canvasHeightPx: 200,
   },
 
   lifetimes: {
+    attached() {
+      this._updateCanvasBox();
+    },
     ready() {
-      // 组件布局完成后再尝试绘制，避免 type=2d canvas 宽高为 0
-      if (this.properties.result) {
-        this.scheduleDraw();
+      this._updateCanvasBox();
+      if (this._pendingResult) {
+        this._paintWithResult(this._pendingResult);
       }
     },
   },
 
   methods: {
+    _updateCanvasBox() {
+      const m = getWindowMetrics();
+      // 页面左右各 24rpx padding + card 内边距约 24rpx → 可用宽度
+      const padPx = rpxToPx(48 + 48);
+      const widthPx = Math.max(200, Math.floor(m.windowWidth - padPx));
+      const heightPx = Math.max(160, Math.floor(rpxToPx(this.properties.heightRpx || 380)));
+      this.setData({
+        canvasWidthPx: widthPx,
+        canvasHeightPx: heightPx,
+      });
+      return { widthPx, heightPx, dpr: m.pixelRatio };
+    },
+
     onResultChange(result) {
       const hasData = Boolean(
         result &&
-          result.trajectory &&
-          result.trajectory.length &&
+          Array.isArray(result.trajectory) &&
+          result.trajectory.length > 0 &&
           result.deck_profile &&
-          result.deck_profile.points &&
-          result.deck_profile.points.length
+          Array.isArray(result.deck_profile.points) &&
+          result.deck_profile.points.length > 0
       );
+      this._pendingResult = hasData ? result : null;
       this.setData({ hasData, metaText: hasData ? this.data.metaText : '' }, () => {
-        if (hasData) this.scheduleDraw();
+        if (hasData) {
+          // 给布局一帧时间，再按固定 CSS 像素尺寸取 node 绘制
+          setTimeout(() => this._paintWithResult(result), 32);
+        }
       });
     },
 
-    scheduleDraw() {
-      this._drawAttempts = 0;
-      // 双 nextTick：先等 setData 落 DOM，再等 scroll-view 完成布局
-      wx.nextTick(() => {
-        wx.nextTick(() => this.draw());
-      });
+    _paintWithResult(result) {
+      if (!result || !result.trajectory || !result.deck_profile) return;
+      const box = this._updateCanvasBox();
+      const cssW = box.widthPx;
+      const cssH = box.heightPx;
+      const dpr = box.dpr || 2;
+
+      // 必须等 style 宽高落到节点后再取 canvas node
+      this.setData(
+        {
+          canvasWidthPx: cssW,
+          canvasHeightPx: cssH,
+        },
+        () => {
+          setTimeout(() => this._drawNode(result, cssW, cssH, dpr, 0), 16);
+        }
+      );
     },
 
-    draw() {
-      const result = this.properties.result;
-      if (
-        !result ||
-        !result.trajectory ||
-        !result.trajectory.length ||
-        !result.deck_profile ||
-        !result.deck_profile.points
-      ) {
-        return;
-      }
-
-      this.createSelectorQuery()
+    _drawNode(result, cssW, cssH, dpr, attempt) {
+      wx.createSelectorQuery()
+        .in(this)
         .select('#trajCanvas')
         .fields({ node: true, size: true })
         .exec((res) => {
-          const nodeInfo = res && res[0];
-          const canvas = nodeInfo && nodeInfo.node;
-          const cssW = nodeInfo ? nodeInfo.width : 0;
-          const cssH = nodeInfo ? nodeInfo.height : 0;
-
-          if (!canvas || cssW < 8 || cssH < 8) {
-            this._drawAttempts = (this._drawAttempts || 0) + 1;
-            if (this._drawAttempts <= 12) {
-              setTimeout(() => this.draw(), 50);
+          const info = res && res[0];
+          const canvas = info && info.node;
+          if (!canvas) {
+            if (attempt < 20) {
+              setTimeout(() => this._drawNode(result, cssW, cssH, dpr, attempt + 1), 50);
+            } else {
+              console.error('[trajectory-chart] 无法获取 canvas node');
+              this.setData({ metaText: '轨迹画布初始化失败，请重试仿真' });
             }
             return;
           }
 
           const ctx = canvas.getContext('2d');
-          const dpr = wx.getSystemInfoSync().pixelRatio || 2;
+          if (!ctx) {
+            this.setData({ metaText: '当前基础库不支持 Canvas 2D' });
+            return;
+          }
+
           canvas.width = Math.round(cssW * dpr);
           canvas.height = Math.round(cssH * dpr);
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.scale(dpr, dpr);
 
-          const meta = paintTrajectory(ctx, result, cssW, cssH);
-          this.setData({ metaText: buildTrajectoryMeta(meta) });
+          try {
+            const meta = paintTrajectory(ctx, result, cssW, cssH);
+            this.setData({ metaText: buildTrajectoryMeta(meta) });
+            this._pendingResult = null;
+          } catch (e) {
+            console.error('[trajectory-chart] 绘制失败', e);
+            this.setData({ metaText: `轨迹绘制失败: ${e.message || e}` });
+          }
         });
     },
   },

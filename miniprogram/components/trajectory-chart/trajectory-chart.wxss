@@ -17,10 +17,10 @@
 }
 
 .trajectory-canvas {
-  width: 100%;
+  display: block;
   border-radius: 12rpx;
   border: 1rpx solid #334155;
-  display: block;
+  background: #1a2332;
 }
 
 .legend {

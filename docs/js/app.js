@@ -12,7 +12,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 14;
+const APP_VERSION = 15;
 let data = null;
 let pyodide = null;
 let pyReady = false;

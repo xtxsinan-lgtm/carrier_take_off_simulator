@@ -382,25 +382,42 @@ Page({
 
     try {
       const result = await runSimulation(payload);
-      const showTraj =
+      const traj = result && result.trajectory;
+      const deck = result && result.deck_profile;
+      const showTraj = Boolean(
         modeHasTrajectory(this.data.currentMode) &&
-        result.success &&
-        result.trajectory &&
-        result.trajectory.length &&
-        result.deck_profile;
+          result.success &&
+          Array.isArray(traj) &&
+          traj.length > 0 &&
+          deck &&
+          Array.isArray(deck.points) &&
+          deck.points.length > 0
+      );
+
+      // 只把绘图所需字段传给组件，避免整包 output 过大导致 observer/渲染异常
+      const chartResult = showTraj
+        ? {
+            trajectory: traj,
+            deck_profile: deck,
+            distance_m: result.distance_m,
+          }
+        : null;
 
       this.setData({
         outputText: result.output || '(无输出)',
-        simResult: showTraj ? result : null,
-        showTrajectory: Boolean(showTraj),
+        simResult: chartResult,
+        showTrajectory: showTraj,
       });
 
       if (result.success) {
-        const trajNote =
-          showTraj && result.trajectory ? ` · 轨迹 ${result.trajectory.length} 点` : '';
+        const trajNote = showTraj ? ` · 轨迹 ${traj.length} 点` : '';
+        const missingTrajNote =
+          modeHasTrajectory(this.data.currentMode) && !showTraj
+            ? ' · 未返回轨迹数据'
+            : '';
         const msg = result.deck_launch_ok
-          ? `仿真完成 — 甲板可用（余量 ${fmtNum(result.deck_margin_m, 1)} m）${trajNote}`
-          : `仿真完成 — 甲板不足（超出 ${fmtNum(-result.deck_margin_m, 1)} m）${trajNote}`;
+          ? `仿真完成 — 甲板可用（余量 ${fmtNum(result.deck_margin_m, 1)} m）${trajNote}${missingTrajNote}`
+          : `仿真完成 — 甲板不足（超出 ${fmtNum(-result.deck_margin_m, 1)} m）${trajNote}${missingTrajNote}`;
         this.setStatus(msg, result.deck_launch_ok ? 'ok' : 'error');
       } else {
         this.setStatus(result.error || '仿真失败', 'error');
