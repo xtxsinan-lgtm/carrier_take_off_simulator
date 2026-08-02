@@ -3,11 +3,13 @@
  */
 const PYODIDE_VERSION = '0.26.4';
 /** 与 saturation-strike.html 中 ?v= 同步递增 */
-const APP_VERSION = 3;
+const APP_VERSION = 4;
 
 /** 仅加载饱和打击相关 Python 模块（无需 numpy） */
 const SATURATION_PY_FILES = [
   'utils/__init__.py',
+  'utils/paths.py',
+  'utils/database_csv.py',
   'utils/saturation_presets.py',
   'utils/saturation_radar.py',
   'utils/saturation_windows.py',
@@ -19,6 +21,8 @@ const SATURATION_PY_FILES = [
 ];
 
 const SATURATION_IMPORTS = [
+  'utils.paths',
+  'utils.database_csv',
   'utils.saturation_presets',
   'utils.saturation_radar',
   'utils.saturation_windows',

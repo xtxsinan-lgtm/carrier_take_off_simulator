@@ -14,8 +14,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 # Pyodide 按依赖顺序加载（路径相对项目根）
+# saturation_presets 依赖 paths + database_csv（CSV 在浏览器中不存在时返回空分组）
 PY_LOAD_ORDER = [
     'utils/__init__.py',
+    'utils/paths.py',
+    'utils/database_csv.py',
     'utils/takeoff_physics.py',
     'utils/ski_jump_geometry.py',
     'utils/trajectory.py',
@@ -41,6 +44,8 @@ PY_LOAD_ORDER = [
 ]
 
 PY_IMPORT_ORDER = [
+    'utils.paths',
+    'utils.database_csv',
     'utils.takeoff_physics',
     'utils.ski_jump_geometry',
     'utils.trajectory',

@@ -68,6 +68,25 @@ def test_docs_saturation_page_exists_and_links():
     assert ver_js.group(1) == ver_html.group(1)
 
 
+def test_pyodide_bundles_saturation_presets_csv_deps():
+    """Pyodide 须打包 saturation_presets 的 CSV 依赖，避免 ModuleNotFoundError。"""
+    from scripts.build_docs import PY_IMPORT_ORDER, PY_LOAD_ORDER
+    from utils.paths import ROOT
+
+    for rel in ('utils/paths.py', 'utils/database_csv.py'):
+        assert rel in PY_LOAD_ORDER
+        assert PY_LOAD_ORDER.index(rel) < PY_LOAD_ORDER.index('utils/saturation_presets.py')
+    for mod in ('utils.paths', 'utils.database_csv'):
+        assert mod in PY_IMPORT_ORDER
+        assert PY_IMPORT_ORDER.index(mod) < PY_IMPORT_ORDER.index('utils.saturation_presets')
+
+    sat_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
+    assert "utils/paths.py" in sat_js
+    assert "utils/database_csv.py" in sat_js
+    assert "utils.paths" in sat_js
+    assert "utils.database_csv" in sat_js
+
+
 def test_build_catalog_payload_includes_simulators_and_csv_presets():
     """catalog 须含启动页模拟器列表，且饱和预设与 CSV 一致。"""
     from utils.database_csv import load_saturation_equipment_csv
