@@ -1,13 +1,11 @@
 <view class="mode-group">
   <view
-    wx:for="{{modes}}"
-    wx:for-item="label"
-    wx:for-index="key"
-    wx:key="key"
-    class="mode-btn {{current === key ? 'active' : ''}}"
-    data-mode="{{key}}"
+    wx:for="{{modeList}}"
+    wx:key="id"
+    class="mode-btn {{current === item.id ? 'active' : ''}}"
+    data-mode="{{item.id}}"
     bindtap="onTap"
   >
-    {{label}}
+    {{item.label}}
   </view>
 </view>

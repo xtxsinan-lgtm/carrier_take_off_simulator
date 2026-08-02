@@ -4,10 +4,12 @@
     <text class="page-subtitle">支持滑跃、短距、短距滑跃三种模式 · 手机端自适应布局</text>
   </view>
 
+  <view class="status-bar {{statusClass}}" wx:if="{{statusText}}" style="margin: 0 0 24rpx;">{{statusText}}</view>
+
   <!-- 1. 起飞模式 -->
   <view class="card">
     <text class="card-title">1. 起飞模式</text>
-    <mode-selector modes="{{modes}}" current="{{currentMode}}" bind:change="onModeChange" />
+    <mode-selector modeList="{{modeList}}" current="{{currentMode}}" bind:change="onModeChange" />
     <text class="card-hint">
       滑跃 / 短距滑跃需滑跃甲板航母；短距起飞需 STOVL 战斗机 + 平直甲板。
       起飞轨迹图仅在滑跃起飞与短距滑跃起飞成功后显示。
@@ -20,10 +22,10 @@
     <text class="field-label">选择航母</text>
     <picker
       mode="selector"
-      range="{{carriers}}"
-      range-key="name"
+      range="{{carrierNames}}"
       value="{{carrierIndex}}"
       bindchange="onCarrierChange"
+      disabled="{{carrierNames.length === 0}}"
     >
       <view class="picker-value">
         <text>{{carrierLabel || '请选择'}}</text>
@@ -58,10 +60,10 @@
     <text class="field-label">选择战斗机</text>
     <picker
       mode="selector"
-      range="{{aircraft}}"
-      range-key="name"
+      range="{{aircraftNames}}"
       value="{{aircraftIndex}}"
       bindchange="onAircraftChange"
+      disabled="{{aircraftNames.length === 0}}"
     >
       <view class="picker-value">
         <text>{{aircraftLabel || '请选择'}}</text>
@@ -93,7 +95,6 @@
         开始仿真
       </button>
     </view>
-    <view class="status-bar {{statusClass}}" wx:if="{{statusText}}">{{statusText}}</view>
     <text class="card-hint" wx:if="{{!hasApi}}">
       提示：在 miniprogram/config.js 设置 apiBaseUrl，并运行 python3 apps/miniprogram_api.py 启动仿真服务。
     </text>

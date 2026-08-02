@@ -1,4 +1,4 @@
-const { loadSimulatorData, runSimulation } = require('../../utils/api.js');
+const { loadSimulatorData, runSimulation, modesToList } = require('../../utils/api.js');
 const {
   computeSkiJumpArc,
   resolveCarrierSkiJump,
@@ -17,10 +17,12 @@ const config = require('../../config.js');
 
 Page({
   data: {
-    modes: {},
+    modeList: [],
     currentMode: 'ski_jump',
     carriers: [],
     aircraft: [],
+    carrierNames: [],
+    aircraftNames: [],
     carrierIndex: 0,
     aircraftIndex: 0,
     carrierLabel: '',
@@ -64,13 +66,16 @@ Page({
     this.setStatus('正在加载数据…', 'loading');
     try {
       const data = await loadSimulatorData();
+      if (!data || !Array.isArray(data.carriers) || !Array.isArray(data.aircraft)) {
+        throw new Error('数据格式无效：缺少 carriers / aircraft');
+      }
       this._data = data;
-      this.setData({ modes: data.modes || {} });
+      this.setData({ modeList: modesToList(data.modes) });
       this.applyMode('ski_jump');
       const hint = config.apiBaseUrl
-        ? '数据与仿真 API 已连接，可直接开始仿真。'
+        ? '本地数据已加载。仿真将请求后端 API。'
         : '数据已加载。仿真需配置 config.js 中的 apiBaseUrl 并启动 python3 apps/miniprogram_api.py';
-      this.setStatus(hint, config.apiBaseUrl ? 'ok' : '');
+      this.setStatus(hint, 'ok');
     } catch (e) {
       this.setStatus(e.message || '加载失败', 'error');
     }
@@ -90,6 +95,8 @@ Page({
       currentMode: mode,
       carriers,
       aircraft,
+      carrierNames: carriers.map((c) => `${c.name}（${c.nation}）`),
+      aircraftNames: aircraft.map((a) => a.name),
       carrierIndex: 0,
       aircraftIndex: 0,
       showTrajectory: false,

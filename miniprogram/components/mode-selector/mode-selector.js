@@ -1,8 +1,9 @@
 Component({
   properties: {
-    modes: {
-      type: Object,
-      value: {},
+    /** [{id, label}, ...] */
+    modeList: {
+      type: Array,
+      value: [],
     },
     current: {
       type: String,
