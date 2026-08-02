@@ -22,7 +22,16 @@ miniprogram/
 python3 scripts/build_all.py
 ```
 
-会生成：`physics.js`（Web + 小程序）、`docs/data.json`、`miniprogram/data/data.json`。
+会生成：`physics.js`（Web + 小程序）、`docs/data.json`、`miniprogram/data/data.json` + **`data.js`**（小程序 `require` 用）。
+
+### 导入目录（重要）
+
+任选其一：
+
+1. **推荐**：直接导入 `miniprogram/` 文件夹  
+2. 或导入**仓库根目录**（已配置 `miniprogramRoot: "miniprogram/"`）
+
+不要导入一个没有 `app.json` 的错误子目录。导入后若仍报缺数据：清缓存并重新编译。
 
 ### 2. 启动仿真 API（小程序无法运行 Pyodide，需后端）
 

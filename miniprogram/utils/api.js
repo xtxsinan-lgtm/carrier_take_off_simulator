@@ -1,20 +1,32 @@
 const config = require('../config.js');
 
-/** 读取内置航母/战斗机数据库（不依赖网络） */
+/** 读取内置航母/战斗机数据库（CommonJS，微信小程序可可靠 require） */
 function loadLocalData() {
   try {
-    return require('../data/data.json');
+    // 必须用 .js：部分基础库/打包器对 require('.json') 支持不稳定
+    return require('../data/data.js');
   } catch (e) {
-    throw new Error('缺少 data/data.json，请运行 python3 scripts/build_miniprogram.py');
+    const detail = (e && e.message) ? e.message : String(e);
+    throw new Error(
+      '缺少 data/data.js，请在仓库根目录运行 python3 scripts/build_all.py（' + detail + '）'
+    );
   }
 }
 
 /**
- * 加载仿真数据：优先使用本地 data.json，保证界面可选；
+ * 加载仿真数据：优先使用本地 data.js，保证界面可选；
  * 若配置了 apiBaseUrl，再尝试用远端数据覆盖（失败则保留本地）。
  */
 function loadSimulatorData() {
-  const local = loadLocalData();
+  let local;
+  try {
+    local = loadLocalData();
+  } catch (e) {
+    return Promise.reject(e);
+  }
+  if (!local || !local.carriers || !local.aircraft) {
+    return Promise.reject(new Error('本地数据格式无效，请重新运行 build_all.py'));
+  }
   const base = config.apiBaseUrl;
   if (!base) {
     return Promise.resolve(local);
@@ -31,7 +43,6 @@ function loadSimulatorData() {
         }
       },
       fail() {
-        // 本地调试网络不通时仍可用内置数据选参数
         resolve(local);
       },
     });

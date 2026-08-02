@@ -1,0 +1,30 @@
+{
+  "description": "航母起飞仿真 — 仓库根目录打开时指向 miniprogram/",
+  "miniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "carrier-takeoff-sim",
+  "setting": {
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "enhance": true,
+    "urlCheck": false,
+    "coverView": true,
+    "compileHotReLoad": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  },
+  "libVersion": "3.5.5"
+}

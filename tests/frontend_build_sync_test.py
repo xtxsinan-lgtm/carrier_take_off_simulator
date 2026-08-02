@@ -52,6 +52,17 @@ def test_miniprogram_data_json_matches_catalog():
     assert actual == expected
 
 
+def test_miniprogram_data_js_matches_catalog():
+    """小程序 data.js（供 require）须与 catalog 一致。"""
+    from scripts.build_miniprogram import render_data_js
+
+    path = ROOT / 'miniprogram' / 'data' / 'data.js'
+    expected = build_catalog_payload(
+        load_aircraft_csv(AIRCRAFT_CSV),
+        load_carriers_csv(CARRIERS_CSV),
+    )
+    assert path.read_text(encoding='utf-8') == render_data_js(expected)
+
 def test_docs_data_json_catalog_section_matches():
     """docs/data.json 的目录字段须与 catalog 一致（忽略 py_sources）。"""
     path = ROOT / 'docs' / 'data.json'
