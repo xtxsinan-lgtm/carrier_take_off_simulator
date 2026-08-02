@@ -1,0 +1,9 @@
+<view class="spec-list">
+  <block wx:if="{{items.length}}">
+    <view class="spec-row" wx:for="{{items}}" wx:key="label">
+      <text class="spec-label">{{item.label}}</text>
+      <text class="spec-value">{{item.value}}</text>
+    </view>
+  </block>
+  <view wx:else class="spec-empty">{{emptyText}}</view>
+</view>

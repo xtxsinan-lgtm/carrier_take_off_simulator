@@ -1,0 +1,18 @@
+<view class="trajectory-wrap" wx:if="{{ready}}">
+  <text class="trajectory-hint">侧视剖面：甲板折线与飞机质心轨迹（m）</text>
+  <text class="trajectory-meta" wx:if="{{metaText}}">{{metaText}}</text>
+  <canvas
+    type="2d"
+    id="trajCanvas"
+    class="trajectory-canvas"
+    style="height: {{heightRpx}}rpx;"
+  />
+  <view class="legend">
+    <text class="legend-item deck">甲板</text>
+    <text class="legend-item path">飞机轨迹</text>
+    <text class="legend-item limit">离舰点</text>
+    <text class="legend-item start">起点</text>
+    <text class="legend-item exit">离舰</text>
+    <text class="legend-item end">终点</text>
+  </view>
+</view>

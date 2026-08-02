@@ -1,0 +1,13 @@
+<view class="mode-group">
+  <view
+    wx:for="{{modes}}"
+    wx:for-item="label"
+    wx:for-index="key"
+    wx:key="key"
+    class="mode-btn {{current === key ? 'active' : ''}}"
+    data-mode="{{key}}"
+    bindtap="onTap"
+  >
+    {{label}}
+  </view>
+</view>

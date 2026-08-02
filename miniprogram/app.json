@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "航母起飞仿真",
+    "navigationBarBackgroundColor": "#1e3a5f",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0f1419",
+    "backgroundTextStyle": "light",
+    "enablePullDownRefresh": false
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

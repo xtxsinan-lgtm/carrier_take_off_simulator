@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "航母起飞仿真",
+  "usingComponents": {
+    "mode-selector": "/components/mode-selector/mode-selector",
+    "spec-list": "/components/spec-list/spec-list",
+    "trajectory-chart": "/components/trajectory-chart/trajectory-chart"
+  }
+}
