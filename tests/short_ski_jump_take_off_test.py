@@ -24,3 +24,16 @@ def test_search_strategy_c_matches_baseline(baseline):
     assert r['total_m'] == pytest.approx(expected['total_m'])
     assert r['flat_m'] == expected['flat_m']
     assert r['pitch_deg'] == expected['pitch_deg']
+
+
+def test_run_strategy_b_search_returns_feasible_solution():
+    best = ski_stovl.run_strategy_b_search()
+    assert best is not None
+    assert best['total_m'] > 0
+    assert 0 <= best['nozzle_deg'] <= 90
+
+
+def test_run_strategy_c_search_returns_feasible_solution():
+    best = ski_stovl.run_strategy_c_search()
+    assert best is not None
+    assert best['total_m'] > 0

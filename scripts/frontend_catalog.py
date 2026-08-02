@@ -13,8 +13,14 @@ MODES = {
     'short_ski_jump': '短距滑跃起飞',
 }
 
+STOVL_STRATEGIES = {
+    'A': '策略 A — 延迟偏转喷口',
+    'B': '策略 B — 全程固定喷口',
+    'C': '策略 C — 尾流约束最优偏转',
+}
+
 # data.json 结构版本；字段变更时递增
-DATA_VERSION = 9
+DATA_VERSION = 10
 
 _AIRCRAFT_KEYS = (
     'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg', 'max_payload_kg',
@@ -55,6 +61,7 @@ def build_catalog_payload(aircraft: dict, carriers: list) -> dict:
         'a2a_missile_count': int(A2A_MISSILE_COUNT),
         'pitch_max_deg': float(PITCH_MAX_DEG),
         'modes': dict(MODES),
+        'stovl_strategies': dict(STOVL_STRATEGIES),
         'aircraft': [aircraft_to_dict(ac) for ac in aircraft.values()],
         'carriers': [carrier_to_dict(c) for c in carriers],
     }

@@ -24,3 +24,16 @@ def test_run_strategy_a_search_returns_feasible_solution():
     assert best['x_m'] > 0
     assert best['v_gs_mps'] > 0
     assert 0 <= best['nozzle_deg'] <= 90
+
+
+def test_run_strategy_b_search_returns_feasible_solution():
+    best = flat.run_strategy_b_search()
+    assert best is not None
+    assert best['x_m'] > 0
+    assert 0 <= best['nozzle_deg'] <= 90
+
+
+def test_run_strategy_c_search_returns_feasible_solution():
+    best = flat.run_strategy_c_search()
+    assert best is not None
+    assert best['x_m'] > 0

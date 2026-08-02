@@ -12,12 +12,12 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 11;
-
+const APP_VERSION = 12;
 let data = null;
 let pyodide = null;
 let pyReady = false;
 let currentMode = 'ski_jump';
+let currentStrategy = 'A';
 let skiGeom = null;
 
 const els = {};
@@ -82,11 +82,24 @@ function modeNeedsSkiJump(mode) {
   return mode === 'ski_jump' || mode === 'short_ski_jump';
 }
 
+function modeNeedsStovlStrategy(mode) {
+  return mode === 'short_takeoff' || mode === 'short_ski_jump';
+}
+
 function refreshModeButtons() {
   els.modeBtns.forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.mode === currentMode);
   });
   els.skiJumpSection.classList.toggle('hidden', !modeNeedsSkiJump(currentMode));
+  refreshStrategySection();
+}
+
+function refreshStrategySection() {
+  const show = modeNeedsStovlStrategy(currentMode);
+  els.strategySection.classList.toggle('hidden', !show);
+  els.strategyBtns.forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.strategy === currentStrategy);
+  });
 }
 
 function populateCarriers() {
@@ -461,6 +474,10 @@ async function runSimulation() {
     total_deck_length_m: carrier.total_deck_length_m,
   };
 
+  if (modeNeedsStovlStrategy(currentMode)) {
+    payload.strategy = currentStrategy;
+  }
+
   if (modeNeedsSkiJump(currentMode) && carrier.ski_jump) {
     updateSkiJumpFromInputs();
     payload.ski_jump_angle_deg = parseFloat(els.skiAngle.value);
@@ -514,6 +531,13 @@ function bindEvents() {
     });
   });
 
+  els.strategyBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      currentStrategy = btn.dataset.strategy;
+      refreshStrategySection();
+    });
+  });
+
   els.carrierSelect.addEventListener('change', () => {
     els.windInput.dataset.userEdited = '';
     updateCarrierInfo();
@@ -540,7 +564,9 @@ function bindEvents() {
 }
 
 async function main() {
-  els.modeBtns = [...document.querySelectorAll('.mode-btn')];
+  els.modeBtns = [...document.querySelectorAll('.mode-btn:not(.strategy-btn)')];
+  els.strategyBtns = [...document.querySelectorAll('.strategy-btn')];
+  els.strategySection = $('strategySection');
   els.carrierSelect = $('carrierSelect');
   els.aircraftSelect = $('aircraftSelect');
   els.carrierSpecs = $('carrierSpecs');

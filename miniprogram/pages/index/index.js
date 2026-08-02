@@ -19,7 +19,10 @@ const config = require('../../config.js');
 Page({
   data: {
     modeList: [],
+    strategyList: [],
     currentMode: 'ski_jump',
+    currentStrategy: 'A',
+    showStrategy: false,
     carriers: [],
     aircraft: [],
     carrierNames: [],
@@ -71,7 +74,14 @@ Page({
         throw new Error('数据格式无效：缺少 carriers / aircraft');
       }
       this._data = data;
-      this.setData({ modeList: modesToList(data.modes) });
+      this.setData({
+        modeList: modesToList(data.modes),
+        strategyList: modesToList(data.stovl_strategies || {
+          A: '策略 A — 延迟偏转喷口',
+          B: '策略 B — 全程固定喷口',
+          C: '策略 C — 尾流约束最优偏转',
+        }),
+      });
       this.applyMode('ski_jump');
       const hint = config.apiBaseUrl
         ? '本地数据已加载。仿真将请求后端 API。'
@@ -90,10 +100,12 @@ Page({
     if (!this._data) return;
     const carriers = filterCarriersForMode(mode, this._data.carriers);
     const aircraft = filterAircraftForMode(mode, this._data.aircraft);
+    const showStrategy = mode === 'short_takeoff' || mode === 'short_ski_jump';
     this._windUserEdited = false;
     this._massUserEdited = false;
     this.setData({
       currentMode: mode,
+      showStrategy,
       carriers,
       aircraft,
       carrierNames: carriers.map((c) => `${c.name}（${c.nation}）`),
@@ -256,6 +268,11 @@ Page({
     this.applyMode(e.detail.mode);
   },
 
+  onStrategyChange(e) {
+    const strategy = e.detail.mode;
+    if (strategy) this.setData({ currentStrategy: strategy });
+  },
+
   onCarrierChange(e) {
     this._windUserEdited = false;
     this.setData({ carrierIndex: Number(e.detail.value) }, () => this.updateCarrierInfo());
@@ -322,6 +339,10 @@ Page({
       wind_kt: wind,
       total_deck_length_m: carrier.total_deck_length_m,
     };
+
+    if (this.data.showStrategy) {
+      payload.strategy = this.data.currentStrategy;
+    }
 
     if (modeNeedsSkiJump(this.data.currentMode) && carrier.ski_jump) {
       this.updateSkiJumpFromInputs();

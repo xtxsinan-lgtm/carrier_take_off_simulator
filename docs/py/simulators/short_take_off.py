@@ -487,6 +487,16 @@ def run_strategy_a_search():
     return best
 
 
+def run_strategy_b_search():
+    """策略 B 搜索，返回最优结果 dict 或 None。"""
+    return search_strategy_b()
+
+
+def run_strategy_c_search():
+    """策略 C（尾流约束 DP），返回最优结果 dict 或 None。"""
+    return simulate_strategy_c(MIN_SAFE_DISTANCE_M)
+
+
 def _main():
     print_config_summary()
 

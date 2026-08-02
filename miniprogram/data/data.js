@@ -3,7 +3,7 @@
  * 请勿手改；修改 CSV 后运行 python3 scripts/build_all.py。
  */
 module.exports = {
-  "version": 9,
+  "version": 10,
   "pilot_load_kg": 100.0,
   "a2a_missile_count": 4,
   "pitch_max_deg": 20.0,
@@ -11,6 +11,11 @@ module.exports = {
     "ski_jump": "滑跃起飞",
     "short_takeoff": "短距起飞",
     "short_ski_jump": "短距滑跃起飞"
+  },
+  "stovl_strategies": {
+    "A": "策略 A — 延迟偏转喷口",
+    "B": "策略 B — 全程固定喷口",
+    "C": "策略 C — 尾流约束最优偏转"
   },
   "aircraft": [
     {

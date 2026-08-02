@@ -23,8 +23,16 @@
       <p style="margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--muted);">
         滑跃 / 短距滑跃模式需滑跃甲板航母；短距起飞需 STOVL 战斗机 + 平直甲板。
         尾流波及范围仅对 STOVL（VTOL）模式计算，常规滑跃起飞不含此项。
-        起飞轨迹图仅在<strong>滑跃起飞</strong>与<strong>短距滑跃起飞</strong>成功后显示。
+        起飞轨迹图仅在<strong>滑跃起飞</strong>与<strong>短距滑跃起飞</strong>成功后显示（策略 C 暂无轨迹）。
       </p>
+      <div id="strategySection" class="hidden" style="margin-top: 1rem;">
+        <h3 style="margin: 0 0 0.5rem; font-size: 0.95rem; color: var(--accent);">喷口策略（短距 / 短距滑跃）</h3>
+        <div class="mode-group" id="strategyGroup">
+          <button type="button" class="mode-btn strategy-btn active" data-strategy="A">策略 A — 延迟偏转</button>
+          <button type="button" class="mode-btn strategy-btn" data-strategy="B">策略 B — 全程固定</button>
+          <button type="button" class="mode-btn strategy-btn" data-strategy="C">策略 C — 尾流约束</button>
+        </div>
+      </div>
     </section>
 
     <div class="grid-2">

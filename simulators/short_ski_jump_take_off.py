@@ -893,6 +893,20 @@ def run_strategy_a_search():
     return refined if refined else best
 
 
+def run_strategy_b_search():
+    """策略 B 粗搜索 + 细化，返回最优结果 dict 或 None。"""
+    best = search_strategy_b()
+    if not best:
+        return None
+    refined = fine_tune_strategy_b(best)
+    return refined if refined else best
+
+
+def run_strategy_c_search():
+    """策略 C（尾流约束）搜索，返回最优结果 dict 或 None。"""
+    return search_strategy_c(MIN_SAFE_DISTANCE_M)
+
+
 def _main():
     print_config_summary()
 

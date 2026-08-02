@@ -29,6 +29,13 @@ MODES = {
     'short_ski_jump': '短距滑跃起飞',
 }
 
+# STOVL 短距 / 短距滑跃可选喷口策略
+STOVL_STRATEGIES = {
+    'A': '策略 A — 延迟偏转喷口',
+    'B': '策略 B — 全程固定喷口',
+    'C': '策略 C — 尾流约束最优偏转',
+}
+
 
 def aircraft_from_dict(d: dict[str, Any]) -> AircraftSpec:
     return AircraftSpec(
@@ -77,6 +84,26 @@ def _opt_float(v: Any) -> float | None:
     if v is None or v == '':
         return None
     return float(v)
+
+
+def normalize_stovl_strategy(strategy: str | None) -> str:
+    """规范化 STOVL 策略代号；缺省为 A。"""
+    if strategy is None or strategy == '':
+        return 'A'
+    key = str(strategy).strip().upper()
+    if key not in STOVL_STRATEGIES:
+        raise ValueError(f'未知 STOVL 策略: {strategy}（可选 A/B/C）')
+    return key
+
+
+def run_stovl_strategy_search(mod, strategy: str):
+    """按策略调用对应搜索入口，返回结果 dict 或 None。"""
+    strategy = normalize_stovl_strategy(strategy)
+    if strategy == 'A':
+        return mod.run_strategy_a_search()
+    if strategy == 'B':
+        return mod.run_strategy_b_search()
+    return mod.run_strategy_c_search()
 
 
 def resolve_ski_jump_geom(
@@ -191,12 +218,17 @@ def _configure_ski_conv(ac: AircraftSpec, mass_kg: float, temp_c: float, wind_kt
     return ski_conv
 
 
-def _format_f35b_output(result: dict, deck_length_m: float, mode_label: str) -> list[str]:
+def _format_f35b_output(result: dict, deck_length_m: float, mode_label: str,
+                        strategy: str | None = None) -> list[str]:
     pitch = '—' if result.get('pitch_deg') is None else f"{result['pitch_deg']}°"
     dist = result.get('distance_m') or result.get('total_m')
     flat_m = result.get('flat_m', result.get('x_m'))
     lines = [
         f'模式: {mode_label}',
+    ]
+    if strategy:
+        lines.append(f'  喷口策略:       {STOVL_STRATEGIES.get(strategy, strategy)}')
+    lines += [
         f"  重量:             {result.get('mass_kg', '—')} kg",
         f"  最小总距离:       {dist:.1f} m" if dist is not None else '  最小总距离:       —',
         f"  飞行甲板总长:     {deck_length_m:.0f} m",
@@ -233,7 +265,13 @@ def _format_conv_output(result: dict, deck_length_m: float) -> list[str]:
     ]
 
 
-def _capture_trajectory(mode: str, mod, result: dict, deck_length_m: float) -> tuple[list | None, dict | None]:
+def _capture_trajectory(
+    mode: str,
+    mod,
+    result: dict,
+    deck_length_m: float,
+    strategy: str | None = None,
+) -> tuple[list | None, dict | None]:
     """用最优参数重跑仿真，采样起飞轨迹与甲板折线（仅滑跃 / 短距滑跃）。"""
     if mode not in ('ski_jump', 'short_ski_jump'):
         return None, None
@@ -243,11 +281,16 @@ def _capture_trajectory(mode: str, mod, result: dict, deck_length_m: float) -> t
     if mode == 'ski_jump':
         mod.simulate(flat_m, pitch_deg, trajectory=traj)
     else:
+        stovl_strategy = normalize_stovl_strategy(strategy)
+        # 策略 C 使用独立 DP 仿真，暂不支持轨迹重放采样
+        if stovl_strategy == 'C':
+            return None, None
+        v_trans = float(result['v_trans_mps']) if stovl_strategy == 'A' else 0.0
         mod.simulate(
             flat_m,
-            float(result['v_trans_mps']),
+            v_trans,
             float(result['nozzle_deg']),
-            'A',
+            stovl_strategy,
             pitch_deg,
             trajectory=traj,
         )
@@ -272,6 +315,7 @@ def run_simulation(
     ski_jump_arc_length_m: float | None = None,
     ski_jump_height_m: float | None = None,
     total_deck_length_m: float | None = None,
+    strategy: str | None = None,
 ) -> dict[str, Any]:
     """运行单次仿真，返回结构化结果与文本输出。"""
     if isinstance(aircraft, dict):
@@ -281,6 +325,7 @@ def run_simulation(
 
     deck_length = total_deck_length_m if total_deck_length_m is not None else carrier.total_deck_length_m
     buf = io.StringIO()
+    stovl_strategy = None
 
     try:
         with redirect_stdout(buf):
@@ -289,35 +334,39 @@ def run_simulation(
                     raise ValueError('短距起飞仅适用于 STOVL 飞机')
                 if carrier.ski_jump:
                     raise ValueError('短距起飞需要平直甲板航母')
+                stovl_strategy = normalize_stovl_strategy(strategy)
                 mod = _configure_flat_stovl(aircraft, mass_kg, temp_c, wind_kt)
                 mod.print_config_summary()
                 print()
-                result = mod.run_strategy_a_search()
+                result = run_stovl_strategy_search(mod, stovl_strategy)
                 if result is None:
                     return _fail('未能找到可行解', buf.getvalue(), mode)
                 result['mass_kg'] = mass_kg
                 result['distance_m'] = float(result['x_m'])
-                lines = _format_f35b_output(result, deck_length, MODES[mode])
+                result['strategy'] = stovl_strategy
+                lines = _format_f35b_output(result, deck_length, MODES[mode], stovl_strategy)
 
             elif mode == 'short_ski_jump':
                 if aircraft.type_label != 'v/stol':
                     raise ValueError('短距滑跃起飞仅适用于 STOVL 飞机')
                 if not carrier.ski_jump:
                     raise ValueError('短距滑跃起飞需要滑跃甲板')
+                stovl_strategy = normalize_stovl_strategy(strategy)
                 angle = ski_jump_angle_deg if ski_jump_angle_deg is not None else carrier.ski_jump_angle_deg
                 geom = resolve_ski_jump_geom(angle, ski_jump_height_m, ski_jump_arc_length_m)
                 mod = _configure_ski_stovl(
                     aircraft, mass_kg, temp_c, wind_kt, geom['angle_deg'], geom['lip_height_m'])
                 mod.print_config_summary()
                 print()
-                result = mod.run_strategy_a_search()
+                result = run_stovl_strategy_search(mod, stovl_strategy)
                 if result is None:
                     return _fail('未能找到可行解', buf.getvalue(), mode)
                 if result['pitch_deg'] > PITCH_MAX_DEG:
                     raise ValueError(f"俯仰角 {result['pitch_deg']}° 超过硬上限 {PITCH_MAX_DEG}°")
                 result['mass_kg'] = mass_kg
                 result['distance_m'] = float(result['total_m'])
-                lines = _format_f35b_output(result, deck_length, MODES[mode])
+                result['strategy'] = stovl_strategy
+                lines = _format_f35b_output(result, deck_length, MODES[mode], stovl_strategy)
 
             elif mode == 'ski_jump':
                 if not carrier.ski_jump:
@@ -357,13 +406,15 @@ def run_simulation(
         if distance_m is not None:
             distance_m = float(distance_m)
 
-        trajectory, deck_profile = _capture_trajectory(mode, mod, result, deck_length)
+        trajectory, deck_profile = _capture_trajectory(
+            mode, mod, result, deck_length, stovl_strategy)
         plume_applicable = simulation_uses_plume_model(mode, aircraft)
         plume_edge = result.get('min_plume_trailing_edge_m') if plume_applicable else None
 
         return {
             'success': True,
             'mode': mode,
+            'strategy': stovl_strategy,
             'output': '\n'.join(output_lines),
             'distance_m': distance_m,
             'deck_launch_ok': distance_m is not None and distance_m <= deck_length,
@@ -378,7 +429,7 @@ def run_simulation(
         config_text = buf.getvalue()
         msg = f'仿真错误: {exc}'
         output = config_text + ('\n' if config_text else '') + msg
-        return {'success': False, 'mode': mode, 'output': output, 'error': str(exc)}
+        return {'success': False, 'mode': mode, 'strategy': stovl_strategy, 'output': output, 'error': str(exc)}
 
 
 def _json_safe(obj: Any) -> Any:
@@ -432,6 +483,7 @@ def run_simulation_json(payload: dict[str, Any] | str) -> dict[str, Any]:
         ski_jump_arc_length_m=_opt_float(payload.get('ski_jump_arc_length_m')),
         ski_jump_height_m=_opt_float(payload.get('ski_jump_height_m')),
         total_deck_length_m=_opt_float(payload.get('total_deck_length_m')),
+        strategy=payload.get('strategy'),
     )
 
 
