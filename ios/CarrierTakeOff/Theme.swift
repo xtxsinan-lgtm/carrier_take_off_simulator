@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 与小程序 / Web 深色主题对齐的颜色与间距
+/// 起飞仿真主题：保留蓝青配色，布局观感对齐饱和打击战术终端
 enum AppTheme {
     static let bg = Color(hex: 0x0F1419)
     static let surface = Color(hex: 0x1A2332)
@@ -12,7 +12,9 @@ enum AppTheme {
     static let accentDim = Color(hex: 0x0EA5E9)
     static let success = Color(hex: 0x4ADE80)
     static let danger = Color(hex: 0xF87171)
-    static let radius: CGFloat = 10
+    /// 战术终端风格：近直角
+    static let radius: CGFloat = 2
+    static let mono = Font.system(size: 13, design: .monospaced)
 }
 
 extension Color {

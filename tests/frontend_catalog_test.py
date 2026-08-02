@@ -111,10 +111,11 @@ def test_docs_html_renders_modes_from_catalog_not_hardcoded():
 
     ver_js = re.search(r'const APP_VERSION\s*=\s*(\d+)', app_js)
     ver_html = re.search(r'app\.js\?v=(\d+)', html)
-    assert ver_js and ver_html
-    assert ver_js.group(1) == ver_html.group(1), (
+    ver_css = re.search(r'style\.css\?v=(\d+)', html)
+    assert ver_js and ver_html and ver_css
+    assert ver_js.group(1) == ver_html.group(1) == ver_css.group(1), (
         f'缓存版本不一致: app.js APP_VERSION={ver_js.group(1)} '
-        f'vs takeoff.html ?v={ver_html.group(1)}'
+        f'vs takeoff.html app.js?v={ver_html.group(1)} style.css?v={ver_css.group(1)}'
     )
 
 

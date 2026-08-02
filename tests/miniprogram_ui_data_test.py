@@ -45,6 +45,17 @@ def test_trajectory_chart_is_inline_below_sim_output():
     assert wxml.index('5. 仿真输出') < wxml.index('6. 起飞轨迹')
     assert wxml.index('6. 起飞轨迹') < wxml.index('page-footer')
 
+
+def test_miniprogram_takeoff_cards_have_terminal_tags():
+    """起飞页六段卡片须带与 HTML/iOS 一致的英文 card-tag。"""
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'index' / 'index.wxml').read_text(encoding='utf-8')
+    wxss = (ROOT / 'miniprogram' / 'app.wxss').read_text(encoding='utf-8')
+    assert '▲ 航母舰载机起飞仿真终端' in wxml
+    for tag in ('MODE', 'CARRIER', 'AIRCRAFT', 'INPUT', 'OUTPUT', 'TRAJECTORY'):
+        assert tag in wxml
+    assert '.card-tag' in wxss
+    assert '#38bdf8' in wxss
+
 def test_miniprogram_saturation_page_and_tabbar():
     """小程序须注册启动页、起飞与饱和打击，且 tabBar 含三者。"""
     app = json.loads((ROOT / 'miniprogram' / 'app.json').read_text(encoding='utf-8'))

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 模式 / 策略按钮组（对齐 mode-selector）
+/// 模式 / 策略按钮组（对齐 mode-selector，战术终端直角）
 struct ModeSelector: View {
     let items: [ModeItem]
     @Binding var current: String
@@ -14,16 +14,13 @@ struct ModeSelector: View {
                     onChange?(item.id)
                 } label: {
                     Text(item.label)
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(current == item.id ? Color(hex: 0x0F172A) : AppTheme.text)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(current == item.id ? AppTheme.accent : AppTheme.surface2)
-                        )
+                        .font(.system(size: 12, weight: current == item.id ? .bold : .regular, design: .monospaced))
+                        .foregroundStyle(current == item.id ? AppTheme.accent : AppTheme.text)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(current == item.id ? AppTheme.accent.opacity(0.16) : AppTheme.surface2)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 6)
+                            Rectangle()
                                 .stroke(current == item.id ? AppTheme.accent : AppTheme.border, lineWidth: 1)
                         )
                 }

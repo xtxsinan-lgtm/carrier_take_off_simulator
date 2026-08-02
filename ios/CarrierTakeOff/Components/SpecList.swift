@@ -8,7 +8,7 @@ struct SpecListView: View {
     var body: some View {
         if items.isEmpty {
             Text(emptyText)
-                .font(.system(size: 13))
+                .font(.system(size: 12, design: .monospaced))
                 .foregroundStyle(AppTheme.muted)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 8)
@@ -17,16 +17,18 @@ struct SpecListView: View {
                 ForEach(items) { item in
                     HStack(alignment: .top) {
                         Text(item.label)
-                            .font(.system(size: 13))
+                            .font(.system(size: 11, design: .monospaced))
                             .foregroundStyle(AppTheme.muted)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         Text(item.value)
-                            .font(.system(size: 13, weight: .medium))
+                            .font(.system(size: 12, design: .monospaced))
                             .foregroundStyle(AppTheme.text)
                             .multilineTextAlignment(.trailing)
                     }
-                    .padding(.vertical, 8)
-                    Divider().overlay(AppTheme.border.opacity(0.6))
+                    .padding(.vertical, 7)
+                    Rectangle()
+                        .fill(AppTheme.border)
+                        .frame(height: 1)
                 }
             }
             .padding(.top, 4)
@@ -34,29 +36,31 @@ struct SpecListView: View {
     }
 }
 
-/// 卡片容器
+/// 面板容器（战术终端直角边框）
 struct CardView<Content: View>: View {
     let title: String
+    var tag: String = "PANEL"
     @ViewBuilder var content: Content
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(AppTheme.accent)
-                .tracking(0.3)
+            HStack {
+                Text(title.uppercased())
+                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .foregroundStyle(AppTheme.muted)
+                    .tracking(2)
+                Spacer()
+                Text(tag)
+                    .font(.system(size: 10, design: .monospaced))
+                    .foregroundStyle(AppTheme.accent)
+                    .tracking(1)
+            }
             content
         }
-        .padding(16)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: AppTheme.radius)
-                .fill(AppTheme.surface)
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.radius)
-                        .stroke(AppTheme.border, lineWidth: 1)
-                )
-        )
+        .background(AppTheme.surface)
+        .overlay(Rectangle().stroke(AppTheme.border, lineWidth: 1))
     }
 }
 
@@ -68,19 +72,14 @@ struct StatusBar: View {
     var body: some View {
         if !text.isEmpty {
             Text(text)
-                .font(.system(size: 13))
+                .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(fg)
+                .tracking(0.5)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(AppTheme.surface2)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(border, lineWidth: 1)
-                        )
-                )
+                .background(AppTheme.surface2)
+                .overlay(Rectangle().stroke(border, lineWidth: 1))
         }
     }
 
@@ -98,7 +97,7 @@ struct StatusBar: View {
         case .ok: return AppTheme.success.opacity(0.35)
         case .error: return AppTheme.danger.opacity(0.35)
         case .loading: return AppTheme.accent.opacity(0.35)
-        case .idle: return .clear
+        case .idle: return AppTheme.border
         }
     }
 }
@@ -111,24 +110,19 @@ struct FieldInput: View {
     var onEdit: (() -> Void)?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(label)
-                .font(.system(size: 12))
+                .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(AppTheme.muted)
             TextField("", text: $text)
+                .font(.system(size: 13, design: .monospaced))
                 .keyboardType(.decimalPad)
                 .disabled(readonly)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 9)
                 .foregroundStyle(readonly ? AppTheme.muted : AppTheme.text)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(AppTheme.surface2)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(AppTheme.border, lineWidth: 1)
-                        )
-                )
+                .background(AppTheme.surface2)
+                .overlay(Rectangle().stroke(AppTheme.border, lineWidth: 1))
                 .onChange(of: text) { _, _ in
                     if !readonly { onEdit?() }
                 }

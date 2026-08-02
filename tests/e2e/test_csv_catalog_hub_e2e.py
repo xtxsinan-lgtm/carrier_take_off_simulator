@@ -47,3 +47,27 @@ def test_e2e_docs_hub_and_takeoff_pages():
     assert 'data.simulators' in hub_js or 'simulators' in hub_js
     assert (ROOT / 'docs' / 'takeoff.html').is_file()
     assert (ROOT / 'docs' / 'saturation-strike.html').is_file()
+
+
+@pytest.mark.e2e
+def test_e2e_takeoff_terminal_gui_three_channels():
+    """起飞战术终端观感须在 HTML / 小程序 / iOS 三端同时落地。"""
+    title = '▲ 航母舰载机起飞仿真终端'
+    tags = ('MODE', 'CARRIER', 'AIRCRAFT', 'INPUT', 'OUTPUT', 'TRAJECTORY')
+
+    html = (ROOT / 'docs' / 'takeoff.html').read_text(encoding='utf-8')
+    css = (ROOT / 'docs' / 'css' / 'style.css').read_text(encoding='utf-8')
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'index' / 'index.wxml').read_text(encoding='utf-8')
+    wxss = (ROOT / 'miniprogram' / 'app.wxss').read_text(encoding='utf-8')
+    ios = (ROOT / 'ios' / 'CarrierTakeOff' / 'ContentView.swift').read_text(encoding='utf-8')
+    theme = (ROOT / 'ios' / 'CarrierTakeOff' / 'Theme.swift').read_text(encoding='utf-8')
+
+    for blob in (html, wxml, ios):
+        assert title in blob
+        for tag in tags:
+            assert tag in blob
+
+    assert 'scanline' in html and '.scanline' in css
+    assert '#38bdf8' in css and '#38bdf8' in wxss
+    assert '0x38BDF8' in theme
+    assert 'card-tag' in wxml and 'CardView' in ios

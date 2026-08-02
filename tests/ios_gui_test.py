@@ -46,7 +46,7 @@ def test_ios_app_has_hub_then_simulators():
 
 
 def test_ios_content_view_has_six_sections():
-    """起飞主界面文案须覆盖与小程序相同的 1–6 段卡片标题。"""
+    """起飞主界面文案须覆盖与小程序相同的 1–6 段卡片标题与 tag。"""
     text = (IOS_ROOT / 'ContentView.swift').read_text(encoding='utf-8')
     for title in (
         '1. 起飞模式',
@@ -57,6 +57,9 @@ def test_ios_content_view_has_six_sections():
         '6. 起飞轨迹',
     ):
         assert title in text, f'ContentView 缺少卡片: {title}'
+    for tag in ('MODE', 'CARRIER', 'AIRCRAFT', 'INPUT', 'OUTPUT', 'TRAJECTORY'):
+        assert f'tag: "{tag}"' in text, f'ContentView 缺少卡片 tag: {tag}'
+    assert '▲ 航母舰载机起飞仿真终端' in text
 
 
 def test_ios_uses_local_engine_not_http_api():

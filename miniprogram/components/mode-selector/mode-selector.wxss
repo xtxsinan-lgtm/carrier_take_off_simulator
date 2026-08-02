@@ -1,24 +1,26 @@
 .mode-group {
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
 .mode-btn {
   width: 100%;
-  padding: 22rpx 28rpx;
+  padding: 20rpx 24rpx;
   text-align: center;
-  border-radius: 12rpx;
-  font-size: 28rpx;
+  border-radius: 4rpx;
+  font-size: 24rpx;
+  letter-spacing: 1rpx;
   background: #243044;
   color: #94a3b8;
   border: 2rpx solid #334155;
   box-sizing: border-box;
+  font-family: Courier New, monospace;
 }
 
 .mode-btn.active {
-  background: rgba(56, 189, 248, 0.18);
+  background: rgba(56, 189, 248, 0.16);
   color: #38bdf8;
   border-color: #38bdf8;
-  font-weight: 600;
+  font-weight: 700;
 }
