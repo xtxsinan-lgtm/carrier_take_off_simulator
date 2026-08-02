@@ -3,7 +3,7 @@
  */
 const PYODIDE_VERSION = '0.26.4';
 /** 与 saturation-strike.html 中 ?v= 同步递增 */
-const APP_VERSION = 4;
+const APP_VERSION = 5;
 
 /** 仅加载饱和打击相关 Python 模块（无需 numpy） */
 const SATURATION_PY_FILES = [
