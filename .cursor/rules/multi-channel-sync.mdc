@@ -13,8 +13,8 @@ alwaysApply: true
 2. **模式目录**：`scripts/frontend_catalog.py` 的 `MODES` / 策略表（Web `data.json` 与小程序同源）
 3. **GitHub Pages HTML**：`docs/`（`build_all.py` 生成 `data.json`；模式按钮由 JS 读 `data.modes`，勿在 `index.html` 硬编码模式）
 4. **微信小程序**：`miniprogram/`（`build_all.py`；模式列表来自 catalog）
-5. **统一仿真 API**：`apps/simulator_api.py`（小程序 / iOS 共用；契约与 `web_simulator` 一致）
-6. **iOS App**：`ios/CarrierTakeOff/`（`build_all.py` 生成 `Resources/data.json` + `Physics.swift`；GUI 对齐小程序）
+5. **小程序 API**：`apps/miniprogram_api.py`（仅小程序；契约与 `web_simulator` 一致）
+6. **iOS App**：`ios/CarrierTakeOff/`（本地 Pyodide + Bundle `data.json`/`py_sources`；无 HTTP 后端）
 
 ## 必做
 

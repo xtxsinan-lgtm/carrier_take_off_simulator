@@ -91,7 +91,7 @@ Page({
       this.applyMode('ski_jump');
       const hint = config.apiBaseUrl
         ? '本地数据已加载。仿真将请求后端 API。'
-        : '数据已加载。仿真需配置 config.js 中的 apiBaseUrl 并启动 python3 apps/simulator_api.py';
+        : '数据已加载。仿真需配置 config.js 中的 apiBaseUrl 并启动 python3 apps/miniprogram_api.py';
       this.setStatus(hint, 'ok');
     } catch (e) {
       this.setStatus(e.message || '加载失败', 'error');

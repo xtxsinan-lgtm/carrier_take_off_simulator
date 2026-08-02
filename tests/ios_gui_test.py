@@ -1,4 +1,4 @@
-"""iOS GUI 通道相关单元测试（源码结构与契约）。"""
+"""iOS GUI 通道相关单元测试（源码结构与本地引擎契约）。"""
 from __future__ import annotations
 
 from utils.paths import ROOT
@@ -7,12 +7,13 @@ IOS_ROOT = ROOT / 'ios' / 'CarrierTakeOff'
 
 
 def test_ios_swift_sources_exist():
-    """主界面与核心模块文件必须存在。"""
+    """主界面与本地引擎模块文件必须存在。"""
     required = [
         'CarrierTakeOffApp.swift',
         'ContentView.swift',
         'SimulatorViewModel.swift',
-        'APIClient.swift',
+        'CatalogStore.swift',
+        'LocalSimulatorEngine.swift',
         'Models.swift',
         'Physics.swift',
         'Config.swift',
@@ -21,6 +22,8 @@ def test_ios_swift_sources_exist():
         'Components/ModeSelector.swift',
         'Components/SpecList.swift',
         'Components/TrajectoryChart.swift',
+        'Resources/engine.html',
+        'Resources/engine.js',
     ]
     for rel in required:
         path = IOS_ROOT / rel
@@ -41,11 +44,15 @@ def test_ios_content_view_has_six_sections():
         assert title in text, f'ContentView 缺少卡片: {title}'
 
 
-def test_ios_api_paths_match_miniprogram():
-    """API 路径须与小程序一致。"""
-    text = (IOS_ROOT / 'APIClient.swift').read_text(encoding='utf-8')
-    assert '/api/data' in text
-    assert '/api/simulate' in text
+def test_ios_uses_local_engine_not_http_api():
+    """iOS 仿真应走 LocalSimulatorEngine，而非 HTTP API。"""
+    vm = (IOS_ROOT / 'SimulatorViewModel.swift').read_text(encoding='utf-8')
+    assert 'LocalSimulatorEngine' in vm
+    assert 'apiBaseUrl' not in vm
+    assert 'APIClient' not in vm
+    engine_js = (IOS_ROOT / 'Resources' / 'engine.js').read_text(encoding='utf-8')
+    assert 'run_simulation_json' in engine_js
+    assert 'loadPyodide' in engine_js
 
 
 def test_ios_project_yml_exists():

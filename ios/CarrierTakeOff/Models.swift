@@ -101,3 +101,19 @@ enum StatusKind {
     case ok
     case error
 }
+
+extension Encodable {
+    /// 将 Codable 转为 JSON 字典，供本地仿真 payload 拼装
+    func asJSONDictionary() throws -> [String: Any] {
+        let data = try JSONEncoder().encode(self)
+        let obj = try JSONSerialization.jsonObject(with: data)
+        guard let dict = obj as? [String: Any] else {
+            throw NSError(
+                domain: "CarrierTakeOff",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "无法编码为 JSON 对象"]
+            )
+        }
+        return dict
+    }
+}

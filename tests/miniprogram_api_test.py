@@ -1,9 +1,9 @@
-"""simulator_api 单元测试（小程序 / iOS 统一后端）。"""
+"""miniprogram_api 单元测试。"""
 from __future__ import annotations
 
 import json
 
-from apps.simulator_api import build_data_payload, handle_request
+from apps.miniprogram_api import build_data_payload, handle_request
 
 
 def test_get_api_data_returns_aircraft_and_carriers():
@@ -57,11 +57,3 @@ def test_post_simulate_invalid_payload_returns_json_not_500():
     result = json.loads(body.decode())
     assert result['success'] is False
     assert 'error' in result
-
-
-def test_legacy_miniprogram_api_shim_reexports():
-    """旧模块名仍可 import，与 simulator_api 为同一实现。"""
-    from apps import miniprogram_api, simulator_api
-
-    assert miniprogram_api.handle_request is simulator_api.handle_request
-    assert miniprogram_api.build_data_payload is simulator_api.build_data_payload

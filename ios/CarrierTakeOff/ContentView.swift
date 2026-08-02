@@ -121,11 +121,11 @@ struct ContentView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                         .opacity(vm.running ? 0.55 : 1)
                     }
-                    .disabled(vm.running)
+                    .disabled(vm.running || !vm.engineReady)
                     .padding(.top, 4)
 
-                    if !vm.hasApi {
-                        Text("提示：在 Config.swift 设置 apiBaseUrl，并运行 python3 apps/simulator_api.py 启动仿真服务。")
+                    if !vm.engineReady {
+                        Text("本地 Python 仿真引擎加载中（与 Web 版同一套物理模型，无需后端）。")
                             .font(.system(size: 12))
                             .foregroundStyle(AppTheme.muted)
                     }
@@ -148,7 +148,7 @@ struct ContentView: View {
                     }
                 }
 
-                Text("仿真由 Python 物理模型计算 · 数据来自 aircraft_database.csv / carriers_database.csv")
+                Text("仿真在设备本地通过 Pyodide 运行 Python 物理模型 · 数据来自 aircraft_database.csv / carriers_database.csv")
                     .font(.system(size: 11))
                     .foregroundStyle(AppTheme.muted)
                     .multilineTextAlignment(.center)
@@ -169,7 +169,7 @@ struct ContentView: View {
             Text("航母舰载机起飞仿真")
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(AppTheme.text)
-            Text("支持滑跃、短距、短距滑跃、倾转短距 · iOS 原生界面")
+            Text("支持滑跃、短距、短距滑跃、倾转短距 · 本机本地计算")
                 .font(.system(size: 13))
                 .foregroundStyle(AppTheme.muted)
         }

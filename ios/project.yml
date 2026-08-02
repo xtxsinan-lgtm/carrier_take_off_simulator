@@ -13,13 +13,13 @@ targets:
   CarrierTakeOff:
     type: application
     platform: iOS
-    sources:
-      - path: CarrierTakeOff
-        excludes:
-          - Resources
-      - path: CarrierTakeOff/Resources/data.json
-        buildPhase: resources
-        type: file
+sources:
+  - path: CarrierTakeOff
+    excludes:
+      - Resources
+  - path: CarrierTakeOff/Resources
+    buildPhase: resources
+    type: folder
     settings:
       base:
         INFOPLIST_FILE: CarrierTakeOff/Info.plist

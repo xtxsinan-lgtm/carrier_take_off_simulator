@@ -6,35 +6,41 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AF4FBF83DDCC5BB680EAF25A /* APIClient.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = D01879514CDF59EDA1260B55 /* APIClient.swift */; };
 		33243D7A0F9554E98680B994 /* CarrierTakeOffApp.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 7E41ED0ABE8753DD9FB196DC /* CarrierTakeOffApp.swift */; };
+		FABB823BD47F5B279DC26F7C /* CatalogStore.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 13A7DD20326F53EDA63E7DE0 /* CatalogStore.swift */; };
 		B73C9A90C3215FF49DAB778D /* Components/ModeSelector.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = CA61023294D05872ACA99E62 /* Components/ModeSelector.swift */; };
 		1A356894595A57AFB0A74750 /* Components/SpecList.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = FCEB011FA83E558D8472FA90 /* Components/SpecList.swift */; };
 		EE05F5EEC20B5632A116556A /* Components/TrajectoryChart.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 45B15473805A5581B41C8F59 /* Components/TrajectoryChart.swift */; };
 		884071C748EA5EC79D6FF75D /* Config.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 7807FAB89078571E89A10816 /* Config.swift */; };
 		69A4DBD53E9158B580952826 /* ContentView.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 712D6BDDF2785D2FBFDA7180 /* ContentView.swift */; };
+		FC78D417969C5E66B27F5BD2 /* LocalSimulatorEngine.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 8DEB6731BAE054BDB1E2B5BB /* LocalSimulatorEngine.swift */; };
 		083462D684ED58EE89A06F94 /* Models.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 828F37BC1B845EB6B4221C97 /* Models.swift */; };
 		DF995F993536557BB6E61BC0 /* Physics.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 69214A43FA7A5B09862DC795 /* Physics.swift */; };
 		1F13E61D1D055C788FD7B9F3 /* SimulatorViewModel.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 8F8BE49FBB77582C83FF99D8 /* SimulatorViewModel.swift */; };
 		BE042B3855E55A4BBB61E643 /* Theme.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = AC5865B3FC315A75B9C400A0 /* Theme.swift */; };
 		D24A15E5E46A5C409858697A /* Resources/data.json in Sources/Resources */ = {isa = PBXBuildFile; fileRef = DF27BFBCD5755B83BD6AFF26 /* Resources/data.json */; };
+		5A086C5B3E1C5A098ED41B17 /* Resources/engine.html in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 552E8AC33231545CBE2AB782 /* Resources/engine.html */; };
+		063DAF5C50D05A608B8262A8 /* Resources/engine.js in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 792ABA4A55F75CAFA1DE8CE0 /* Resources/engine.js */; };
 		F21D6A9A0583536E946EF34F /* Assets.xcassets in Sources/Resources */ = {isa = PBXBuildFile; fileRef = D237E91CD8315A60BD61E382 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		DB28CF1D1B635B14AB9B5A56 /* CarrierTakeOff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarrierTakeOff.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D01879514CDF59EDA1260B55 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "APIClient.swift"; sourceTree = "<group>"; };
 		7E41ED0ABE8753DD9FB196DC /* CarrierTakeOffApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CarrierTakeOffApp.swift"; sourceTree = "<group>"; };
+		13A7DD20326F53EDA63E7DE0 /* CatalogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CatalogStore.swift"; sourceTree = "<group>"; };
 		CA61023294D05872ACA99E62 /* Components/ModeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModeSelector.swift"; sourceTree = "<group>"; };
 		FCEB011FA83E558D8472FA90 /* Components/SpecList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpecList.swift"; sourceTree = "<group>"; };
 		45B15473805A5581B41C8F59 /* Components/TrajectoryChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrajectoryChart.swift"; sourceTree = "<group>"; };
 		7807FAB89078571E89A10816 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Config.swift"; sourceTree = "<group>"; };
 		712D6BDDF2785D2FBFDA7180 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
+		8DEB6731BAE054BDB1E2B5BB /* LocalSimulatorEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalSimulatorEngine.swift"; sourceTree = "<group>"; };
 		828F37BC1B845EB6B4221C97 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models.swift"; sourceTree = "<group>"; };
 		69214A43FA7A5B09862DC795 /* Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Physics.swift"; sourceTree = "<group>"; };
 		8F8BE49FBB77582C83FF99D8 /* SimulatorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SimulatorViewModel.swift"; sourceTree = "<group>"; };
 		AC5865B3FC315A75B9C400A0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme.swift"; sourceTree = "<group>"; };
 		DF27BFBCD5755B83BD6AFF26 /* data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
+		552E8AC33231545CBE2AB782 /* engine.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = engine.html; sourceTree = "<group>"; };
+		792ABA4A55F75CAFA1DE8CE0 /* engine.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = engine.js; sourceTree = "<group>"; };
 		D237E91CD8315A60BD61E382 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
 		A4DE4DD5CFDC56DE831E3C7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,10 +65,11 @@
 		FB1916206DF7519DA6B81C0B /* CarrierTakeOff */ = {
 			isa = PBXGroup;
 			children = (
-				D01879514CDF59EDA1260B55 /* APIClient.swift */,
 				7E41ED0ABE8753DD9FB196DC /* CarrierTakeOffApp.swift */,
+				13A7DD20326F53EDA63E7DE0 /* CatalogStore.swift */,
 				7807FAB89078571E89A10816 /* Config.swift */,
 				712D6BDDF2785D2FBFDA7180 /* ContentView.swift */,
+				8DEB6731BAE054BDB1E2B5BB /* LocalSimulatorEngine.swift */,
 				828F37BC1B845EB6B4221C97 /* Models.swift */,
 				69214A43FA7A5B09862DC795 /* Physics.swift */,
 				8F8BE49FBB77582C83FF99D8 /* SimulatorViewModel.swift */,
@@ -89,6 +96,8 @@
 			isa = PBXGroup;
 			children = (
 				DF27BFBCD5755B83BD6AFF26 /* data.json */,
+				552E8AC33231545CBE2AB782 /* engine.html */,
+				792ABA4A55F75CAFA1DE8CE0 /* engine.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -147,13 +156,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AF4FBF83DDCC5BB680EAF25A /* APIClient.swift in Sources */,
 				33243D7A0F9554E98680B994 /* CarrierTakeOffApp.swift in Sources */,
+				FABB823BD47F5B279DC26F7C /* CatalogStore.swift in Sources */,
 				B73C9A90C3215FF49DAB778D /* Components/ModeSelector.swift in Sources */,
 				1A356894595A57AFB0A74750 /* Components/SpecList.swift in Sources */,
 				EE05F5EEC20B5632A116556A /* Components/TrajectoryChart.swift in Sources */,
 				884071C748EA5EC79D6FF75D /* Config.swift in Sources */,
 				69A4DBD53E9158B580952826 /* ContentView.swift in Sources */,
+				FC78D417969C5E66B27F5BD2 /* LocalSimulatorEngine.swift in Sources */,
 				083462D684ED58EE89A06F94 /* Models.swift in Sources */,
 				DF995F993536557BB6E61BC0 /* Physics.swift in Sources */,
 				1F13E61D1D055C788FD7B9F3 /* SimulatorViewModel.swift in Sources */,
@@ -169,6 +179,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D24A15E5E46A5C409858697A /* data.json in Resources */,
+				5A086C5B3E1C5A098ED41B17 /* engine.html in Resources */,
+				063DAF5C50D05A608B8262A8 /* engine.js in Resources */,
 				F21D6A9A0583536E946EF34F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

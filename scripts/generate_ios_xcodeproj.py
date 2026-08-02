@@ -29,6 +29,12 @@ def main() -> None:
     assert data_json.is_file(), '缺少 data.json，请先运行 build_all.py'
     assert info_plist.is_file()
 
+    resource_files = sorted(
+        p.relative_to(SRC)
+        for p in (SRC / 'Resources').iterdir()
+        if p.is_file()
+    )
+
     project_id = _id('project')
     target_id = _id('target')
     sources_phase = _id('sources')
@@ -56,9 +62,10 @@ def main() -> None:
         file_refs[key] = _id(f'file:{key}')
         build_files[key] = _id(f'build:{key}')
 
-    data_key = 'Resources/data.json'
-    file_refs[data_key] = _id(f'file:{data_key}')
-    build_files[data_key] = _id(f'build:{data_key}')
+    for rel in resource_files:
+        key = str(rel)
+        file_refs[key] = _id(f'file:{key}')
+        build_files[key] = _id(f'build:{key}')
 
     for rel in asset_dirs:
         key = str(rel)
@@ -92,9 +99,20 @@ def main() -> None:
         lines.append(
             f'\t\t{file_refs[key]} /* {key} */ = {{isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "{Path(key).name}"; sourceTree = "<group>"; }};'
         )
-    lines.append(
-        f'\t\t{file_refs[data_key]} /* data.json */ = {{isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; }};'
-    )
+    for rel in resource_files:
+        key = str(rel)
+        name = Path(key).name
+        if name.endswith('.json'):
+            ftype = 'text.json'
+        elif name.endswith('.js'):
+            ftype = 'sourcecode.javascript'
+        elif name.endswith('.html'):
+            ftype = 'text.html'
+        else:
+            ftype = 'text'
+        lines.append(
+            f'\t\t{file_refs[key]} /* {name} */ = {{isa = PBXFileReference; lastKnownFileType = {ftype}; path = {name}; sourceTree = "<group>"; }};'
+        )
     for rel in asset_dirs:
         key = str(rel)
         lines.append(
@@ -157,7 +175,9 @@ def main() -> None:
     lines.append(f'\t\t{resources_group} /* Resources */ = {{')
     lines.append('\t\t\tisa = PBXGroup;')
     lines.append('\t\t\tchildren = (')
-    lines.append(f'\t\t\t\t{file_refs[data_key]} /* data.json */,')
+    for rel in resource_files:
+        key = str(rel)
+        lines.append(f'\t\t\t\t{file_refs[key]} /* {Path(key).name} */,')
     lines.append('\t\t\t);')
     lines.append('\t\t\tpath = Resources;')
     lines.append('\t\t\tsourceTree = "<group>";')
@@ -231,7 +251,9 @@ def main() -> None:
     lines.append('\t\t\tisa = PBXResourcesBuildPhase;')
     lines.append('\t\t\tbuildActionMask = 2147483647;')
     lines.append('\t\t\tfiles = (')
-    lines.append(f'\t\t\t\t{build_files[data_key]} /* data.json in Resources */,')
+    for rel in resource_files:
+        key = str(rel)
+        lines.append(f'\t\t\t\t{build_files[key]} /* {Path(key).name} in Resources */,')
     for rel in asset_dirs:
         key = str(rel)
         lines.append(f'\t\t\t\t{build_files[key]} /* {key} in Resources */,')

@@ -1,15 +1,18 @@
 # 航母舰载机起飞仿真 — iOS App
 
-SwiftUI 原生界面，布局与交互对齐微信小程序 / Web 版（深色主题、6 段卡片、轨迹图）。
+SwiftUI 原生界面，布局与小程序对齐。**数据与仿真均在设备本地完成**（Bundle `data.json` + Pyodide 跑同一套 Python），不依赖 HTTP 后端。
 
 ## 架构
 
 ```
 iPhone App (SwiftUI)
-  ├─ Bundle data.json（机库目录，由 build_all 生成）
-  ├─ Physics.swift（预览气动/滑跃，由 Python 生成）
-  └─ HTTP → apps/simulator_api.py（与小程序同一仿真 API）
+  ├─ Bundle data.json（机库目录 + py_sources，由 build_all 生成）
+  ├─ Physics.swift（参数预览，由 Python 生成）
+  └─ LocalSimulatorEngine（隐藏 WKWebView + Pyodide）
+         └─ apps.web_simulator.run_simulation_json（与 Web 同源）
 ```
+
+微信小程序仍使用 `python3 apps/miniprogram_api.py`；iOS **不需要**该服务。
 
 ## 快速开始
 
@@ -19,35 +22,16 @@ iPhone App (SwiftUI)
 python3 scripts/build_all.py
 ```
 
-### 2. 启动仿真 API
+### 2. 打开 Xcode 工程
+
+需要完整版 Xcode：
 
 ```bash
-# 模拟器可用 127.0.0.1；真机需局域网
-python3 apps/simulator_api.py --host 0.0.0.0
-```
-
-### 3. 配置 API 地址
-
-编辑 `CarrierTakeOff/Config.swift`：
-
-- 模拟器：`http://127.0.0.1:8765`
-- 真机：`http://<Mac局域网IP>:8765`
-
-### 4. 打开 Xcode 工程
-
-需要安装完整版 [Xcode](https://developer.apple.com/xcode/)（仅 Command Line Tools 无法跑模拟器）。
-
-```bash
-# 若尚未生成工程：
-python3 scripts/generate_ios_xcodeproj.py
-# 或一键：python3 scripts/build_all.py
-
+python3 scripts/generate_ios_xcodeproj.py   # 若尚未生成
 open ios/CarrierTakeOff.xcodeproj
 ```
 
-选择 iPhone 模拟器或真机 → Run。
-
-也可用 XcodeGen（可选）：`cd ios && xcodegen generate`。
+选模拟器或真机 → Run。首次启动会从 CDN 拉取 Pyodide/numpy（仅引擎运行时）；仿真计算在本机完成。
 
 ## 与其他通道同步
 
@@ -55,9 +39,9 @@ open ios/CarrierTakeOff.xcodeproj
 |------|------|
 | 模式 / 策略 / 机库 | `scripts/frontend_catalog.py` → `Resources/data.json` |
 | 预览物理常量 | `generate_frontend_physics.py` → `Physics.swift` |
-| 仿真数值 | `simulator_api` → `web_simulator.run_simulation_json` |
+| 仿真数值 | Bundle 内 `py_sources` → 本地 Pyodide → `web_simulator` |
 
-**禁止手改** `Physics.swift`、`Resources/data.json`（与 JS 产物一样由 build 生成）。
+**禁止手改** `Physics.swift`、`Resources/data.json`（由 build 生成）。
 
 ## 界面结构（与小程序一致）
 

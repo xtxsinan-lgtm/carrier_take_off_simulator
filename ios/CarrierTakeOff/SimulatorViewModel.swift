@@ -36,7 +36,7 @@ final class SimulatorViewModel: ObservableObject {
     @Published var running: Bool = false
     @Published var showTrajectory: Bool = false
     @Published var chartResult: SimulationResult?
-    @Published var hasApi: Bool = false
+    @Published var engineReady: Bool = false
 
     private var catalog: CatalogPayload?
     private var stovlStrategies: [String: String] = [:]
@@ -53,13 +53,9 @@ final class SimulatorViewModel: ObservableObject {
     }
 
     func bootstrap() async {
-        hasApi = !AppConfig.apiBaseUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        setStatus("正在加载数据…", .loading)
+        setStatus("正在加载本地数据与仿真引擎…", .loading)
         do {
-            // 先确保 Bundle 有数据；再尝试远端覆盖
-            let bundled = try APIClient.loadBundledCatalog()
-            let data = await APIClient.loadSimulatorData()
-            let resolved = data.carriers.isEmpty ? bundled : data
+            let resolved = try CatalogStore.loadBundledCatalog()
             catalog = resolved
             stovlStrategies = resolved.stovl_strategies ?? [
                 "A": "策略 A — 延迟偏转喷口",
@@ -73,11 +69,12 @@ final class SimulatorViewModel: ObservableObject {
             modeList = modesToList(resolved.modes)
             strategyList = modesToList(stovlStrategies)
             applyMode("ski_jump")
-            let hint = hasApi
-                ? "本地数据已加载。仿真将请求后端 API。"
-                : "数据已加载。仿真需配置 Config.swift 中的 apiBaseUrl 并启动 python3 apps/simulator_api.py"
-            setStatus(hint, .ok)
+            setStatus("目录已加载，正在初始化本地 Python 引擎（首次可能较慢）…", .loading)
+            try await LocalSimulatorEngine.shared.prepare()
+            engineReady = true
+            setStatus("本地仿真引擎已就绪（数据与计算均在本机）", .ok)
         } catch {
+            engineReady = false
             setStatus(error.localizedDescription, .error)
         }
     }
@@ -267,7 +264,7 @@ final class SimulatorViewModel: ObservableObject {
                 if let h = Double(skiHeight) { payload["ski_jump_height_m"] = h }
             }
 
-            let result = try await APIClient.runSimulation(payload: payload)
+            let result = try await LocalSimulatorEngine.shared.run(payload: payload)
             let traj = result.trajectory
             let deck = result.deck_profile
             let showTraj =

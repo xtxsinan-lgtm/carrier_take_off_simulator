@@ -100,7 +100,7 @@
       </button>
     </view>
     <text class="card-hint" wx:if="{{!hasApi}}">
-      提示：在 miniprogram/config.js 设置 apiBaseUrl，并运行 python3 apps/simulator_api.py 启动仿真服务。
+      提示：在 miniprogram/config.js 设置 apiBaseUrl，并运行 python3 apps/miniprogram_api.py 启动仿真服务。
     </text>
   </view>
 

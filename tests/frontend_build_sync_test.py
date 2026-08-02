@@ -80,7 +80,9 @@ def test_docs_data_json_catalog_section_matches():
 
 
 def test_ios_data_json_matches_catalog():
-    """iOS Bundle data.json 须与 CSV→catalog 实时结果一致。"""
+    """iOS Bundle data.json 目录字段须与 catalog 一致，并含本地仿真 py_sources。"""
+    from scripts.build_docs import PY_LOAD_ORDER
+
     path = ROOT / 'ios' / 'CarrierTakeOff' / 'Resources' / 'data.json'
     expected = build_catalog_payload(
         load_aircraft_csv(AIRCRAFT_CSV),
@@ -88,7 +90,10 @@ def test_ios_data_json_matches_catalog():
     )
     assert path.is_file(), '缺少 ios/.../data.json，请运行 build_all.py'
     actual = json.loads(path.read_text(encoding='utf-8'))
-    assert actual == expected
+    for key in expected:
+        assert actual[key] == expected[key], f'ios data.json 字段 {key} 过期'
+    assert 'py_sources' in actual and len(actual['py_sources']) >= 1
+    assert actual['py_load_order'] == list(PY_LOAD_ORDER)
 
 
 def test_generated_constants_match_python():
