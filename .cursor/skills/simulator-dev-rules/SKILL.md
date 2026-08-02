@@ -13,7 +13,7 @@ description: >-
 2. **功能改动需要有 e2e test**
 3. **所有注释用中文**
 
-## 四条发布通道必须同步
+## 多条发布通道必须同步
 
 任何功能/模式/机型/策略改动，必须同时覆盖以下通道（缺一不可）：
 
@@ -23,8 +23,9 @@ description: >-
 | GitHub Pages HTML | `docs/index.html`、`docs/js/`、`docs/data.json` | `build_all.py`；模式按钮由 `data.modes` 动态生成 |
 | 微信小程序 | `miniprogram/`（`data.json` + 页面） | `build_all.py`；模式列表来自 catalog |
 | 小程序 HTTP API | `apps/miniprogram_api.py` | 与 `web_simulator` 同一套模式契约 |
+| iOS App | `ios/CarrierTakeOff/` | `build_all.py` → `Resources/data.json` + `Physics.swift`；GUI 对齐小程序 |
 
-**禁止**：只改仿真器或只改小程序就结束；HTML 硬编码模式按钮（须读 `data.modes`）。
+**禁止**：只改仿真器或只改小程序/iOS 就结束；HTML 硬编码模式按钮（须读 `data.modes`）。
 
 任务结束前自检：
 
@@ -34,8 +35,8 @@ description: >-
 - [ ] 已运行 python3 scripts/build_all.py
 - [ ] 本地打开 docs/ 或确认 Pages 能看到新模式（push 后等 1–3 分钟；必要时递增 APP_VERSION 与 index.html ?v=）
 - [ ] 小程序模式列表含新模式（来自 data.json，勿只改 wxml 文案）
+- [ ] iOS Resources/data.json 与 Physics.swift 已由 build 更新
 ```
-
 ## 实施流程
 
 每次改代码前复制此清单并逐项完成：
@@ -54,8 +55,10 @@ description: >-
 
 - `docs/js/physics.js`
 - `miniprogram/utils/physics.js`
+- `ios/CarrierTakeOff/Physics.swift`
 - `docs/data.json` / `docs/py/**`（由 `build_docs` 生成）
 - `miniprogram/data/data.json`（由 `build_miniprogram` 生成）
+- `ios/CarrierTakeOff/Resources/data.json`（由 `build_ios` 生成）
 
 ## 1. 单元测试
 

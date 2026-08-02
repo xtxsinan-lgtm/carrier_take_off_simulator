@@ -50,3 +50,12 @@ def test_unknown_route_404():
     status, _, body = handle_request('GET', '/unknown', None)
     assert status == 404
     assert json.loads(body.decode())['error'] == 'Not Found'
+
+
+def test_post_simulate_invalid_payload_returns_json_not_500():
+    """缺字段时不应抛未捕获异常（真机侧会显示 HTTP 500）。"""
+    status, _, body = handle_request('POST', '/api/simulate', b'{}')
+    assert status == 200
+    result = json.loads(body.decode())
+    assert result['success'] is False
+    assert 'error' in result

@@ -16,6 +16,21 @@ if str(_ROOT) not in sys.path:
 from apps.web_simulator import run_simulation_json
 
 
+def _guess_lan_ip() -> str | None:
+    """尝试获取本机局域网 IPv4，供真机调试提示。"""
+    import socket
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(('8.8.8.8', 80))
+            ip = s.getsockname()[0]
+            if ip and not ip.startswith('127.'):
+                return ip
+    except OSError:
+        pass
+    return None
+
+
 def build_data_payload() -> dict[str, Any]:
     """返回航母/战斗机数据库 JSON（与 build_miniprogram 结构一致）。"""
     from scripts.build_miniprogram import build_miniprogram_data
@@ -53,8 +68,13 @@ def handle_request(method: str, path: str, body: bytes | None) -> tuple[int, dic
         except json.JSONDecodeError as exc:
             err = {'success': False, 'error': f'JSON 解析失败: {exc}'}
             return 400, {**cors, 'Content-Type': 'application/json'}, json.dumps(err).encode()
-        result = run_simulation_json(payload)
-        body_bytes = json.dumps(result, ensure_ascii=False).encode('utf-8')
+        try:
+            result = run_simulation_json(payload)
+            body_bytes = json.dumps(result, ensure_ascii=False).encode('utf-8')
+        except Exception as exc:
+            print(f'[miniprogram_api] 仿真未捕获异常: {exc}')
+            err = {'success': False, 'error': f'服务器内部错误: {exc}'}
+            body_bytes = json.dumps(err, ensure_ascii=False).encode('utf-8')
         headers = {**cors, 'Content-Type': 'application/json; charset=utf-8'}
         return 200, headers, body_bytes
 
@@ -105,6 +125,10 @@ def serve(host: str = '127.0.0.1', port: int = 8765) -> None:
     print(f'小程序仿真 API 运行于 http://{host}:{port}')
     print('  GET  /api/data     — 航母/战斗机数据')
     print('  POST /api/simulate — 运行仿真')
+    if host in ('0.0.0.0', '::'):
+        lan = _guess_lan_ip()
+        if lan:
+            print(f'  真机调试：miniprogram/config.js 中 apiBaseUrl 改为 http://{lan}:{port}')
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -13,10 +13,12 @@ import pytest
 from scripts.frontend_catalog import build_catalog_payload
 from scripts.generate_frontend_physics import (
     DOCS_PHYSICS,
+    IOS_PHYSICS,
     MINI_PHYSICS,
     render_cjs,
     render_esm,
     render_physics_body,
+    render_swift,
     _load_constants,
 )
 from utils.database_csv import load_aircraft_csv, load_carriers_csv
@@ -36,9 +38,10 @@ OSASCRIPT = shutil.which('osascript')
 
 
 def test_physics_js_artifacts_match_generator():
-    """docs / 小程序 physics.js 必须与生成器输出一致（防手改漂移）。"""
+    """docs / 小程序 physics.js 与 iOS Physics.swift 必须与生成器输出一致（防手改漂移）。"""
     assert DOCS_PHYSICS.read_text(encoding='utf-8') == render_esm()
     assert MINI_PHYSICS.read_text(encoding='utf-8') == render_cjs()
+    assert IOS_PHYSICS.read_text(encoding='utf-8') == render_swift()
 
 
 def test_miniprogram_data_json_matches_catalog():
@@ -74,6 +77,18 @@ def test_docs_data_json_catalog_section_matches():
     for key in expected:
         assert data[key] == expected[key], f'docs/data.json 字段 {key} 过期，请运行 build_all.py'
     assert 'py_sources' in data and len(data['py_sources']) >= 1
+
+
+def test_ios_data_json_matches_catalog():
+    """iOS Bundle data.json 须与 CSV→catalog 实时结果一致。"""
+    path = ROOT / 'ios' / 'CarrierTakeOff' / 'Resources' / 'data.json'
+    expected = build_catalog_payload(
+        load_aircraft_csv(AIRCRAFT_CSV),
+        load_carriers_csv(CARRIERS_CSV),
+    )
+    assert path.is_file(), '缺少 ios/.../data.json，请运行 build_all.py'
+    actual = json.loads(path.read_text(encoding='utf-8'))
+    assert actual == expected
 
 
 def test_generated_constants_match_python():

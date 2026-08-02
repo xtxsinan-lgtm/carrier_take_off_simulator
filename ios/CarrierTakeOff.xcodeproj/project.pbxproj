@@ -1,0 +1,298 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AF4FBF83DDCC5BB680EAF25A /* APIClient.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = D01879514CDF59EDA1260B55 /* APIClient.swift */; };
+		33243D7A0F9554E98680B994 /* CarrierTakeOffApp.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 7E41ED0ABE8753DD9FB196DC /* CarrierTakeOffApp.swift */; };
+		B73C9A90C3215FF49DAB778D /* Components/ModeSelector.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = CA61023294D05872ACA99E62 /* Components/ModeSelector.swift */; };
+		1A356894595A57AFB0A74750 /* Components/SpecList.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = FCEB011FA83E558D8472FA90 /* Components/SpecList.swift */; };
+		EE05F5EEC20B5632A116556A /* Components/TrajectoryChart.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 45B15473805A5581B41C8F59 /* Components/TrajectoryChart.swift */; };
+		884071C748EA5EC79D6FF75D /* Config.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 7807FAB89078571E89A10816 /* Config.swift */; };
+		69A4DBD53E9158B580952826 /* ContentView.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 712D6BDDF2785D2FBFDA7180 /* ContentView.swift */; };
+		083462D684ED58EE89A06F94 /* Models.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 828F37BC1B845EB6B4221C97 /* Models.swift */; };
+		DF995F993536557BB6E61BC0 /* Physics.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 69214A43FA7A5B09862DC795 /* Physics.swift */; };
+		1F13E61D1D055C788FD7B9F3 /* SimulatorViewModel.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 8F8BE49FBB77582C83FF99D8 /* SimulatorViewModel.swift */; };
+		BE042B3855E55A4BBB61E643 /* Theme.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = AC5865B3FC315A75B9C400A0 /* Theme.swift */; };
+		D24A15E5E46A5C409858697A /* Resources/data.json in Sources/Resources */ = {isa = PBXBuildFile; fileRef = DF27BFBCD5755B83BD6AFF26 /* Resources/data.json */; };
+		F21D6A9A0583536E946EF34F /* Assets.xcassets in Sources/Resources */ = {isa = PBXBuildFile; fileRef = D237E91CD8315A60BD61E382 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		DB28CF1D1B635B14AB9B5A56 /* CarrierTakeOff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarrierTakeOff.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D01879514CDF59EDA1260B55 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "APIClient.swift"; sourceTree = "<group>"; };
+		7E41ED0ABE8753DD9FB196DC /* CarrierTakeOffApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CarrierTakeOffApp.swift"; sourceTree = "<group>"; };
+		CA61023294D05872ACA99E62 /* Components/ModeSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModeSelector.swift"; sourceTree = "<group>"; };
+		FCEB011FA83E558D8472FA90 /* Components/SpecList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SpecList.swift"; sourceTree = "<group>"; };
+		45B15473805A5581B41C8F59 /* Components/TrajectoryChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrajectoryChart.swift"; sourceTree = "<group>"; };
+		7807FAB89078571E89A10816 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Config.swift"; sourceTree = "<group>"; };
+		712D6BDDF2785D2FBFDA7180 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
+		828F37BC1B845EB6B4221C97 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models.swift"; sourceTree = "<group>"; };
+		69214A43FA7A5B09862DC795 /* Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Physics.swift"; sourceTree = "<group>"; };
+		8F8BE49FBB77582C83FF99D8 /* SimulatorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SimulatorViewModel.swift"; sourceTree = "<group>"; };
+		AC5865B3FC315A75B9C400A0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Theme.swift"; sourceTree = "<group>"; };
+		DF27BFBCD5755B83BD6AFF26 /* data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
+		D237E91CD8315A60BD61E382 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
+		A4DE4DD5CFDC56DE831E3C7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		9FBB5A71533A562FA4A4C297 = {
+			isa = PBXGroup;
+			children = (
+				FB1916206DF7519DA6B81C0B /* CarrierTakeOff */,
+				835D1CE69E455DC6B131D27C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		835D1CE69E455DC6B131D27C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DB28CF1D1B635B14AB9B5A56 /* CarrierTakeOff.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FB1916206DF7519DA6B81C0B /* CarrierTakeOff */ = {
+			isa = PBXGroup;
+			children = (
+				D01879514CDF59EDA1260B55 /* APIClient.swift */,
+				7E41ED0ABE8753DD9FB196DC /* CarrierTakeOffApp.swift */,
+				7807FAB89078571E89A10816 /* Config.swift */,
+				712D6BDDF2785D2FBFDA7180 /* ContentView.swift */,
+				828F37BC1B845EB6B4221C97 /* Models.swift */,
+				69214A43FA7A5B09862DC795 /* Physics.swift */,
+				8F8BE49FBB77582C83FF99D8 /* SimulatorViewModel.swift */,
+				AC5865B3FC315A75B9C400A0 /* Theme.swift */,
+				740379012C79578AB0AE12FC /* Components */,
+				8DFEABFBFE4A5AFDB1CF6087 /* Resources */,
+				D237E91CD8315A60BD61E382 /* Assets.xcassets */,
+				A4DE4DD5CFDC56DE831E3C7F /* Info.plist */,
+			);
+			path = CarrierTakeOff;
+			sourceTree = "<group>";
+		};
+		740379012C79578AB0AE12FC /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				CA61023294D05872ACA99E62 /* Components/ModeSelector.swift */,
+				FCEB011FA83E558D8472FA90 /* Components/SpecList.swift */,
+				45B15473805A5581B41C8F59 /* Components/TrajectoryChart.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		8DFEABFBFE4A5AFDB1CF6087 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DF27BFBCD5755B83BD6AFF26 /* data.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FEC5511F661C50A7AE99A18F /* CarrierTakeOff */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E43BEF4415B753C7A543C5D6 /* Build configuration list for PBXNativeTarget "CarrierTakeOff" */;
+			buildPhases = (
+				281F803552435C5AAE73AF52 /* Sources */,
+				6AD03D9C8C6A528AADC4EA4E /* Frameworks */,
+				B3B71381466A583E8D052DB3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CarrierTakeOff;
+			productName = CarrierTakeOff;
+			productReference = DB28CF1D1B635B14AB9B5A56 /* CarrierTakeOff.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0A365442F9C454F287BE65BD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = 96C2091FB44E5B34BDCD5573 /* Build configuration list for PBXProject "CarrierTakeOff" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 9FBB5A71533A562FA4A4C297;
+			productRefGroup = 835D1CE69E455DC6B131D27C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FEC5511F661C50A7AE99A18F /* CarrierTakeOff */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		281F803552435C5AAE73AF52 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF4FBF83DDCC5BB680EAF25A /* APIClient.swift in Sources */,
+				33243D7A0F9554E98680B994 /* CarrierTakeOffApp.swift in Sources */,
+				B73C9A90C3215FF49DAB778D /* Components/ModeSelector.swift in Sources */,
+				1A356894595A57AFB0A74750 /* Components/SpecList.swift in Sources */,
+				EE05F5EEC20B5632A116556A /* Components/TrajectoryChart.swift in Sources */,
+				884071C748EA5EC79D6FF75D /* Config.swift in Sources */,
+				69A4DBD53E9158B580952826 /* ContentView.swift in Sources */,
+				083462D684ED58EE89A06F94 /* Models.swift in Sources */,
+				DF995F993536557BB6E61BC0 /* Physics.swift in Sources */,
+				1F13E61D1D055C788FD7B9F3 /* SimulatorViewModel.swift in Sources */,
+				BE042B3855E55A4BBB61E643 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B3B71381466A583E8D052DB3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D24A15E5E46A5C409858697A /* data.json in Resources */,
+				F21D6A9A0583536E946EF34F /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6AD03D9C8C6A528AADC4EA4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F3BB407217D7524893CF6043 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				ONLY_ACTIVE_ARCH = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)",);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		BAE63BDD49A65066B2AB2818 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		F98860D7BDD45E90A137F923 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CarrierTakeOff/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carriertakeoff.simulator;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		3297C2C55A6B530BA33EA84C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CarrierTakeOff/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carriertakeoff.simulator;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		96C2091FB44E5B34BDCD5573 /* Build configuration list for PBXProject "CarrierTakeOff" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F3BB407217D7524893CF6043 /* Debug */,
+				BAE63BDD49A65066B2AB2818 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E43BEF4415B753C7A543C5D6 /* Build configuration list for PBXNativeTarget "CarrierTakeOff" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F98860D7BDD45E90A137F923 /* Debug */,
+				3297C2C55A6B530BA33EA84C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0A365442F9C454F287BE65BD /* Project object */;
+}
