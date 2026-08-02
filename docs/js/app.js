@@ -11,7 +11,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 8;
+const APP_VERSION = 9;
 
 let data = null;
 let pyodide = null;
@@ -45,7 +45,9 @@ if '/py' not in sys.path:
 
   for (const name of data.py_load_order) {
     const code = data.py_sources[name];
-    if (!code) throw new Error(`缺少 Python 模块: ${name}`);
+    if (code === undefined || code === null) {
+      throw new Error(`缺少 Python 模块: ${name}`);
+    }
     const parts = name.split('/');
     if (parts.length > 1) {
       let dir = '/py';
