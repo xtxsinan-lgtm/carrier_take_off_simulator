@@ -93,7 +93,15 @@ class _ApiHandler(BaseHTTPRequestHandler):
 
 def serve(host: str = '127.0.0.1', port: int = 8765) -> None:
     """启动仿真 API 服务。"""
-    server = ThreadingHTTPServer((host, port), _ApiHandler)
+    try:
+        server = ThreadingHTTPServer((host, port), _ApiHandler)
+    except OSError as exc:
+        if exc.errno == 48:
+            print(f'端口 {port} 已被占用，仿真 API 可能已在运行。')
+            print(f'  可直接访问: http://{host}:{port}/api/data')
+            print(f'  若要重启: kill $(lsof -t -i :{port}) 后再运行本脚本')
+            raise SystemExit(1) from exc
+        raise
     print(f'小程序仿真 API 运行于 http://{host}:{port}')
     print('  GET  /api/data     — 航母/战斗机数据')
     print('  POST /api/simulate — 运行仿真')
@@ -105,4 +113,10 @@ def serve(host: str = '127.0.0.1', port: int = 8765) -> None:
 
 
 if __name__ == '__main__':
-    serve()
+    import argparse
+
+    parser = argparse.ArgumentParser(description='航母起飞仿真 — 小程序 HTTP API')
+    parser.add_argument('--host', default='127.0.0.1', help='监听地址（默认 127.0.0.1）')
+    parser.add_argument('--port', type=int, default=8765, help='监听端口（默认 8765）')
+    args = parser.parse_args()
+    serve(args.host, args.port)
