@@ -12,7 +12,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 13;
+const APP_VERSION = 14;
 let data = null;
 let pyodide = null;
 let pyReady = false;
@@ -314,12 +314,17 @@ function resolveTakeoffX(result, deckPts, traj) {
 function paintTrajectoryCanvas(result) {
   const canvas = els.trajectoryCanvas;
   const ctx = canvas.getContext('2d');
+  // 从 hidden 恢复后首帧 getBoundingClientRect 可能为 0，回退到父级/属性宽度
   const rect = canvas.getBoundingClientRect();
-  const cssW = Math.max(rect.width || canvas.width || 1060, 640);
-  const cssH = Math.max(rect.height || canvas.height || 320, 240);
+  const parent = canvas.parentElement;
+  const parentW = parent ? parent.clientWidth : 0;
+  const cssW = Math.max(rect.width || parentW || Number(canvas.getAttribute('width')) || 1060, 320);
+  const cssH = Math.max(rect.height || Number(canvas.getAttribute('height')) || 320, 200);
   const dpr = window.devicePixelRatio || 1;
   canvas.width = Math.round(cssW * dpr);
   canvas.height = Math.round(cssH * dpr);
+  canvas.style.width = `${cssW}px`;
+  canvas.style.height = `${cssH}px`;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   const deckPts = result.deck_profile.points;
@@ -465,9 +470,12 @@ function drawTrajectory(result) {
       `最大高度 ${fmtNum(Math.max(...result.trajectory.map((p) => p.y)), 1)} m`;
   }
 
+  // 双 rAF：先完成取消 hidden 的布局，再测量 canvas 尺寸绘制
   requestAnimationFrame(() => {
-    paintTrajectoryCanvas(result);
-    els.trajectorySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    requestAnimationFrame(() => {
+      paintTrajectoryCanvas(result);
+      els.trajectorySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   });
 }
 

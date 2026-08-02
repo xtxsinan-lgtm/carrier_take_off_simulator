@@ -24,7 +24,12 @@ function paintTrajectory(ctx, result, cssW, cssH) {
   const deckPts = result.deck_profile.points;
   const traj = result.trajectory;
   const takeoffX = resolveTakeoffX(result, deckPts, traj);
-  const takeoffLabelM = result.distance_m ?? result.deck_profile?.takeoff_distance_m ?? takeoffX;
+  const deckTakeoff =
+    result.deck_profile && result.deck_profile.takeoff_distance_m != null
+      ? result.deck_profile.takeoff_distance_m
+      : null;
+  const takeoffLabelM =
+    result.distance_m != null ? result.distance_m : deckTakeoff != null ? deckTakeoff : takeoffX;
   const carrierDeckM = result.deck_profile.total_deck_length_m;
 
   const xs = [...deckPts.map((p) => p[0]), ...traj.map((p) => p.x), takeoffX];

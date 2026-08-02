@@ -261,7 +261,7 @@ Page({
         { label: '桨盘直径', value: `${fmtNum(ac.prop_diameter_m, 2)} m` },
         {
           label: '短舱遮挡比',
-          value: `${fmtNum((ac.nacelle_blockage_frac ?? 0.1) * 100, 0)} %`,
+          value: `${fmtNum((ac.nacelle_blockage_frac != null ? ac.nacelle_blockage_frac : 0.1) * 100, 0)} %`,
         }
       );
     } else {

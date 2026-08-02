@@ -499,8 +499,8 @@ def run_simulation(
             'plume_applicable': plume_applicable,
             'min_plume_trailing_edge_m': plume_edge,
             'result': _json_safe(result),
-            'trajectory': trajectory,
-            'deck_profile': deck_profile,
+            'trajectory': _json_safe(trajectory),
+            'deck_profile': _json_safe(deck_profile),
         }
     except Exception as exc:
         config_text = buf.getvalue()

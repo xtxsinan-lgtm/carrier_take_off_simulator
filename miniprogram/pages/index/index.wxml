@@ -111,7 +111,8 @@
   </view>
 
   <!-- 6. 起飞轨迹 -->
-  <view class="card" wx:if="{{showTrajectory}}">
+  <!-- 轨迹：用 hidden 保留组件，避免每次仿真销毁重建导致 Canvas 采不到节点 -->
+  <view class="card" hidden="{{!showTrajectory}}">
     <text class="card-title">6. 起飞轨迹</text>
     <trajectory-chart result="{{simResult}}" heightRpx="{{trajHeightRpx}}" />
   </view>

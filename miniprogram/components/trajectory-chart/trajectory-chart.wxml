@@ -1,12 +1,12 @@
-<view class="trajectory-wrap" wx:if="{{ready}}">
+<view class="trajectory-wrap" wx:if="{{hasData}}">
   <text class="trajectory-hint">侧视剖面：甲板折线与飞机质心轨迹（m）</text>
   <text class="trajectory-meta" wx:if="{{metaText}}">{{metaText}}</text>
   <canvas
     type="2d"
     id="trajCanvas"
     class="trajectory-canvas"
-    style="height: {{heightRpx}}rpx;"
-  />
+    style="width: 100%; height: {{heightRpx}}rpx;"
+  ></canvas>
   <view class="legend">
     <text class="legend-item deck">甲板</text>
     <text class="legend-item path">飞机轨迹</text>
