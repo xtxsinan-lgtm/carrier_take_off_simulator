@@ -1,8 +1,0 @@
-﻿id,name,type_label,mtow_kg,empty_kg,internal_fuel_kg,bvr_missile,missile_mass_kg,sweep_le_deg,wingspan_m,wing_area_m2,wing_height_m,cd0,t_max_sl_n,t_main_stovl_sl_n,t_liftfan_sl_n,t_rollposts_sl_n,notes
-F-35B,F-35B Lightning II,v/stol,27200,14651,6400,AIM-120C AMRAAM,152.0,35,10.7,42.7,1.96,0.039,,83260,83260,14600,STOVL 推力为垂起模式海平面标定值（15°C）
-J-15,歼-15,conventional,33000,17500,9800,PL-12,199.0,42,14.7,67.84,2.55,0.0475,251000,,,,WS-10H/AL-31 双发最大加力约 251 kN（15°C 标定）
-J-15T,歼-15T,conventional,35900,17800,10000,PL-15,210.0,42,14.7,67.84,2.55,0.0475,264000,,,,弹射型，滑跃舰上仍按 STOBAR 仿真；加力约 264 kN
-J-35,歼-35,conventional,29500,15500,8000,PL-15,210.0,38,13.6,66.9,1.96,0.039,186000,,,,WS-21 级双发加力约 186 kN（公开估算）
-MiG-29K,MiG-29K,conventional,24500,12000,4560,RVV-AE (R-77),175.0,40,11.99,34.5,1.89,0.042,176380,,,,2×RD-33MK 加力各 88.3 kN；翼展/面积/翼高为公开数据估算
-Rafale-M,阵风 M,conventional,24500,10600,4700,MBDA Meteor,190.0,48,10.8,45.7,1.9,0.036,150000,,,,2×M88-2/E4 加力各 75 kN（15°C SL）；空重/内油/翼面积取自 Dassault/法军公开数据
-FA-18E,F/A-18E Super Hornet,conventional,29937,14552,6667,AIM-120C AMRAAM,152.0,20,13.62,46.5,1.55,0.042,195800,,,,2×F414-GE-400 加力各 97.9 kN（15°C SL）；NAVAIR/DefenceDB 公开数据

@@ -81,3 +81,9 @@ def horizontal_at_s(s_m: float, arc: SkiJumpArc) -> float:
     """自滑跃入口起累计水平距离，m。"""
     phi = deck_angle_rad_at_s(s_m, arc)
     return arc.radius_m * math.sin(phi)
+
+
+def deck_height_at_s(s_m: float, arc: SkiJumpArc) -> float:
+    """沿弧长 s 处甲板表面相对平甲板的高度，m。"""
+    phi = deck_angle_rad_at_s(s_m, arc)
+    return arc.radius_m * (1.0 - math.cos(phi))

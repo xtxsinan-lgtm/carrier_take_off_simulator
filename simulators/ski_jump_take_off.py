@@ -1,13 +1,18 @@
 """固定翼舰载机滑跃起飞仿真（以歼-15 为气动参考）。
 
-滑跃段为圆弧：入口切线水平，出口切线角 = 资料滑跃角；见 ski_jump_geometry。"""
+滑跃段为圆弧：入口切线水平，出口切线角 = 资料滑跃角；见 ski_jump_geometry。
+不计算主喷管尾流波及（该模型仅用于 VTOL/STOVL，见 utils.exhaust_plume）。
+"""
+from __future__ import annotations
+
 import numpy as np
 
-from deck_config import assign_ski_jump_globals, total_takeoff_distance_m as _total_takeoff_distance_m
-from search_utils import fine_range_deck, fine_range_symmetric
-from sim_config import apply_wind_knots_globals
-from ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s
-from takeoff_physics import (
+from utils.deck_config import assign_ski_jump_globals, total_takeoff_distance_m as _total_takeoff_distance_m
+from utils.search_utils import fine_range_deck, fine_range_symmetric
+from utils.sim_config import apply_wind_knots_globals
+from utils.ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s, deck_height_at_s
+from utils.trajectory import TrajectoryRecorder
+from utils.takeoff_physics import (
     FLAP_DEFLECTION_DEG,
     FLAP_EFFICIENCY,
     G,
@@ -161,26 +166,33 @@ def drag_coefficient(cl, phi_ground):
     return _drag_coefficient(CD0, K_IND, cl, phi_ground)
 
 
-def simulate(flat_length_m, pitch_deg, dt=DT_DEFAULT, max_time_s=MAX_GROUND_TIME_S):
+def simulate(flat_length_m, pitch_deg, dt=DT_DEFAULT, max_time_s=MAX_GROUND_TIME_S,
+             trajectory: list | None = None):
     """
     固定翼滑跃起飞全过程仿真。
 
     返回: (success, x_deck, v_deck, vy_final, min_vy, t_deck, final_lift_n)
+    若传入 trajectory 列表，则按间隔写入 {'x','y','t','phase'} 轨迹点。
     """
     check_pitch_deg(pitch_deg)
-    v_gs, x, t = 0.0, 0.0, 0.0                  # 地速、水平位置、时间
+    v_gs, x, t = 0.0, 0.0, 0.0
+    y = 0.0
+    rec = TrajectoryRecorder(trajectory)
+    rec.record(x, y, t, 'flat', force=True)
 
     # ==================== 阶段 1：平直甲板滑跑 ====================
     while x < flat_length_m and t < max_time_s:
-        v_air = v_gs + V_WIND_MPS                 # 空速 = 地速 + 甲板风
-        q = dynamic_pressure(v_air)               # 动压
-        lift = q * S_REF_M2 * CL_TAXI              # 机翼升力 L = q·S·Cl
+        v_air = v_gs + V_WIND_MPS
+        q = dynamic_pressure(v_air)
+        lift = q * S_REF_M2 * CL_TAXI
         drag = q * S_REF_M2 * drag_coefficient(CL_TAXI, PHI_GROUND_FLAT)
-        normal = max(WEIGHT_N - lift, 0.0)        # 地面正压力 N = W - L
-        # 水平加速度 a = (T - D - μ·N) / m
+        normal = max(WEIGHT_N - lift, 0.0)
         v_gs = max(v_gs + (T_MAX_N - drag - MU * normal) / MASS_KG * dt, 0.0)
         x += v_gs * dt
         t += dt
+        rec.record(x, y, t, 'flat')
+
+    rec.record(x, y, t, 'flat', force=True)
 
     # ==================== 阶段 2：滑跃圆弧段 ====================
     s = 0.0
@@ -195,48 +207,57 @@ def simulate(flat_length_m, pitch_deg, dt=DT_DEFAULT, max_time_s=MAX_GROUND_TIME
         v_gs = max(v_gs + (T_MAX_N - drag - WEIGHT_N * sin_p - MU * normal) / MASS_KG * dt, 0.0)
         s += v_gs * dt
         x += v_gs * cos_p * dt
+        y = deck_height_at_s(s, SKI_JUMP_ARC)
         t += dt
+        rec.record(x, y, t, 'arc')
 
     if s < SKI_JUMP_ARC_LENGTH_M * 0.99:
         return False, x, v_gs, 0.0, 0.0, t, 0.0
 
-    v_deck = v_gs                                 # 离甲板速度（沿斜面）
-    vx = v_gs * SKI_JUMP_COS                      # 水平速度分量
-    vy = v_gs * SKI_JUMP_SIN                      # 垂直速度分量（滑跃赋予）
+    v_deck = v_gs
+    vx = v_gs * SKI_JUMP_COS
+    vy = v_gs * SKI_JUMP_SIN
     x_deck, t_deck = x, t
+    y_deck = y
     min_vy = vy
+    rec.record(x_deck, y_deck, t_deck, 'deck_exit', force=True)
     if vy <= 0:
         return False, x_deck, v_deck, vy, min_vy, t_deck, 0.0
 
     # ==================== 阶段 3：离甲板后自由飞行 ====================
-    pitch_rad = np.radians(pitch_deg)             # 固定俯仰角，rad
+    pitch_rad = np.radians(pitch_deg)
     t_air = 0.0
     final_lift_n = 0.0
+    x_air, y_air = x_deck, y_deck
 
     while t_air < MAX_AIR_TIME_S and t < max_time_s:
+        rec.record(x_air, y_air, t, 'air')
         v_spd = np.hypot(vx, vy)
-        gamma = np.arctan2(vy, vx) if v_spd > 0.1 else 0.0  # 航迹角
-        v_air = np.hypot(vx + V_WIND_MPS, vy)      # 合空速
+        gamma = np.arctan2(vy, vx) if v_spd > 0.1 else 0.0
+        v_air = np.hypot(vx + V_WIND_MPS, vy)
         q = dynamic_pressure(v_air)
-        alpha_eff = pitch_rad - gamma              # 有效迎角 = 俯仰角 - 航迹角
-        cl = np.clip(CL_TAXI + CL_ALPHA * alpha_eff, 0.0, CL_MAX)  # Cl = Cl_taxi + C_Lα·α
+        alpha_eff = pitch_rad - gamma
+        cl = np.clip(CL_TAXI + CL_ALPHA * alpha_eff, 0.0, CL_MAX)
         lift = q * S_REF_M2 * cl
-        drag = q * S_REF_M2 * (CD0 + K_IND * cl * cl)  # 离甲板后无地面效应
+        drag = q * S_REF_M2 * (CD0 + K_IND * cl * cl)
         final_lift_n = lift
 
         sin_g, cos_g = np.sin(gamma), np.cos(gamma)
-        dvx = (T_MAX_N - lift * sin_g - drag * cos_g) / MASS_KG  # 水平加速度
-        dvy = (lift * cos_g - drag * sin_g - WEIGHT_N) / MASS_KG  # 垂直加速度
+        dvx = (T_MAX_N - lift * sin_g - drag * cos_g) / MASS_KG
+        dvy = (lift * cos_g - drag * sin_g - WEIGHT_N) / MASS_KG
         vx += dvx * dt
         vy += dvy * dt
+        x_air += vx * dt
+        y_air += vy * dt
         t_air += dt
         t += dt
         min_vy = min(min_vy, vy)
 
-        if vy <= 0:                                # 垂直速度降为 0 → 失败
+        if vy <= 0:
+            rec.record(x_air, y_air, t, 'air', force=True)
             return False, x_deck, v_deck, vy, min_vy, t_deck, final_lift_n
-        # 安全判据：升力接近重力且有足够爬升率
         if lift >= WEIGHT_N * 0.95 and vy > 1.0 and t_air > 0.5:
+            rec.record(x_air, y_air, t, 'air', force=True)
             break
 
     return True, x_deck, v_deck, vy, min_vy, t_deck, final_lift_n

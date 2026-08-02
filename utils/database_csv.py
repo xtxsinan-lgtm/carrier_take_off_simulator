@@ -6,13 +6,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from carrier_takeoff_survey import AircraftSpec, CarrierSpec
+    from utils.specs import AircraftSpec, CarrierSpec
 
 AIRCRAFT_CSV_COLUMNS = (
     'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg',
     'bvr_missile', 'missile_mass_kg', 'sweep_le_deg', 'wingspan_m', 'wing_area_m2',
     'wing_height_m', 'cd0', 't_max_sl_n', 't_main_stovl_sl_n', 't_liftfan_sl_n',
-    't_rollposts_sl_n', 'notes',
+    't_rollposts_sl_n', 'exhaust_mdot_kg_s', 'exhaust_d0_m', 'exhaust_height_m', 'notes',
 )
 
 CARRIERS_CSV_COLUMNS = (
@@ -71,7 +71,7 @@ def export_carriers_csv(path: str | Path, carriers: list['CarrierSpec']) -> None
 
 
 def load_aircraft_csv(path: str | Path) -> dict[str, 'AircraftSpec']:
-    from carrier_takeoff_survey import AircraftSpec
+    from utils.specs import AircraftSpec
 
     path = Path(path)
     rows: list[dict[str, str]] = []
@@ -107,6 +107,9 @@ def load_aircraft_csv(path: str | Path) -> dict[str, 'AircraftSpec']:
             t_main_stovl_sl_n=_parse_optional_float(row['t_main_stovl_sl_n']),
             t_liftfan_sl_n=_parse_optional_float(row['t_liftfan_sl_n']),
             t_rollposts_sl_n=_parse_optional_float(row['t_rollposts_sl_n']),
+            exhaust_mdot_kg_s=_parse_optional_float(row.get('exhaust_mdot_kg_s', '')),
+            exhaust_d0_m=_parse_optional_float(row.get('exhaust_d0_m', '')),
+            exhaust_height_m=_parse_optional_float(row.get('exhaust_height_m', '')),
             notes=row.get('notes', '').strip(),
         )
     if not aircraft:
@@ -115,7 +118,7 @@ def load_aircraft_csv(path: str | Path) -> dict[str, 'AircraftSpec']:
 
 
 def load_carriers_csv(path: str | Path) -> list['CarrierSpec']:
-    from carrier_takeoff_survey import CarrierSpec
+    from utils.specs import CarrierSpec
 
     path = Path(path)
     carriers: list[CarrierSpec] = []

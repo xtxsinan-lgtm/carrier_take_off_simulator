@@ -1,5 +1,5 @@
 """Shared simulation configuration helpers (module-global mutators)."""
-from takeoff_physics import KT_TO_MPS, wind_knots_to_mps
+from utils.takeoff_physics import KT_TO_MPS, wind_knots_to_mps
 
 
 def apply_wind_knots_globals(wind_kt, globals_dict, kt_to_mps=KT_TO_MPS):

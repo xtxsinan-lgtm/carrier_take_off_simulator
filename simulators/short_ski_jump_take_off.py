@@ -1,5 +1,8 @@
 """F-35B 短距滑跃起飞仿真（平直段 + 圆弧滑跃段，策略 A/B/C 喷口偏转对比）。
 
+尾流波及：本模块为 VTOL/STOVL 专用；主喷管尾流模型见 utils.exhaust_plume。
+常规固定翼滑跃仿真（ski_jump_take_off）不计算尾流波及范围。
+
 滑跃段建模为圆弧：入口切线与平直甲板相切（水平），出口切线角为资料给定滑跃角；
 弧长与水平投影由圆弧半径导出（仅需滑跃角，可选唇口高度定半径）。见 ski_jump_geometry。
 
@@ -25,19 +28,24 @@
 
 ALLOW_AIR_NOZZLE_VECTORING 为 True 时，策略 A/B 还可搜索离舰后主喷口继续偏转的角度。
 """
+from __future__ import annotations
+
 import numpy as np
 
-from deck_config import assign_ski_jump_globals, total_takeoff_distance_m as _total_takeoff_distance_m
-from exhaust_plume import (
+from utils.deck_config import assign_ski_jump_globals, total_takeoff_distance_m as _total_takeoff_distance_m
+from utils.exhaust_plume import (
+    ExhaustPlumeParams,
     calc_exhaust_safe_distance_m as _calc_exhaust_safe_distance_m,
     calc_exhaust_theta_deg_for_safe_distance_m as _calc_exhaust_theta_deg_for_safe_distance_m,
     calc_min_nozzle_deg_for_plume as _calc_min_nozzle_deg_for_plume,
+    default_exhaust_plume_params,
     update_min_plume_trailing_edge_m as _update_min_plume_trailing_edge_m,
 )
-from search_utils import fine_range_deck, fine_range_symmetric, grid_step
-from sim_config import apply_wind_knots_globals
-from ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s
-from takeoff_physics import (
+from utils.search_utils import fine_range_deck, fine_range_symmetric, grid_step
+from utils.sim_config import apply_wind_knots_globals
+from utils.ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s, deck_height_at_s
+from utils.trajectory import TrajectoryRecorder
+from utils.takeoff_physics import (
     G,
     KT_TO_MPS,
     M_TO_FT,
@@ -144,26 +152,35 @@ else:
 
 FINE_SEARCH_STEP = 1
 
+PLUME_PARAMS: ExhaustPlumeParams = default_exhaust_plume_params()
+
+
+def apply_exhaust_plume_params(params: ExhaustPlumeParams) -> None:
+    """设置本机尾流模型参数（按机型在仿真前调用）。"""
+    global PLUME_PARAMS
+    PLUME_PARAMS = params
+
 
 def calc_exhaust_safe_distance_m(theta_deg, u_wind_mps):
     """尾流衰减至安全阈值所需的水平向后距离，m。"""
-    return _calc_exhaust_safe_distance_m(theta_deg, u_wind_mps, RHO)
+    return _calc_exhaust_safe_distance_m(theta_deg, u_wind_mps, RHO, PLUME_PARAMS)
 
 
 def calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps):
     """calc_exhaust_safe_distance_m 的反函数：求最小喷流角 θ（°）。"""
-    return _calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps, RHO)
+    return _calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps, RHO, PLUME_PARAMS)
 
 
 def calc_min_nozzle_deg_for_plume(x_m, min_safe_distance_m, u_wind_mps, deck_angle_deg=0.0):
     """位置 x 处满足尾流约束的最小喷口偏转角（°）；deck_angle_deg 为当前甲板切线角。"""
     return _calc_min_nozzle_deg_for_plume(
-        x_m, min_safe_distance_m, u_wind_mps, deck_angle_deg, RHO)
+        x_m, min_safe_distance_m, u_wind_mps, deck_angle_deg, RHO, PLUME_PARAMS)
 
 
 def update_min_plume_trailing_edge_m(x_m, theta_deg, u_wind_mps, current_min_m):
     """更新甲板上受影响最后缘位置，m：滑跑全程 min(x − 安全距离)。"""
-    return _update_min_plume_trailing_edge_m(x_m, theta_deg, u_wind_mps, current_min_m, RHO)
+    return _update_min_plume_trailing_edge_m(
+        x_m, theta_deg, u_wind_mps, current_min_m, RHO, PLUME_PARAMS)
 
 
 def _plume_edge_or_zero(value):
@@ -203,18 +220,20 @@ def apply_wind_knots(wind_kt):
 def apply_stovl_thrust_sl(t_main_sl_n, t_liftfan_sl_n, t_rollposts_sl_n):
     global T_MAIN_STOVL_SL_N, T_LIFTFAN_SL_N, T_ROLLPOSTS_SL_N
     T_MAIN_STOVL_SL_N = t_main_sl_n
-    T_LIFTFAN_SL_N = t_liftfan_sl_n
-    T_ROLLPOSTS_SL_N = t_rollposts_sl_n
+    T_LIFTFAN_SL_N = t_liftfan_sl_n or 0.0
+    T_ROLLPOSTS_SL_N = t_rollposts_sl_n or 0.0
     apply_thrust_temperature(AMBIENT_TEMP_C)
 
 
-def apply_aircraft_geometry(mass_kg, s_ref_m2, wingspan_m, wing_height_m, sweep_le_deg):
-    global MASS_KG, S_REF_M2, WINGSPAN_M, WING_HEIGHT_M, SWEEP_LE_DEG
+def apply_aircraft_geometry(mass_kg, s_ref_m2, wingspan_m, wing_height_m, sweep_le_deg, cd0=None):
+    global MASS_KG, S_REF_M2, WINGSPAN_M, WING_HEIGHT_M, SWEEP_LE_DEG, CD0
     MASS_KG = mass_kg
     S_REF_M2 = s_ref_m2
     WINGSPAN_M = wingspan_m
     WING_HEIGHT_M = wing_height_m
     SWEEP_LE_DEG = sweep_le_deg
+    if cd0 is not None:
+        CD0 = cd0
     recompute_aero_parameters()
 
 
@@ -269,11 +288,12 @@ def drag_coefficient(cl, phi_ground):
 
 
 def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg,
-             nozzle_air_deg=0, dt=DT_DEFAULT):
+             nozzle_air_deg=0, dt=DT_DEFAULT, trajectory: list | None = None):
     """
     滑跃短距起飞全过程仿真。
 
     返回: (success, x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m)
+    若传入 trajectory 列表，则按间隔写入 {'x','y','t','phase'} 轨迹点。
     """
     check_pitch_deg(pitch_deg)
     nozzle_final_rad = np.radians(nozzle_takeoff_deg)
@@ -283,6 +303,9 @@ def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg
     min_plume_trailing_edge_m = None
 
     v_gs, x, t = 0.0, 0.0, 0.0
+    y = 0.0
+    rec = TrajectoryRecorder(trajectory)
+    rec.record(x, y, t, 'flat', force=True)
     transitioned, in_trans, trans_start_t = False, False, 0.0
     nozzle_rad = nozzle_start_rad
 
@@ -320,6 +343,9 @@ def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg
         x += v_gs * dt
         t += dt
         track_plume(0.0)
+        rec.record(x, y, t, 'flat')
+
+    rec.record(x, y, t, 'flat', force=True)
 
     # ==================== 阶段 2：滑跃圆弧段 ====================
     s = 0.0
@@ -338,8 +364,10 @@ def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg
         v_gs = max(v_gs + (t_s - drag - WEIGHT_N * sin_p - MU * normal) / MASS_KG * dt, 0.0)
         s += v_gs * dt
         x += v_gs * cos_p * dt
+        y = deck_height_at_s(s, SKI_JUMP_ARC)
         t += dt
         track_plume(deck_deg)
+        rec.record(x, y, t, 'arc')
 
     if s < SKI_JUMP_ARC_LENGTH_M * 0.99:
         return False, x, v_gs, t, 0.0, _plume_edge_or_zero(min_plume_trailing_edge_m)
@@ -348,7 +376,9 @@ def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg
     vx = v_gs * SKI_JUMP_COS
     vy = v_gs * SKI_JUMP_SIN
     x_deck, t_deck = x, t
+    y_deck = y
     min_vy = vy
+    rec.record(x_deck, y_deck, t_deck, 'deck_exit', force=True)
 
     if vy < 0:
         return False, x_deck, v_deck, t_deck, min_vy, _plume_edge_or_zero(min_plume_trailing_edge_m)
@@ -357,16 +387,24 @@ def simulate(flat_length_m, v_trans_mps, nozzle_takeoff_deg, strategy, pitch_deg
     if ALLOW_AIR_NOZZLE_VECTORING:
         return _simulate_air_vectoring(
             vx, vy, pitch_rad, nozzle_final_rad, nozzle_takeoff_deg, nozzle_air_deg,
-            x_deck, v_deck, t_deck, min_vy, plume_trailing_edge_m, dt)
+            x_deck, v_deck, t_deck, min_vy, plume_trailing_edge_m, dt,
+            trajectory=trajectory, y_deck=y_deck)
     return _simulate_air_fixed(
         vx, vy, pitch_rad, nozzle_final_rad,
-        x_deck, v_deck, t_deck, min_vy, plume_trailing_edge_m, dt)
+        x_deck, v_deck, t_deck, min_vy, plume_trailing_edge_m, dt,
+        trajectory=trajectory, y_deck=y_deck)
 
 
 def _simulate_air_fixed(vx, vy, pitch_rad, nozzle_final_rad,
-                        x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m, dt):
+                        x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m, dt,
+                        trajectory=None, y_deck=None):
+    rec = TrajectoryRecorder(trajectory)
+    t = t_deck
+    x_air = x_deck
+    y_air = y_deck if y_deck is not None else SKI_JUMP_LIP_HEIGHT_M
     t_air = 0.0
     while t_air < MAX_AIR_TIME_S:
+        rec.record(x_air, y_air, t, 'air')
         v_spd = np.hypot(vx, vy)
         gamma = np.arctan2(vy, vx) if v_spd > 0.1 else 0.0
         v_air = np.hypot(vx + V_WIND_MPS, vy)
@@ -396,19 +434,29 @@ def _simulate_air_fixed(vx, vy, pitch_rad, nozzle_final_rad,
 
         vx += dvx * dt
         vy += dvy * dt
+        x_air += vx * dt
+        y_air += vy * dt
         t_air += dt
+        t += dt
         min_vy = min(min_vy, vy)
 
         if vy <= 0:
+            rec.record(x_air, y_air, t, 'air', force=True)
             return False, x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m
         if lift + t_vy >= WEIGHT_N and vy > 2 and t_air > 0.3:
+            rec.record(x_air, y_air, t, 'air', force=True)
             break
 
     return True, x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m
 
 
 def _simulate_air_vectoring(vx, vy, pitch_rad, nozzle_final_rad, nozzle_takeoff_deg, nozzle_air_deg,
-                            x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m, dt):
+                            x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m, dt,
+                            trajectory=None, y_deck=None):
+    rec = TrajectoryRecorder(trajectory)
+    t = t_deck
+    x_air = x_deck
+    y_air = y_deck if y_deck is not None else SKI_JUMP_LIP_HEIGHT_M
     nozzle_air_final_rad = np.radians(nozzle_air_deg)
     trans_air_duration_s = abs(nozzle_air_deg - nozzle_takeoff_deg) / NOZZLE_RATE_DEG_S
     in_trans_air, transitioned_air, trans_air_start_t = False, False, 0.0
@@ -416,6 +464,7 @@ def _simulate_air_vectoring(vx, vy, pitch_rad, nozzle_final_rad, nozzle_takeoff_
     t_air = 0.0
 
     while t_air < MAX_AIR_TIME_S:
+        rec.record(x_air, y_air, t, 'air')
         if nozzle_air_deg != nozzle_takeoff_deg:
             if not transitioned_air and not in_trans_air:
                 in_trans_air, trans_air_start_t = True, t_air
@@ -454,11 +503,16 @@ def _simulate_air_vectoring(vx, vy, pitch_rad, nozzle_final_rad, nozzle_takeoff_
 
         vx += dvx * dt
         vy += dvy * dt
+        x_air += vx * dt
+        y_air += vy * dt
         t_air += dt
+        t += dt
         min_vy = min(min_vy, vy)
         if vy <= 0:
+            rec.record(x_air, y_air, t, 'air', force=True)
             return False, x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m
         if lift + t_vy >= WEIGHT_N and vy > 2 and t_air > 0.3:
+            rec.record(x_air, y_air, t, 'air', force=True)
             break
 
     return True, x_deck, v_deck, t_deck, min_vy, min_plume_trailing_edge_m

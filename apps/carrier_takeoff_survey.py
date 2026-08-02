@@ -6,19 +6,17 @@ F-35B：策略 A（short_take_off / short_ski_jump_take_off）
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 
-import short_ski_jump_take_off as ski_stovl
-import short_take_off as flat_stovl
-import ski_jump_take_off as ski_conv
-from ski_jump_geometry import compute_ski_jump_arc
+import simulators.short_ski_jump_take_off as ski_stovl
+import simulators.short_take_off as flat_stovl
+import simulators.ski_jump_take_off as ski_conv
+from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV, SURVEY_RESULTS_TXT
+from utils.specs import A2A_MISSILE_COUNT, AircraftSpec, CarrierSpec, PILOT_LOAD_KG
 
 SURVEY_TEMP_C = 30.0
-PILOT_LOAD_KG = 100.0
-A2A_MISSILE_COUNT = 4
 # 与仿真模块一致：俯仰角硬上限（°）
 PITCH_MAX_DEG = ski_conv.PITCH_MAX_DEG
 
@@ -41,76 +39,12 @@ _SEARCH_DEFAULTS = {
         FLAT_SEARCH_MAX_M=ski_conv.FLAT_SEARCH_MAX_M,
     ),
 }
-PILOT_LOAD_KG = 100.0
-A2A_MISSILE_COUNT = 4
-
 # 记录搜索边界是否被最优解触及，用于事后收紧未使用的边界
 BOUNDARY_HITS: dict[str, set[str]] = {
     'flat_stovl': set(),
     'ski_stovl': set(),
     'ski_conv': set(),
 }
-
-
-@dataclass(frozen=True)
-class AircraftSpec:
-    id: str
-    name: str
-    type_label: str  # 'conventional' | 'v/stol'
-    mtow_kg: float
-    empty_kg: float
-    internal_fuel_kg: float
-    bvr_missile: str
-    missile_mass_kg: float
-    sweep_le_deg: float
-    wingspan_m: float
-    wing_area_m2: float
-    wing_height_m: float
-    cd0: float = 0.039
-    t_max_sl_n: float | None = None
-    t_main_stovl_sl_n: float | None = None
-    t_liftfan_sl_n: float | None = None
-    t_rollposts_sl_n: float | None = None
-    notes: str = ''
-
-    @property
-    def a2a_mass_kg(self) -> float:
-        return (self.empty_kg + self.internal_fuel_kg
-                + A2A_MISSILE_COUNT * self.missile_mass_kg + PILOT_LOAD_KG)
-
-
-@dataclass(frozen=True)
-class CarrierSpec:
-    id: str
-    name: str
-    nation: str
-    max_speed_kt: float
-    ski_jump: bool
-    total_deck_length_m: float  # 飞行甲板沿起飞方向可用总长，m（公开资料）
-    ski_jump_angle_deg: float = 0.0
-    ski_jump_height_m: float | None = None  # 可选唇口高度，用于确定圆弧半径
-    f35b_capable: bool = False
-    notes: str = ''
-    deck_length_source: str = ''
-
-    def deck_wind_kt(self) -> float:
-        return self.max_speed_kt
-
-    def ski_jump_geom(self):
-        if not self.ski_jump:
-            return None
-        return compute_ski_jump_arc(self.ski_jump_angle_deg, lip_height_m=self.ski_jump_height_m)
-
-    def ski_jump_arc_m(self) -> float:
-        g = self.ski_jump_geom()
-        return g.arc_length_m if g else 0.0
-
-    def ski_jump_horizontal_m(self) -> float:
-        g = self.ski_jump_geom()
-        return g.horizontal_m if g else 0.0
-
-    def deck_fits_distance(self, required_m: float) -> bool:
-        return required_m <= self.total_deck_length_m
 
 
 AIRCRAFT: dict[str, AircraftSpec] = {
@@ -121,7 +55,17 @@ AIRCRAFT: dict[str, AircraftSpec] = {
         sweep_le_deg=35, wingspan_m=10.7, wing_area_m2=42.7, wing_height_m=1.96,
         cd0=0.039,
         t_main_stovl_sl_n=83260, t_liftfan_sl_n=83260, t_rollposts_sl_n=14600,
-        notes='STOVL 推力为垂起模式海平面标定值（15°C）',
+        notes='STOVL 推力为垂起模式海平面标定值（15°C）；含升力风扇',
+    ),
+    'AV-8B': AircraftSpec(
+        id='AV-8B', name='AV-8B Harrier II', type_label='v/stol',
+        mtow_kg=14061, empty_kg=6340, internal_fuel_kg=3540,
+        bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
+        sweep_le_deg=37, wingspan_m=9.25, wing_area_m2=21.37, wing_height_m=1.55,
+        cd0=0.043,
+        t_main_stovl_sl_n=105000, t_liftfan_sl_n=0, t_rollposts_sl_n=1080,
+        exhaust_mdot_kg_s=195.95, exhaust_d0_m=1.219, exhaust_height_m=1.55,
+        notes='Pegasus F402-408；四矢量喷口、无升力风扇',
     ),
     'J-15': AircraftSpec(
         id='J-15', name='歼-15', type_label='conventional',
@@ -247,15 +191,15 @@ CARRIERS: list[CarrierSpec] = [
     ),
 ]
 
-AIRCRAFT_CSV_PATH = 'aircraft_database.csv'
-CARRIERS_CSV_PATH = 'carriers_database.csv'
+AIRCRAFT_CSV_PATH = str(AIRCRAFT_CSV)
+CARRIERS_CSV_PATH = str(CARRIERS_CSV)
 
 
 def export_databases_to_csv(
     aircraft_path: str = AIRCRAFT_CSV_PATH,
     carriers_path: str = CARRIERS_CSV_PATH,
 ) -> None:
-    from database_csv import export_aircraft_csv, export_carriers_csv
+    from utils.database_csv import export_aircraft_csv, export_carriers_csv
 
     export_aircraft_csv(aircraft_path, AIRCRAFT)
     export_carriers_csv(carriers_path, CARRIERS)
@@ -271,7 +215,7 @@ def load_databases_from_csv(
     global AIRCRAFT, CARRIERS
     from pathlib import Path
 
-    from database_csv import load_aircraft_csv, load_carriers_csv
+    from utils.database_csv import load_aircraft_csv, load_carriers_csv
 
     ap, cp = Path(aircraft_path), Path(carriers_path)
     if not ap.is_file() or not cp.is_file():
@@ -315,24 +259,29 @@ def _deck_launch_label(r: dict[str, Any]) -> str:
     return '—'
 
 
-def _configure_f35b(ac: AircraftSpec, carrier: CarrierSpec, mass_kg: float):
+def _configure_stovl(ac: AircraftSpec, carrier: CarrierSpec, mass_kg: float):
     geom = dict(mass_kg=mass_kg, s_ref_m2=ac.wing_area_m2, wingspan_m=ac.wingspan_m,
-                wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg)
-    thrust = dict(t_main_sl_n=ac.t_main_stovl_sl_n, t_liftfan_sl_n=ac.t_liftfan_sl_n,
-                  t_rollposts_sl_n=ac.t_rollposts_sl_n)
+                wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg, cd0=ac.cd0)
     wind_kt = carrier.deck_wind_kt()
     if carrier.ski_jump:
         ski_stovl.apply_thrust_temperature(SURVEY_TEMP_C)
-        ski_stovl.apply_stovl_thrust_sl(**thrust)
+        ski_stovl.apply_stovl_thrust_sl(
+            ac.t_main_stovl_sl_n, ac.t_liftfan_sl_n or 0.0, ac.t_rollposts_sl_n or 0.0)
+        ski_stovl.apply_exhaust_plume_params(ac.exhaust_plume_params())
         ski_stovl.apply_wind_knots(wind_kt)
         ski_stovl.apply_aircraft_geometry(**geom)
         ski_stovl.apply_ski_jump_deck(carrier.ski_jump_angle_deg, carrier.ski_jump_height_m)
         return ski_stovl
     flat_stovl.apply_thrust_temperature(SURVEY_TEMP_C)
-    flat_stovl.apply_stovl_thrust_sl(**thrust)
+    flat_stovl.apply_stovl_thrust_sl(
+        ac.t_main_stovl_sl_n, ac.t_liftfan_sl_n or 0.0, ac.t_rollposts_sl_n or 0.0)
+    flat_stovl.apply_exhaust_plume_params(ac.exhaust_plume_params())
     flat_stovl.apply_wind_knots(wind_kt)
     flat_stovl.apply_aircraft_geometry(**geom)
     return flat_stovl
+
+
+_configure_f35b = _configure_stovl  # 兼容旧名
 
 
 def _configure_conventional(ac: AircraftSpec, carrier: CarrierSpec, mass_kg: float):
@@ -531,8 +480,8 @@ def _build_conv_result(ac, carrier, load_label, mass_kg, result) -> dict[str, An
     )
 
 
-def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_kg: float) -> dict[str, Any]:
-    mod = _configure_f35b(ac, carrier, mass_kg)
+def run_stovl_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_kg: float) -> dict[str, Any]:
+    mod = _configure_stovl(ac, carrier, mass_kg)
     for attempt in range(3):
         if carrier.ski_jump:
             result = mod.run_strategy_a_search()
@@ -543,7 +492,7 @@ def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_
             _record_hits('ski_stovl', hits)
             if hits and attempt < 2:
                 _expand_ski_stovl_bounds(hits)
-                _configure_f35b(ac, carrier, mass_kg)
+                _configure_stovl(ac, carrier, mass_kg)
                 continue
             return _annotate_deck_feasibility(
                 _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=True), carrier)
@@ -555,11 +504,15 @@ def run_f35b_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_
             _record_hits('flat_stovl', hits)
             if hits and attempt < 2:
                 _expand_flat_stovl_bounds(hits)
-                _configure_f35b(ac, carrier, mass_kg)
+                _configure_stovl(ac, carrier, mass_kg)
                 continue
             return _annotate_deck_feasibility(
                 _build_f35b_result(ac, carrier, load_label, mass_kg, result, ski_jump=False), carrier)
     return dict(success=False, aircraft=ac.id, carrier=carrier.id, load=load_label)
+
+
+run_f35b_case = run_stovl_case  # 兼容旧名
+STOVL_AIRCRAFT_IDS = ('F-35B', 'AV-8B')
 
 
 def run_conventional_case(ac: AircraftSpec, carrier: CarrierSpec, load_label: str, mass_kg: float) -> dict[str, Any]:
@@ -593,9 +546,12 @@ def print_aircraft_database():
         print(f"  中距弹: {ac.bvr_missile} ×{A2A_MISSILE_COUNT}（{ac.missile_mass_kg:.0f} kg/枚）")
         print(f"  空战挂载: {ac.a2a_mass_kg:.0f} kg（含飞行员相关 {PILOT_LOAD_KG:.0f} kg）")
         print(f"  后掠角 {ac.sweep_le_deg}° | 翼展 {ac.wingspan_m} m | 面积 {ac.wing_area_m2} m² | 翼高 {ac.wing_height_m} m")
-        if ac.type_label == 'v/stol':
+        if ac.is_vtol:
             print(f"  垂起推力(15°C SL): 主喷管 {ac.t_main_stovl_sl_n/1000:.1f} kN，"
-                  f"升力风扇 {ac.t_liftfan_sl_n/1000:.1f} kN，滚转 {ac.t_rollposts_sl_n/1000:.1f} kN")
+                  f"升力风扇 {(ac.t_liftfan_sl_n or 0)/1000:.1f} kN，"
+                  f"滚转 {(ac.t_rollposts_sl_n or 0)/1000:.1f} kN")
+            plume = ac.exhaust_plume_params()
+            print(f"  尾流 ṁ={plume.mdot_kg_s:.1f} kg/s，u₀={plume.u0_mps:.0f} m/s，d₀={plume.d0_m:.2f} m")
         else:
             print(f"  最大加力(15°C SL): {ac.t_max_sl_n/1000:.1f} kN | Cd0={ac.cd0}")
         if ac.notes:
@@ -643,7 +599,7 @@ def _format_f35b_detail_block(r: dict[str, Any]) -> list[str]:
         f"  平直段:         {r['flat_m']:.0f} m",
         f"  喷管最终角:     {r['nozzle_deg']}°",
         f"  开始偏转地速:   {r['v_trans_mps']} m/s",
-        f"  甲板受影响最后缘: {_fmt_opt(r['min_plume_trailing_edge_m'])} m",
+        f"  尾流波及最后缘 (VTOL): {_fmt_opt(r['min_plume_trailing_edge_m'])} m",
         f"  俯仰角:         {pitch}",
         f"  离舰速度:       {r['v_deck_mps']:.1f} m/s",
         f"  离舰用时:       {r['t_deck_s']:.2f} s",
@@ -683,8 +639,8 @@ def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> 
         '舰载机最小起飞距离遍历报告',
         sep,
         f'条件: {SURVEY_TEMP_C:.0f}°C | 甲板风 = 航母最大航速 | 俯仰角硬上限 {PITCH_MAX_DEG}°',
-        f'F-35B: 策略 A（short_take_off / short_ski_jump_take_off）',
-        f'常规型: ski_jump_take_off（仅 STOBAR 航母，不含 F-35B 适用舰）',
+        f'F-35B: 策略 A（short_take_off / short_ski_jump_take_off）；含 VTOL 主喷管尾流波及',
+        f'常规型: ski_jump_take_off（仅 STOBAR 航母，不含 F-35B 适用舰；不计算尾流波及）',
         f'甲板判定: 所需总距 ≤ 飞行甲板总长 → 甲板起飞成功（✓），否则失败（✗）',
         '',
         '航母飞行甲板总长（公开资料，m）:',
@@ -861,7 +817,7 @@ def run_conv_survey_subset(aircraft_ids: tuple[str, ...]):
             continue
         print(f"{r['aircraft']:<10} {r['carrier']:<14} {r['load']:<8} {r['mass_kg']:>8.0f} "
               f"{r['distance_m']:>8.1f}  {r['carrier_desc']}")
-    report_path = 'carrier_takeoff_survey_results.txt'
+    report_path = str(SURVEY_RESULTS_TXT)
     # 增量模式：读取已有报告中的结果不可行，需全量重跑写入；此处仅追加控制台提示
     print(f'\n提示: 运行完整 survey 以更新 {report_path}')
     return results
@@ -876,22 +832,22 @@ def run_survey():
     print_aircraft_database()
     print_carrier_database()
 
-    f35b = AIRCRAFT['F-35B']
-    f35b_carriers = [c for c in CARRIERS if c.f35b_capable]
+    stovl_carriers = [c for c in CARRIERS if c.f35b_capable]
     conv_ac = [AIRCRAFT[k] for k in ('J-15', 'J-15T', 'J-35', 'MiG-29K', 'Rafale-M', 'FA-18E')]
-    # 常规滑跃机仅在 STOBAR 航母上计算，跳过 F-35B 适用舰（QE/加富尔/的里雅斯特等）
     conv_carriers = [c for c in CARRIERS if c.ski_jump and not c.f35b_capable]
 
     print('\n' + '=' * 88)
-    print(f'F-35B 策略 A 遍历（{SURVEY_TEMP_C:.0f}°C，甲板风 = 航母最大航速）')
+    print(f'VTOL/STOVL 策略 A 遍历（{SURVEY_TEMP_C:.0f}°C，甲板风 = 航母最大航速）')
     print('=' * 88)
     f35b_results = []
-    for carrier in f35b_carriers:
-        for load_label, mass in (('空战挂载', f35b.a2a_mass_kg), ('MTOW', f35b.mtow_kg)):
-            print(f"\n--- {f35b.name} | {carrier.name} | {load_label} ---")
-            r = run_f35b_case(f35b, carrier, load_label, mass)
-            f35b_results.append(r)
-            _print_result_row(r)
+    for ac_id in STOVL_AIRCRAFT_IDS:
+        ac = AIRCRAFT[ac_id]
+        for carrier in stovl_carriers:
+            for load_label, mass in (('空战挂载', ac.a2a_mass_kg), ('MTOW', ac.mtow_kg)):
+                print(f"\n--- {ac.name} | {carrier.name} | {load_label} ---")
+                r = run_stovl_case(ac, carrier, load_label, mass)
+                f35b_results.append(r)
+                _print_result_row(r)
 
     print('\n' + '=' * 88)
     print(f'常规舰载机滑跃起飞遍历（{SURVEY_TEMP_C:.0f}°C，甲板风 = 航母最大航速，仅 STOBAR 航母）')
@@ -922,7 +878,7 @@ def run_survey():
     for key, hits in BOUNDARY_HITS.items():
         print(f"  {key}: {sorted(hits) if hits else '无'}")
 
-    report_path = 'carrier_takeoff_survey_results.txt'
+    report_path = str(SURVEY_RESULTS_TXT)
     write_survey_report(report_path, f35b_results, conv_results)
     print(f'\n报告已写入 {report_path}')
     return f35b_results, conv_results
