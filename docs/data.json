@@ -137,7 +137,7 @@
       "wingspan_m": 11.99,
       "wing_area_m2": 34.5,
       "wing_height_m": 1.89,
-      "cd0": 0.042,
+      "cd0": 0.043,
       "t_max_sl_n": 176380.0,
       "t_main_stovl_sl_n": null,
       "t_liftfan_sl_n": null,
@@ -145,7 +145,7 @@
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "2×RD-33MK 加力各 88.3 kN；翼展/面积/翼高为公开数据估算"
+      "notes": "2×RD-33MK 加力各 88.3 kN；Cd0=20°襟翼+落架+挂载；翼展/面积/翼高为公开数据估算"
     },
     {
       "id": "Rafale-M",
@@ -160,7 +160,7 @@
       "wingspan_m": 10.8,
       "wing_area_m2": 45.7,
       "wing_height_m": 1.9,
-      "cd0": 0.036,
+      "cd0": 0.039,
       "t_max_sl_n": 150000.0,
       "t_main_stovl_sl_n": null,
       "t_liftfan_sl_n": null,
@@ -168,7 +168,7 @@
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "2×M88-2/E4 加力各 75 kN（15°C SL）；空重/内油/翼面积取自 Dassault/法军公开数据"
+      "notes": "2×M88-2/E4 加力各 75 kN（15°C SL）；Cd0=20°襟翼+落架+挂载"
     },
     {
       "id": "FA-18E",
@@ -183,7 +183,7 @@
       "wingspan_m": 13.62,
       "wing_area_m2": 46.5,
       "wing_height_m": 1.55,
-      "cd0": 0.042,
+      "cd0": 0.044,
       "t_max_sl_n": 195800.0,
       "t_main_stovl_sl_n": null,
       "t_liftfan_sl_n": null,
@@ -191,7 +191,7 @@
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "2×F414-GE-400 加力各 97.9 kN（15°C SL）；NAVAIR/DefenceDB 公开数据"
+      "notes": "2×F414-GE-400 加力各 97.9 kN（15°C SL）；Cd0=20°襟翼+落架+挂载"
     }
   ],
   "carriers": [
