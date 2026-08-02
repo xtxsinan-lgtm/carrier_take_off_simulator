@@ -1,12 +1,19 @@
 """饱和打击仿真核心单元测试。"""
 from __future__ import annotations
 
+import subprocess
+import sys
+from pathlib import Path
+
 from simulators.saturation_strike import (
     MACH_MPS,
     run_estimate_distance_from_params,
     run_estimate_pk_from_params,
     run_saturation_strike,
 )
+
+_ROOT = Path(__file__).resolve().parent.parent
+
 
 
 def test_mach_constant():
@@ -59,3 +66,18 @@ def test_run_estimate_pk_from_params():
         'seeker_type': 'active_aesa',
     })
     assert 0.03 <= r['pk'] <= 0.97
+
+
+def test_saturation_strike_script_runs_as_file():
+    """直接执行 simulators/saturation_strike.py 不应因缺 utils 而失败。"""
+    script = _ROOT / 'simulators' / 'saturation_strike.py'
+    proc = subprocess.run(
+        [sys.executable, str(script), '--fast', '--nm', '8', '--ni', '6'],
+        cwd=str(_ROOT / 'simulators'),  # 故意不在项目根，验证路径引导
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert '拦截窗口数' in proc.stdout

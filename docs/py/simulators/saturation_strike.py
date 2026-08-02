@@ -6,7 +6,14 @@
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 from typing import Any
+
+# 支持直接运行：python3 simulators/saturation_strike.py
+_ROOT = Path(__file__).resolve().parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 from utils.saturation_monte_carlo import optimize_plan
 from utils.saturation_radar import (
