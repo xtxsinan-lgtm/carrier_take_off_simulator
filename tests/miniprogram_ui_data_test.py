@@ -29,3 +29,18 @@ def test_modes_to_list_shape_matches_miniprogram_contract():
     mode_list = [{'id': k, 'label': v} for k, v in modes.items()]
     assert len(mode_list) == 3
     assert mode_list[0] == {'id': 'ski_jump', 'label': '滑跃起飞'}
+
+
+def test_trajectory_chart_is_inline_below_sim_output():
+    """轨迹图须跟在仿真输出卡片后进入文档流，不得用底部固定坞（traj-dock）。"""
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'index' / 'index.wxml').read_text(encoding='utf-8')
+    wxss = (ROOT / 'miniprogram' / 'pages' / 'index' / 'index.wxss').read_text(encoding='utf-8')
+    assert 'traj-dock' not in wxml
+    assert 'traj-dock' not in wxss
+    assert 'page-root' not in wxml
+    assert '5. 仿真输出' in wxml
+    assert '6. 起飞轨迹' in wxml
+    assert 'trajectory-chart' in wxml
+    # 轨迹区块须出现在仿真输出之后，保证滚动时随内容离开视口
+    assert wxml.index('5. 仿真输出') < wxml.index('6. 起飞轨迹')
+    assert wxml.index('6. 起飞轨迹') < wxml.index('page-footer')
