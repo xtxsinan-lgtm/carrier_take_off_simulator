@@ -75,7 +75,7 @@ final class SimulatorViewModel: ObservableObject {
             applyMode("ski_jump")
             let hint = hasApi
                 ? "本地数据已加载。仿真将请求后端 API。"
-                : "数据已加载。仿真需配置 Config.swift 中的 apiBaseUrl 并启动 python3 apps/miniprogram_api.py"
+                : "数据已加载。仿真需配置 Config.swift 中的 apiBaseUrl 并启动 python3 apps/simulator_api.py"
             setStatus(hint, .ok)
         } catch {
             setStatus(error.localizedDescription, .error)

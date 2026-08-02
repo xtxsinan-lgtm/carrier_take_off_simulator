@@ -22,7 +22,7 @@ description: >-
 | Python 仿真核心 | `simulators/`、`utils/`、`apps/web_simulator.py` | 源码 |
 | GitHub Pages HTML | `docs/index.html`、`docs/js/`、`docs/data.json` | `build_all.py`；模式按钮由 `data.modes` 动态生成 |
 | 微信小程序 | `miniprogram/`（`data.json` + 页面） | `build_all.py`；模式列表来自 catalog |
-| 小程序 HTTP API | `apps/miniprogram_api.py` | 与 `web_simulator` 同一套模式契约 |
+| 小程序 / iOS HTTP API | `apps/simulator_api.py` | 与 `web_simulator` 同一套模式契约 |
 | iOS App | `ios/CarrierTakeOff/` | `build_all.py` → `Resources/data.json` + `Physics.swift`；GUI 对齐小程序 |
 
 **禁止**：只改仿真器或只改小程序/iOS 就结束；HTML 硬编码模式按钮（须读 `data.modes`）。

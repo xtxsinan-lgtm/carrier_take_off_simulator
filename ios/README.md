@@ -8,7 +8,7 @@ SwiftUI 原生界面，布局与交互对齐微信小程序 / Web 版（深色�
 iPhone App (SwiftUI)
   ├─ Bundle data.json（机库目录，由 build_all 生成）
   ├─ Physics.swift（预览气动/滑跃，由 Python 生成）
-  └─ HTTP → apps/miniprogram_api.py（与小程序同一仿真 API）
+  └─ HTTP → apps/simulator_api.py（与小程序同一仿真 API）
 ```
 
 ## 快速开始
@@ -23,7 +23,7 @@ python3 scripts/build_all.py
 
 ```bash
 # 模拟器可用 127.0.0.1；真机需局域网
-python3 apps/miniprogram_api.py --host 0.0.0.0
+python3 apps/simulator_api.py --host 0.0.0.0
 ```
 
 ### 3. 配置 API 地址
@@ -55,7 +55,7 @@ open ios/CarrierTakeOff.xcodeproj
 |------|------|
 | 模式 / 策略 / 机库 | `scripts/frontend_catalog.py` → `Resources/data.json` |
 | 预览物理常量 | `generate_frontend_physics.py` → `Physics.swift` |
-| 仿真数值 | `miniprogram_api` → `web_simulator.run_simulation_json` |
+| 仿真数值 | `simulator_api` → `web_simulator.run_simulation_json` |
 
 **禁止手改** `Physics.swift`、`Resources/data.json`（与 JS 产物一样由 build 生成）。
 

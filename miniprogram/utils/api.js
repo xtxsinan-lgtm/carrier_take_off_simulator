@@ -54,7 +54,7 @@ function runSimulation(payload) {
   const base = config.apiBaseUrl;
   if (!base) {
     return Promise.reject(
-      new Error('未配置 apiBaseUrl。请在 config.js 填写后端地址，或运行 python3 apps/miniprogram_api.py')
+      new Error('未配置 apiBaseUrl。请在 config.js 填写后端地址，或运行 python3 apps/simulator_api.py')
     );
   }
   return new Promise((resolve, reject) => {

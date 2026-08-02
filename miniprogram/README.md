@@ -36,7 +36,7 @@ python3 scripts/build_all.py
 ### 2. 启动仿真 API（小程序无法运行 Pyodide，需后端）
 
 ```bash
-python3 apps/miniprogram_api.py
+python3 apps/simulator_api.py
 # 默认 http://127.0.0.1:8765
 ```
 
@@ -85,7 +85,7 @@ module.exports = {
 
 | 项目 | Web (GitHub Pages) | 微信小程序 |
 |------|-------------------|-----------|
-| 仿真引擎 | 浏览器 Pyodide | 后端 `miniprogram_api.py` |
+| 仿真引擎 | 浏览器 Pyodide | 后端 `simulator_api.py` |
 | 数据 | `docs/data.json` | `miniprogram/data/data.json` |
 | 参数预览 | `physics.js` | 同逻辑移植至 `utils/physics.js` |
 

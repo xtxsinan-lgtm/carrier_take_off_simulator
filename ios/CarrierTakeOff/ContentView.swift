@@ -125,7 +125,7 @@ struct ContentView: View {
                     .padding(.top, 4)
 
                     if !vm.hasApi {
-                        Text("提示：在 Config.swift 设置 apiBaseUrl，并运行 python3 apps/miniprogram_api.py 启动仿真服务。")
+                        Text("提示：在 Config.swift 设置 apiBaseUrl，并运行 python3 apps/simulator_api.py 启动仿真服务。")
                             .font(.system(size: 12))
                             .foregroundStyle(AppTheme.muted)
                     }

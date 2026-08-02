@@ -11,7 +11,7 @@ enum APIClient {
         var errorDescription: String? {
             switch self {
             case .missingBaseURL:
-                return "未配置 apiBaseUrl。请在 Config.swift 填写后端地址，并启动 python3 apps/miniprogram_api.py"
+                return "未配置 apiBaseUrl。请在 Config.swift 填写后端地址，并启动 python3 apps/simulator_api.py"
             case .invalidResponse:
                 return "服务器返回无效数据"
             case .server(let msg):
