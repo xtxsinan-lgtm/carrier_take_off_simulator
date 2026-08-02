@@ -1,5 +1,5 @@
 """Shared ski-jump deck configuration helpers."""
-from ski_jump_geometry import compute_ski_jump_arc
+from utils.ski_jump_geometry import compute_ski_jump_arc
 
 
 def assign_ski_jump_globals(globals_dict, angle_deg, lip_height_m=None):

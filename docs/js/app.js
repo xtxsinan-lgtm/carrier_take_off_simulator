@@ -11,7 +11,7 @@ import {
 } from './physics.js';
 
 const PYODIDE_VERSION = '0.26.4';
-const APP_VERSION = 4;
+const APP_VERSION = 8;
 
 let data = null;
 let pyodide = null;
@@ -46,25 +46,27 @@ if '/py' not in sys.path:
   for (const name of data.py_load_order) {
     const code = data.py_sources[name];
     if (!code) throw new Error(`缺少 Python 模块: ${name}`);
+    const parts = name.split('/');
+    if (parts.length > 1) {
+      let dir = '/py';
+      for (let i = 0; i < parts.length - 1; i++) {
+        dir += `/${parts[i]}`;
+        try {
+          pyodide.FS.mkdir(dir);
+        } catch {
+          /* already exists */
+        }
+      }
+    }
     pyodide.FS.writeFile(`/py/${name}`, code);
   }
 
-  pyodide.globals.set(
-    '_py_order',
-    data.py_load_order.map((n) => n.replace(/\.py$/, ''))
-  );
+  const importOrder = data.py_import_order || data.py_load_order.map((n) => n.replace(/\.py$/, '').replace(/\//g, '.'));
+  pyodide.globals.set('_py_import_order', importOrder);
   await pyodide.runPythonAsync(`
-import importlib.util
-import sys
-
-for _name in _py_order:
-    _path = f'/py/{_name}.py'
-    _spec = importlib.util.spec_from_file_location(_name, _path)
-    if _spec is None or _spec.loader is None:
-        raise ImportError(f'无法加载模块 {_name} from {_path}')
-    _mod = importlib.util.module_from_spec(_spec)
-    sys.modules[_name] = _mod
-    _spec.loader.exec_module(_mod)
+import importlib
+for _name in _py_import_order:
+    importlib.import_module(_name)
 `);
 }
 
@@ -230,6 +232,153 @@ async function initPyodide() {
   setStatus('仿真引擎已就绪', 'ok');
 }
 
+function modeHasTrajectory(mode) {
+  return mode === 'ski_jump' || mode === 'short_ski_jump';
+}
+
+function hideTrajectory() {
+  els.trajectorySection.classList.add('hidden');
+  if (els.trajectoryMeta) els.trajectoryMeta.textContent = '';
+}
+
+function paintTrajectoryCanvas(result) {
+  const canvas = els.trajectoryCanvas;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.getBoundingClientRect();
+  const cssW = Math.max(rect.width || canvas.width || 1060, 640);
+  const cssH = Math.max(rect.height || canvas.height || 320, 240);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const deckPts = result.deck_profile.points;
+  const traj = result.trajectory;
+  const deckLen = result.deck_profile.total_deck_length_m || deckPts[deckPts.length - 1][0];
+
+  const xs = [...deckPts.map((p) => p[0]), ...traj.map((p) => p.x), deckLen];
+  const ys = [...deckPts.map((p) => p[1]), ...traj.map((p) => p.y)];
+  const minX = 0;
+  const maxX = Math.max(...xs, 1) * 1.05;
+  const minY = Math.min(0, ...ys) - 2;
+  const maxY = Math.max(...ys, result.deck_profile.lip_height_m || 0, 1) + 8;
+
+  const pad = { l: 48, r: 16, t: 16, b: 36 };
+  const plotW = cssW - pad.l - pad.r;
+  const plotH = cssH - pad.t - pad.b;
+
+  const toX = (x) => pad.l + ((x - minX) / (maxX - minX)) * plotW;
+  const toY = (y) => pad.t + plotH - ((y - minY) / (maxY - minY)) * plotH;
+
+  ctx.clearRect(0, 0, cssW, cssH);
+  ctx.fillStyle = '#1a2332';
+  ctx.fillRect(0, 0, cssW, cssH);
+
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+  ctx.lineWidth = 1;
+  for (let gx = 0; gx <= maxX; gx += 20) {
+    ctx.beginPath();
+    ctx.moveTo(toX(gx), pad.t);
+    ctx.lineTo(toX(gx), pad.t + plotH);
+    ctx.stroke();
+  }
+  for (let gy = Math.ceil(minY / 5) * 5; gy <= maxY; gy += 5) {
+    ctx.beginPath();
+    ctx.moveTo(pad.l, toY(gy));
+    ctx.lineTo(pad.l + plotW, toY(gy));
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('水平距离 (m)', pad.l + plotW / 2, cssH - 8);
+  ctx.save();
+  ctx.translate(14, pad.t + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('高度 (m)', 0, 0);
+  ctx.restore();
+
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let gy = Math.ceil(minY / 5) * 5; gy <= maxY; gy += 10) {
+    ctx.fillText(String(gy), pad.l - 6, toY(gy));
+  }
+
+  ctx.strokeStyle = '#f87171';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(toX(deckLen), pad.t);
+  ctx.lineTo(toX(deckLen), pad.t + plotH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = '#64748b';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  deckPts.forEach(([x, y], i) => {
+    if (i === 0) ctx.moveTo(toX(x), toY(y));
+    else ctx.lineTo(toX(x), toY(y));
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(100, 116, 139, 0.25)';
+  ctx.beginPath();
+  deckPts.forEach(([x, y], i) => {
+    if (i === 0) ctx.moveTo(toX(x), toY(y));
+    else ctx.lineTo(toX(x), toY(y));
+  });
+  ctx.lineTo(toX(deckPts[deckPts.length - 1][0]), toY(minY));
+  ctx.lineTo(toX(deckPts[0][0]), toY(minY));
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  traj.forEach((p, i) => {
+    if (i === 0) ctx.moveTo(toX(p.x), toY(p.y));
+    else ctx.lineTo(toX(p.x), toY(p.y));
+  });
+  ctx.stroke();
+
+  const first = traj[0];
+  const last = traj[traj.length - 1];
+  for (const [pt, color] of [
+    [first, '#4ade80'],
+    [last, '#fbbf24'],
+  ]) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(toX(pt.x), toY(pt.y), 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function drawTrajectory(result) {
+  if (!modeHasTrajectory(currentMode)) {
+    hideTrajectory();
+    return;
+  }
+  if (!result?.trajectory?.length || !result?.deck_profile?.points?.length) {
+    hideTrajectory();
+    return;
+  }
+
+  els.trajectorySection.classList.remove('hidden');
+  if (els.trajectoryMeta) {
+    els.trajectoryMeta.textContent =
+      `共 ${result.trajectory.length} 个采样点，` +
+      `最大高度 ${fmtNum(Math.max(...result.trajectory.map((p) => p.y)), 1)} m`;
+  }
+
+  requestAnimationFrame(() => {
+    paintTrajectoryCanvas(result);
+    els.trajectorySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+}
+
 async function runSimulation() {
   const carrier = getSelectedCarrier();
   const aircraft = getSelectedAircraft();
@@ -257,6 +406,7 @@ async function runSimulation() {
   setStatus('仿真计算中（可能需要数秒至数十秒）…', 'loading');
   els.output.classList.remove('empty');
   els.output.textContent = '计算中…';
+  hideTrajectory();
 
   const payload = {
     mode: currentMode,
@@ -279,22 +429,29 @@ async function runSimulation() {
     pyodide.globals.set('_payload_json', JSON.stringify(payload));
     const raw = pyodide.runPython(`
 import json
-from web_simulator import run_simulation_json
+from apps.web_simulator import run_simulation_json
 json.dumps(run_simulation_json(_payload_json), ensure_ascii=False)
 `);
     const result = JSON.parse(raw);
     els.output.textContent = result.output || '(无输出)';
     if (result.success) {
+      drawTrajectory(result);
+      const trajNote =
+        modeHasTrajectory(currentMode) && result.trajectory?.length
+          ? ` · 轨迹 ${result.trajectory.length} 点`
+          : '';
       setStatus(
-        result.deck_launch_ok
+        (result.deck_launch_ok
           ? `仿真完成 — 甲板可用（余量 ${fmtNum(result.deck_margin_m, 1)} m）`
-          : `仿真完成 — 甲板不足（超出 ${fmtNum(-result.deck_margin_m, 1)} m）`,
+          : `仿真完成 — 甲板不足（超出 ${fmtNum(-result.deck_margin_m, 1)} m）`) + trajNote,
         result.deck_launch_ok ? 'ok' : 'error'
       );
     } else {
+      hideTrajectory();
       setStatus(result.error || '仿真失败', 'error');
     }
   } catch (e) {
+    hideTrajectory();
     els.output.textContent = String(e);
     setStatus(`仿真出错: ${e.message}`, 'error');
   } finally {
@@ -357,6 +514,9 @@ async function main() {
   els.preloadBtn = $('preloadBtn');
   els.output = $('output');
   els.status = $('status');
+  els.trajectorySection = $('trajectorySection');
+  els.trajectoryCanvas = $('trajectoryCanvas');
+  els.trajectoryMeta = $('trajectoryMeta');
 
   try {
     await loadData();

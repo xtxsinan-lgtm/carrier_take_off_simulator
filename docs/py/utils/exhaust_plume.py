@@ -1,9 +1,16 @@
-"""Shared STOVL main-engine exhaust plume safety-distance model."""
+"""VTOL/STOVL 主喷管尾流安全距离模型（utils.exhaust_plume）。
+
+仅适用于可偏转主喷管向下/后方的 VTOL 飞机（如 F-35B、AV-8B）。
+常规固定翼舰载机（滑跃起飞）不调用本模块——其发动机尾流不作甲板波及计算。
+"""
+from __future__ import annotations
+
+import math
 from dataclasses import dataclass
 
 import numpy as np
 
-# F-35B default exhaust parameters
+# F-35B 默认尾流参数（15°C 海平面 STOVL 标定）
 EXHAUST_MDOT_KG_S = 147.0
 EXHAUST_U0_MPS = 666.0
 EXHAUST_D0_M = 1.04
@@ -12,6 +19,42 @@ EXHAUST_USAFE_MPS = 25.0
 EXHAUST_WALL_ETA = 0.70
 EXHAUST_WALL_CW = 6.0
 HORIZONTAL_JET_THETA_DEG = 5.0
+
+# Rolls-Royce Pegasus（AV-8B）公开进气量：432 lb/s
+PEGASUS_AIRFLOW_LB_S = 432.0
+LB_S_TO_KG_S = 0.45359237
+
+
+def lb_s_to_kg_s(lb_s: float) -> float:
+    """质量流率 lb/s → kg/s。"""
+    return lb_s * LB_S_TO_KG_S
+
+
+def calc_exhaust_u0_from_thrust_mdot(thrust_n: float, mdot_kg_s: float) -> float:
+    """由推力与质量流率估算四喷口同速假设下的排气速度 u₀ = T / ṁ（N·s/kg ≡ m/s）。"""
+    if mdot_kg_s <= 0:
+        raise ValueError('质量流率必须为正')
+    return thrust_n / mdot_kg_s
+
+
+def calc_exhaust_d0_equiv_four_nozzles(nozzle_diameter_m: float) -> float:
+    """四等径矢量喷口合并为单股射流时的等效直径 d₀ = 2·d_n。"""
+    if nozzle_diameter_m <= 0:
+        raise ValueError('喷口直径必须为正')
+    return 2.0 * nozzle_diameter_m
+
+
+def calc_exhaust_d0_from_engine_diameter(engine_diameter_m: float, nozzle_count: int = 4) -> float:
+    """由发动机外径粗估四喷口等效直径（喷口直径 ≈ D_engine / √n）。"""
+    if engine_diameter_m <= 0 or nozzle_count < 1:
+        raise ValueError('发动机直径与喷口数量必须为正')
+    nozzle_d = engine_diameter_m / math.sqrt(nozzle_count)
+    return calc_exhaust_d0_equiv_four_nozzles(nozzle_d)
+
+
+def estimate_rcs_rollpost_thrust_n(bleed_mdot_kg_s: float, jet_velocity_mps: float = 340.0) -> float:
+    """由 RCS 引气质量流率估算姿态控制喷管等效推力（用于滚转辅助项）。"""
+    return bleed_mdot_kg_s * jet_velocity_mps
 
 
 @dataclass(frozen=True)
@@ -24,6 +67,47 @@ class ExhaustPlumeParams:
     wall_eta: float = EXHAUST_WALL_ETA
     wall_cw: float = EXHAUST_WALL_CW
     horizontal_jet_theta_deg: float = HORIZONTAL_JET_THETA_DEG
+
+
+def default_exhaust_plume_params() -> ExhaustPlumeParams:
+    """F-35B 默认尾流参数。"""
+    return ExhaustPlumeParams()
+
+
+def exhaust_plume_params_from_stovl(
+    thrust_n: float,
+    mdot_kg_s: float | None = None,
+    d0_m: float | None = None,
+    height_m: float | None = None,
+    *,
+    lb_s_airflow: float | None = None,
+    nozzle_diameter_m: float | None = None,
+    engine_diameter_m: float | None = None,
+) -> ExhaustPlumeParams:
+    """
+    由 STOVL 推力与进气量构造尾流参数。
+
+    ṁ 优先用 mdot_kg_s；否则由 lb_s_airflow 换算。
+    u₀ = T / ṁ；d₀ 可由喷口直径或发动机外径估算。
+    """
+    if mdot_kg_s is None:
+        if lb_s_airflow is None:
+            raise ValueError('需提供 mdot_kg_s 或 lb_s_airflow')
+        mdot_kg_s = lb_s_to_kg_s(lb_s_airflow)
+    u0 = calc_exhaust_u0_from_thrust_mdot(thrust_n, mdot_kg_s)
+    if d0_m is None:
+        if nozzle_diameter_m is not None:
+            d0_m = calc_exhaust_d0_equiv_four_nozzles(nozzle_diameter_m)
+        elif engine_diameter_m is not None:
+            d0_m = calc_exhaust_d0_from_engine_diameter(engine_diameter_m)
+        else:
+            d0_m = EXHAUST_D0_M
+    return ExhaustPlumeParams(
+        mdot_kg_s=mdot_kg_s,
+        u0_mps=u0,
+        d0_m=d0_m,
+        height_m=height_m if height_m is not None else EXHAUST_HEIGHT_M,
+    )
 
 
 def calc_exhaust_safe_distance_m(theta_deg, u_wind_mps, rho,

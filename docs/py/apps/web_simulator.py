@@ -4,14 +4,15 @@ from __future__ import annotations
 import io
 import sys
 from contextlib import redirect_stdout
-from dataclasses import dataclass
 from typing import Any
 
-import short_ski_jump_take_off as ski_stovl
-import short_take_off as flat_stovl
-import ski_jump_take_off as ski_conv
-from ski_jump_geometry import SKI_JUMP_REF_RADIUS_M, compute_ski_jump_arc
-from takeoff_physics import (
+import simulators.short_ski_jump_take_off as ski_stovl
+import simulators.short_take_off as flat_stovl
+import simulators.ski_jump_take_off as ski_conv
+from utils.ski_jump_geometry import SKI_JUMP_REF_RADIUS_M, compute_ski_jump_arc
+from utils.trajectory import build_deck_profile
+from utils.specs import AircraftSpec, CarrierSpec, simulation_uses_plume_model
+from utils.takeoff_physics import (
     FLAP_DEFLECTION_DEG,
     FLAP_EFFICIENCY,
     PITCH_MAX_DEG,
@@ -22,60 +23,11 @@ from takeoff_physics import (
     taxi_alpha_deg,
 )
 
-PILOT_LOAD_KG = 100.0
-A2A_MISSILE_COUNT = 4
-
 MODES = {
     'ski_jump': '滑跃起飞',
     'short_takeoff': '短距起飞',
     'short_ski_jump': '短距滑跃起飞',
 }
-
-
-@dataclass(frozen=True)
-class AircraftSpec:
-    id: str
-    name: str
-    type_label: str
-    mtow_kg: float
-    empty_kg: float
-    internal_fuel_kg: float
-    bvr_missile: str
-    missile_mass_kg: float
-    sweep_le_deg: float
-    wingspan_m: float
-    wing_area_m2: float
-    wing_height_m: float
-    cd0: float = 0.039
-    t_max_sl_n: float | None = None
-    t_main_stovl_sl_n: float | None = None
-    t_liftfan_sl_n: float | None = None
-    t_rollposts_sl_n: float | None = None
-    notes: str = ''
-
-    @property
-    def a2a_mass_kg(self) -> float:
-        return (self.empty_kg + self.internal_fuel_kg
-                + A2A_MISSILE_COUNT * self.missile_mass_kg + PILOT_LOAD_KG)
-
-    @property
-    def max_payload_kg(self) -> float:
-        return self.mtow_kg - self.empty_kg - self.internal_fuel_kg - PILOT_LOAD_KG
-
-
-@dataclass(frozen=True)
-class CarrierSpec:
-    id: str
-    name: str
-    nation: str
-    max_speed_kt: float
-    ski_jump: bool
-    total_deck_length_m: float
-    ski_jump_angle_deg: float = 0.0
-    ski_jump_height_m: float | None = None
-    f35b_capable: bool = False
-    notes: str = ''
-    deck_length_source: str = ''
 
 
 def aircraft_from_dict(d: dict[str, Any]) -> AircraftSpec:
@@ -97,6 +49,9 @@ def aircraft_from_dict(d: dict[str, Any]) -> AircraftSpec:
         t_main_stovl_sl_n=_opt_float(d.get('t_main_stovl_sl_n')),
         t_liftfan_sl_n=_opt_float(d.get('t_liftfan_sl_n')),
         t_rollposts_sl_n=_opt_float(d.get('t_rollposts_sl_n')),
+        exhaust_mdot_kg_s=_opt_float(d.get('exhaust_mdot_kg_s')),
+        exhaust_d0_m=_opt_float(d.get('exhaust_d0_m')),
+        exhaust_height_m=_opt_float(d.get('exhaust_height_m')),
         notes=d.get('notes', ''),
     )
 
@@ -179,10 +134,12 @@ def filter_carriers_for_mode(mode: str, carriers: list[CarrierSpec]) -> list[Car
 
 
 def filter_aircraft_for_mode(mode: str, aircraft: list[AircraftSpec]) -> list[AircraftSpec]:
+    from utils.specs import VTOL_TYPE_LABEL
+
     if mode == 'ski_jump':
-        return [a for a in aircraft if a.type_label != 'v/stol']
+        return [a for a in aircraft if a.type_label != VTOL_TYPE_LABEL]
     if mode in ('short_takeoff', 'short_ski_jump'):
-        return [a for a in aircraft if a.type_label == 'v/stol']
+        return [a for a in aircraft if a.type_label == VTOL_TYPE_LABEL]
     raise ValueError(f'未知模式: {mode}')
 
 
@@ -197,11 +154,11 @@ def _deck_launch_label(success: bool, distance_m: float | None, deck_length_m: f
 
 def _configure_flat_stovl(ac: AircraftSpec, mass_kg: float, temp_c: float, wind_kt: float):
     geom = dict(mass_kg=mass_kg, s_ref_m2=ac.wing_area_m2, wingspan_m=ac.wingspan_m,
-                wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg)
-    thrust = dict(t_main_sl_n=ac.t_main_stovl_sl_n, t_liftfan_sl_n=ac.t_liftfan_sl_n,
-                  t_rollposts_sl_n=ac.t_rollposts_sl_n)
+                wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg, cd0=ac.cd0)
     flat_stovl.apply_thrust_temperature(temp_c)
-    flat_stovl.apply_stovl_thrust_sl(**thrust)
+    flat_stovl.apply_stovl_thrust_sl(
+        ac.t_main_stovl_sl_n, ac.t_liftfan_sl_n or 0.0, ac.t_rollposts_sl_n or 0.0)
+    flat_stovl.apply_exhaust_plume_params(ac.exhaust_plume_params())
     flat_stovl.apply_wind_knots(wind_kt)
     flat_stovl.apply_aircraft_geometry(**geom)
     return flat_stovl
@@ -210,11 +167,11 @@ def _configure_flat_stovl(ac: AircraftSpec, mass_kg: float, temp_c: float, wind_
 def _configure_ski_stovl(ac: AircraftSpec, mass_kg: float, temp_c: float, wind_kt: float,
                          ski_angle: float, lip_height_m: float | None):
     geom = dict(mass_kg=mass_kg, s_ref_m2=ac.wing_area_m2, wingspan_m=ac.wingspan_m,
-                wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg)
-    thrust = dict(t_main_sl_n=ac.t_main_stovl_sl_n, t_liftfan_sl_n=ac.t_liftfan_sl_n,
-                  t_rollposts_sl_n=ac.t_rollposts_sl_n)
+                wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg, cd0=ac.cd0)
     ski_stovl.apply_thrust_temperature(temp_c)
-    ski_stovl.apply_stovl_thrust_sl(**thrust)
+    ski_stovl.apply_stovl_thrust_sl(
+        ac.t_main_stovl_sl_n, ac.t_liftfan_sl_n or 0.0, ac.t_rollposts_sl_n or 0.0)
+    ski_stovl.apply_exhaust_plume_params(ac.exhaust_plume_params())
     ski_stovl.apply_wind_knots(wind_kt)
     ski_stovl.apply_aircraft_geometry(**geom)
     ski_stovl.apply_ski_jump_deck(ski_angle, lip_height_m)
@@ -249,7 +206,7 @@ def _format_f35b_output(result: dict, deck_length_m: float, mode_label: str) -> 
     ]
     plume = result.get('min_plume_trailing_edge_m')
     if plume is not None:
-        lines.append(f"  甲板受影响最后缘: {plume:.1f} m")
+        lines.append(f"  尾流波及最后缘 (VTOL): {plume:.1f} m")
     v_deck = result.get('v_deck_mps') or result.get('v_gs_mps')
     t_deck = result.get('t_deck_s') or result.get('t_s')
     lines += [
@@ -273,6 +230,29 @@ def _format_conv_output(result: dict, deck_length_m: float) -> list[str]:
         f"  离舰速度:         {result['v_deck_mps']:.1f} m/s",
         f"  离舰用时:         {result['t_deck_s']:.2f} s",
     ]
+
+
+def _capture_trajectory(mode: str, mod, result: dict, deck_length_m: float) -> tuple[list | None, dict | None]:
+    """用最优参数重跑仿真，采样起飞轨迹与甲板折线（仅滑跃 / 短距滑跃）。"""
+    if mode not in ('ski_jump', 'short_ski_jump'):
+        return None, None
+    traj: list[dict] = []
+    flat_m = float(result['flat_m'])
+    pitch_deg = float(result['pitch_deg'])
+    if mode == 'ski_jump':
+        mod.simulate(flat_m, pitch_deg, trajectory=traj)
+    else:
+        mod.simulate(
+            flat_m,
+            float(result['v_trans_mps']),
+            float(result['nozzle_deg']),
+            'A',
+            pitch_deg,
+            trajectory=traj,
+        )
+    deck = build_deck_profile(flat_m, mod.SKI_JUMP_ARC)
+    deck['total_deck_length_m'] = float(deck_length_m)
+    return traj, deck
 
 
 def run_simulation(
@@ -371,6 +351,10 @@ def run_simulation(
         if distance_m is not None:
             distance_m = float(distance_m)
 
+        trajectory, deck_profile = _capture_trajectory(mode, mod, result, deck_length)
+        plume_applicable = simulation_uses_plume_model(mode, aircraft)
+        plume_edge = result.get('min_plume_trailing_edge_m') if plume_applicable else None
+
         return {
             'success': True,
             'mode': mode,
@@ -378,7 +362,11 @@ def run_simulation(
             'distance_m': distance_m,
             'deck_launch_ok': distance_m is not None and distance_m <= deck_length,
             'deck_margin_m': deck_length - distance_m if distance_m is not None else None,
+            'plume_applicable': plume_applicable,
+            'min_plume_trailing_edge_m': plume_edge,
             'result': _json_safe(result),
+            'trajectory': trajectory,
+            'deck_profile': deck_profile,
         }
     except Exception as exc:
         config_text = buf.getvalue()
@@ -442,12 +430,11 @@ def run_simulation_json(payload: dict[str, Any] | str) -> dict[str, Any]:
 
 
 if __name__ == '__main__':
-    from database_csv import load_aircraft_csv, load_carriers_csv
-    from pathlib import Path
+    from utils.database_csv import load_aircraft_csv, load_carriers_csv
+    from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV
 
-    root = Path(__file__).resolve().parent
-    ac_map = load_aircraft_csv(root / 'aircraft_database.csv')
-    carriers = load_carriers_csv(root / 'carriers_database.csv')
+    ac_map = load_aircraft_csv(AIRCRAFT_CSV)
+    carriers = load_carriers_csv(CARRIERS_CSV)
     carrier = next(c for c in carriers if c.id == 'SHANDONG')
     ac = ac_map['J-15']
     r = run_simulation('ski_jump', ac, carrier, ac.a2a_mass_kg, 30.0, carrier.max_speed_kt)

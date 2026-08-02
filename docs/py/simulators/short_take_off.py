@@ -1,5 +1,8 @@
 """F-35B 短距起飞仿真（平直甲板，策略 A/B/C 喷口偏转对比）。
 
+尾流波及：本模块为 VTOL/STOVL 专用；主喷管尾流模型见 utils.exhaust_plume。
+常规固定翼滑跃仿真（ski_jump_take_off）不计算尾流波及范围。
+
 策略说明
 --------
 策略 A — 延迟偏转喷口
@@ -21,15 +24,17 @@
 """
 import numpy as np
 
-from exhaust_plume import (
+from utils.exhaust_plume import (
+    ExhaustPlumeParams,
     calc_exhaust_safe_distance_m as _calc_exhaust_safe_distance_m,
     calc_exhaust_theta_deg_for_safe_distance_m as _calc_exhaust_theta_deg_for_safe_distance_m,
     calc_min_nozzle_deg_for_plume as _calc_min_nozzle_deg_for_plume,
+    default_exhaust_plume_params,
     update_min_plume_trailing_edge_m as _update_min_plume_trailing_edge_m,
 )
-from search_utils import fine_range_symmetric
-from sim_config import apply_wind_knots_globals
-from takeoff_physics import (
+from utils.search_utils import fine_range_symmetric
+from utils.sim_config import apply_wind_knots_globals
+from utils.takeoff_physics import (
     G,
     KT_TO_MPS,
     MPS_TO_KT,
@@ -102,25 +107,35 @@ DT_DEFAULT = 0.01
 MAX_SIM_TIME_S = 60.0
 MAX_RUNWAY_M = 3000.0
 
+PLUME_PARAMS: ExhaustPlumeParams = default_exhaust_plume_params()
+
+
+def apply_exhaust_plume_params(params: ExhaustPlumeParams) -> None:
+    """设置本机尾流模型参数（按机型在仿真前调用）。"""
+    global PLUME_PARAMS
+    PLUME_PARAMS = params
+
+
 def calc_exhaust_safe_distance_m(theta_deg, u_wind_mps):
     """尾流衰减至安全阈值所需的水平向后距离，m。"""
-    return _calc_exhaust_safe_distance_m(theta_deg, u_wind_mps, RHO)
+    return _calc_exhaust_safe_distance_m(theta_deg, u_wind_mps, RHO, PLUME_PARAMS)
 
 
 def calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps):
     """calc_exhaust_safe_distance_m 的反函数：求最小喷流角 θ（°）。"""
-    return _calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps, RHO)
+    return _calc_exhaust_theta_deg_for_safe_distance_m(max_safe_m, u_wind_mps, RHO, PLUME_PARAMS)
 
 
 def calc_min_nozzle_deg_for_plume(x_m, min_safe_distance_m, u_wind_mps, ski_jump_offset_deg=0.0):
     """位置 x 处满足尾流约束的最小喷口偏转角（°）。"""
     return _calc_min_nozzle_deg_for_plume(
-        x_m, min_safe_distance_m, u_wind_mps, ski_jump_offset_deg, RHO)
+        x_m, min_safe_distance_m, u_wind_mps, ski_jump_offset_deg, RHO, PLUME_PARAMS)
 
 
 def update_min_plume_trailing_edge_m(x_m, theta_deg, u_wind_mps, current_min_m):
     """更新甲板上受影响最后缘位置，m：滑跑全程 min(x − 安全距离)。"""
-    return _update_min_plume_trailing_edge_m(x_m, theta_deg, u_wind_mps, current_min_m, RHO)
+    return _update_min_plume_trailing_edge_m(
+        x_m, theta_deg, u_wind_mps, current_min_m, RHO, PLUME_PARAMS)
 
 
 TAXI_ALPHA_DEG = taxi_alpha_deg()  # 滑行等效迎角，°
@@ -158,18 +173,20 @@ def apply_wind_knots(wind_kt):
 def apply_stovl_thrust_sl(t_main_sl_n, t_liftfan_sl_n, t_rollposts_sl_n):
     global T_MAIN_STOVL_SL_N, T_LIFTFAN_SL_N, T_ROLLPOSTS_SL_N
     T_MAIN_STOVL_SL_N = t_main_sl_n
-    T_LIFTFAN_SL_N = t_liftfan_sl_n
-    T_ROLLPOSTS_SL_N = t_rollposts_sl_n
+    T_LIFTFAN_SL_N = t_liftfan_sl_n or 0.0
+    T_ROLLPOSTS_SL_N = t_rollposts_sl_n or 0.0
     apply_thrust_temperature(AMBIENT_TEMP_C)
 
 
-def apply_aircraft_geometry(mass_kg, s_ref_m2, wingspan_m, wing_height_m, sweep_le_deg):
-    global MASS_KG, S_REF_M2, WINGSPAN_M, WING_HEIGHT_M, SWEEP_LE_DEG
+def apply_aircraft_geometry(mass_kg, s_ref_m2, wingspan_m, wing_height_m, sweep_le_deg, cd0=None):
+    global MASS_KG, S_REF_M2, WINGSPAN_M, WING_HEIGHT_M, SWEEP_LE_DEG, CD0
     MASS_KG = mass_kg
     S_REF_M2 = s_ref_m2
     WINGSPAN_M = wingspan_m
     WING_HEIGHT_M = wing_height_m
     SWEEP_LE_DEG = sweep_le_deg
+    if cd0 is not None:
+        CD0 = cd0
     recompute_aero_parameters()
 
 

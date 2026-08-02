@@ -22,6 +22,8 @@
       </div>
       <p style="margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--muted);">
         滑跃 / 短距滑跃模式需滑跃甲板航母；短距起飞需 STOVL 战斗机 + 平直甲板。
+        尾流波及范围仅对 STOVL（VTOL）模式计算，常规滑跃起飞不含此项。
+        起飞轨迹图仅在<strong>滑跃起飞</strong>与<strong>短距滑跃起飞</strong>成功后显示。
       </p>
     </section>
 
@@ -82,7 +84,7 @@
           <label for="massInput">起飞重量 (kg)</label>
           <input type="number" id="massInput" step="10" min="1000">
         </div>
-        <button type="button" id="preloadBtn" class="mode-btn">预加载引擎</button>
+        <button type="button" id="preloadBtn" class="secondary">预加载引擎</button>
         <button type="button" id="runBtn" class="primary">开始仿真</button>
       </div>
       <div id="status"></div>
@@ -92,12 +94,24 @@
       <h2>5. 仿真输出</h2>
       <pre id="output" class="empty">选择参数后点击「开始仿真」，结果将显示在此处。</pre>
     </section>
+
+    <section class="card hidden" id="trajectorySection">
+      <h2>6. 起飞轨迹</h2>
+      <p class="trajectory-hint">侧视剖面：甲板折线与飞机质心轨迹（水平 x、高度 y，单位 m）</p>
+      <p class="trajectory-meta" id="trajectoryMeta"></p>
+      <canvas id="trajectoryCanvas" width="1060" height="320"></canvas>
+      <div class="trajectory-legend">
+        <span class="legend-item"><i class="swatch deck"></i>甲板</span>
+        <span class="legend-item"><i class="swatch path"></i>飞机轨迹</span>
+        <span class="legend-item"><i class="swatch limit"></i>甲板总长</span>
+      </div>
+    </section>
   </main>
 
   <footer>
     仿真在浏览器内通过 Pyodide 运行 Python 物理模型 · 数据来自 aircraft_database.csv / carriers_database.csv
   </footer>
 
-  <script type="module" src="js/app.js?v=4"></script>
+  <script type="module" src="js/app.js?v=8"></script>
 </body>
 </html>
