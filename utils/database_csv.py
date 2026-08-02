@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from utils.specs import AircraftSpec, CarrierSpec
 
 AIRCRAFT_CSV_COLUMNS = (
-    'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg',
+    'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg', 'max_payload_kg',
     'bvr_missile', 'missile_mass_kg', 'sweep_le_deg', 'wingspan_m', 'wing_area_m2',
     'wing_height_m', 'cd0', 't_max_sl_n', 't_main_stovl_sl_n', 't_liftfan_sl_n',
     't_rollposts_sl_n', 'exhaust_mdot_kg_s', 'exhaust_d0_m', 'exhaust_height_m', 'notes',
@@ -96,6 +96,7 @@ def load_aircraft_csv(path: str | Path) -> dict[str, 'AircraftSpec']:
             mtow_kg=_parse_float(row['mtow_kg'], 'mtow_kg'),
             empty_kg=_parse_float(row['empty_kg'], 'empty_kg'),
             internal_fuel_kg=_parse_float(row['internal_fuel_kg'], 'internal_fuel_kg'),
+            max_payload_kg=_parse_float(row['max_payload_kg'], 'max_payload_kg'),
             bvr_missile=row['bvr_missile'].strip(),
             missile_mass_kg=_parse_float(row['missile_mass_kg'], 'missile_mass_kg'),
             sweep_le_deg=_parse_float(row['sweep_le_deg'], 'sweep_le_deg'),

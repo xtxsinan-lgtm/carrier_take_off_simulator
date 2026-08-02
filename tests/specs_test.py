@@ -1,4 +1,4 @@
-"""Unit tests for specs.py."""
+"""AircraftSpec / 载弹量字段单元测试。"""
 from utils.database_csv import load_aircraft_csv
 from utils.paths import AIRCRAFT_CSV
 from utils.specs import (
@@ -9,10 +9,30 @@ from utils.specs import (
 )
 
 
-def test_a2a_mass_and_payload():
+def test_a2a_mass_and_catalog_payload():
+    """空战起飞重量仍为推算；最大载弹量取自 CSV 资料值。"""
     ac = load_aircraft_csv(AIRCRAFT_CSV)['J-15']
     assert ac.a2a_mass_kg == ac.empty_kg + ac.internal_fuel_kg + A2A_MISSILE_COUNT * ac.missile_mass_kg + PILOT_LOAD_KG
-    assert ac.max_payload_kg == ac.mtow_kg - ac.empty_kg - ac.internal_fuel_kg - PILOT_LOAD_KG
+    assert ac.max_payload_kg == 6500
+
+
+def test_max_payload_kg_user_specified_chinese_types():
+    aircraft = load_aircraft_csv(AIRCRAFT_CSV)
+    assert aircraft['J-15'].max_payload_kg == 6500
+    assert aircraft['J-15T'].max_payload_kg == 8000
+    assert aircraft['J-35'].max_payload_kg == 8000
+
+
+def test_max_payload_kg_wikipedia_sourced_types():
+    """其余机型载弹量为公开资料（Wikipedia / 厂商）圆整值。"""
+    aircraft = load_aircraft_csv(AIRCRAFT_CSV)
+    assert aircraft['F-35B'].max_payload_kg == 6800
+    assert aircraft['AV-8B'].max_payload_kg == 4200
+    assert aircraft['MiG-29K'].max_payload_kg == 5500
+    assert aircraft['Rafale-M'].max_payload_kg == 9500
+    assert aircraft['FA-18E'].max_payload_kg == 8050
+    assert aircraft['FA-18C'].max_payload_kg == 6215
+    assert aircraft['F-14'].max_payload_kg == 6700
 
 
 def test_carrier_ski_jump_geom():

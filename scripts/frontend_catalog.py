@@ -14,10 +14,10 @@ MODES = {
 }
 
 # data.json 结构版本；字段变更时递增
-DATA_VERSION = 8
+DATA_VERSION = 9
 
 _AIRCRAFT_KEYS = (
-    'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg',
+    'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg', 'max_payload_kg',
     'bvr_missile', 'missile_mass_kg', 'sweep_le_deg', 'wingspan_m', 'wing_area_m2',
     'wing_height_m', 'cd0', 't_max_sl_n', 't_main_stovl_sl_n', 't_liftfan_sl_n',
     't_rollposts_sl_n', 'exhaust_mdot_kg_s', 'exhaust_d0_m', 'exhaust_height_m', 'notes',

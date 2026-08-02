@@ -3,7 +3,7 @@
  * 请勿手改；修改 CSV 后运行 python3 scripts/build_all.py。
  */
 module.exports = {
-  "version": 8,
+  "version": 9,
   "pilot_load_kg": 100.0,
   "a2a_missile_count": 4,
   "pitch_max_deg": 20.0,
@@ -20,6 +20,7 @@ module.exports = {
       "mtow_kg": 27200.0,
       "empty_kg": 14651.0,
       "internal_fuel_kg": 6400.0,
+      "max_payload_kg": 6800.0,
       "bvr_missile": "AIM-120C AMRAAM",
       "missile_mass_kg": 152.0,
       "sweep_le_deg": 35.0,
@@ -34,7 +35,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "STOVL 推力为垂起模式海平面标定值（15°C）；含升力风扇"
+      "notes": "STOVL 推力为垂起模式海平面标定值（15°C）；含升力风扇；载弹量 6800 kg（Lockheed 15"
     },
     {
       "id": "AV-8B",
@@ -43,6 +44,7 @@ module.exports = {
       "mtow_kg": 14061.0,
       "empty_kg": 6340.0,
       "internal_fuel_kg": 3540.0,
+      "max_payload_kg": 4200.0,
       "bvr_missile": "AIM-120C AMRAAM",
       "missile_mass_kg": 152.0,
       "sweep_le_deg": 37.0,
@@ -57,7 +59,7 @@ module.exports = {
       "exhaust_mdot_kg_s": 195.95,
       "exhaust_d0_m": 1.219,
       "exhaust_height_m": 1.55,
-      "notes": "Pegasus F402-408 23500 lbf；432 lb/s 进气；四矢量喷口同速 u=T/ṁ≈536 m/s；无升力风扇；RCS 滚转≈7 lbm/s×340 m/s"
+      "notes": "Pegasus F402-408 23500 lbf；载弹量 4200 kg（Wikipedia 9"
     },
     {
       "id": "J-15",
@@ -66,6 +68,7 @@ module.exports = {
       "mtow_kg": 33000.0,
       "empty_kg": 17500.0,
       "internal_fuel_kg": 9800.0,
+      "max_payload_kg": 6500.0,
       "bvr_missile": "PL-12",
       "missile_mass_kg": 199.0,
       "sweep_le_deg": 42.0,
@@ -80,7 +83,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "WS-10H/AL-31 双发最大加力约 251 kN（15°C 标定）"
+      "notes": "WS-10H/AL-31 双发最大加力约 251 kN；最大载弹量 6500 kg"
     },
     {
       "id": "J-15T",
@@ -89,6 +92,7 @@ module.exports = {
       "mtow_kg": 35900.0,
       "empty_kg": 17800.0,
       "internal_fuel_kg": 10000.0,
+      "max_payload_kg": 8000.0,
       "bvr_missile": "PL-15",
       "missile_mass_kg": 210.0,
       "sweep_le_deg": 42.0,
@@ -103,7 +107,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "弹射型，滑跃舰上仍按 STOBAR 仿真；加力约 264 kN"
+      "notes": "弹射型，滑跃舰上仍按 STOBAR 仿真；最大载弹量 8000 kg"
     },
     {
       "id": "J-35",
@@ -112,6 +116,7 @@ module.exports = {
       "mtow_kg": 29500.0,
       "empty_kg": 15500.0,
       "internal_fuel_kg": 8000.0,
+      "max_payload_kg": 8000.0,
       "bvr_missile": "PL-15",
       "missile_mass_kg": 210.0,
       "sweep_le_deg": 38.0,
@@ -126,7 +131,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "WS-21 级双发加力约 186 kN（公开估算）"
+      "notes": "WS-21 级双发加力约 186 kN；最大载弹量 8000 kg"
     },
     {
       "id": "MiG-29K",
@@ -135,6 +140,7 @@ module.exports = {
       "mtow_kg": 24500.0,
       "empty_kg": 12000.0,
       "internal_fuel_kg": 4560.0,
+      "max_payload_kg": 5500.0,
       "bvr_missile": "RVV-AE (R-77)",
       "missile_mass_kg": 175.0,
       "sweep_le_deg": 40.0,
@@ -149,7 +155,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "2×RD-33MK 加力各 88.3 kN；Cd0=20°襟翼+落架+挂载；翼展/面积/翼高为公开数据估算"
+      "notes": "2×RD-33MK；载弹量 5500 kg（Wikipedia combat payload）"
     },
     {
       "id": "Rafale-M",
@@ -158,6 +164,7 @@ module.exports = {
       "mtow_kg": 24500.0,
       "empty_kg": 10600.0,
       "internal_fuel_kg": 4700.0,
+      "max_payload_kg": 9500.0,
       "bvr_missile": "MBDA Meteor",
       "missile_mass_kg": 190.0,
       "sweep_le_deg": 48.0,
@@ -172,7 +179,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "2×M88-2/E4 加力各 75 kN（15°C SL）；Cd0=20°襟翼+落架+挂载"
+      "notes": "2×M88-2/E4；外挂 9500 kg（Dassault / Wikipedia 9.5 t）"
     },
     {
       "id": "FA-18E",
@@ -181,6 +188,7 @@ module.exports = {
       "mtow_kg": 29937.0,
       "empty_kg": 14552.0,
       "internal_fuel_kg": 6667.0,
+      "max_payload_kg": 8050.0,
       "bvr_missile": "AIM-120C AMRAAM",
       "missile_mass_kg": 152.0,
       "sweep_le_deg": 20.0,
@@ -195,7 +203,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "2×F414-GE-400 加力各 97.9 kN（15°C SL）；Cd0=20°襟翼+落架+挂载"
+      "notes": "2×F414-GE-400；外挂 8050 kg（17"
     },
     {
       "id": "FA-18C",
@@ -204,6 +212,7 @@ module.exports = {
       "mtow_kg": 23541.0,
       "empty_kg": 10680.0,
       "internal_fuel_kg": 4930.0,
+      "max_payload_kg": 6215.0,
       "bvr_missile": "AIM-120C AMRAAM",
       "missile_mass_kg": 152.0,
       "sweep_le_deg": 20.0,
@@ -218,7 +227,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "2×F404-GE-402 加力各 78.3 kN（15°C SL）；Classic Hornet；Cd0=20°襟翼+落架+挂载"
+      "notes": "2×F404-GE-402；外挂 6215 kg（13"
     },
     {
       "id": "F-14",
@@ -227,6 +236,7 @@ module.exports = {
       "mtow_kg": 33724.0,
       "empty_kg": 18955.0,
       "internal_fuel_kg": 7348.0,
+      "max_payload_kg": 6700.0,
       "bvr_missile": "AIM-120C AMRAAM",
       "missile_mass_kg": 152.0,
       "sweep_le_deg": 20.0,
@@ -241,7 +251,7 @@ module.exports = {
       "exhaust_mdot_kg_s": null,
       "exhaust_d0_m": null,
       "exhaust_height_m": null,
-      "notes": "F-14B/D；2×F110-GE-400 加力共约 251 kN；起飞翼后掠 20°、翼展 19.54 m；Cd0=20°襟翼+落架+挂载"
+      "notes": "F-14B/D；外挂约 6700 kg（Wikipedia over 6"
     }
   ],
   "carriers": [

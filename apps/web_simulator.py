@@ -38,6 +38,7 @@ def aircraft_from_dict(d: dict[str, Any]) -> AircraftSpec:
         mtow_kg=float(d['mtow_kg']),
         empty_kg=float(d['empty_kg']),
         internal_fuel_kg=float(d['internal_fuel_kg']),
+        max_payload_kg=float(d['max_payload_kg']),
         bvr_missile=d['bvr_missile'],
         missile_mass_kg=float(d['missile_mass_kg']),
         sweep_le_deg=float(d['sweep_le_deg']),

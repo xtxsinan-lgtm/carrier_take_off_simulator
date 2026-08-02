@@ -95,6 +95,7 @@ def test_run_simulation_json_string(aircraft, carriers):
             'id': ac.id, 'name': ac.name, 'type_label': ac.type_label,
             'mtow_kg': ac.mtow_kg, 'empty_kg': ac.empty_kg,
             'internal_fuel_kg': ac.internal_fuel_kg,
+            'max_payload_kg': ac.max_payload_kg,
             'bvr_missile': ac.bvr_missile, 'missile_mass_kg': ac.missile_mass_kg,
             'sweep_le_deg': ac.sweep_le_deg, 'wingspan_m': ac.wingspan_m,
             'wing_area_m2': ac.wing_area_m2, 'wing_height_m': ac.wing_height_m,

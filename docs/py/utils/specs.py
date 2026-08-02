@@ -34,6 +34,7 @@ class AircraftSpec:
     mtow_kg: float
     empty_kg: float
     internal_fuel_kg: float
+    max_payload_kg: float  # 最大外挂/载弹量（资料值，非 MTOW 推算）
     bvr_missile: str
     missile_mass_kg: float
     sweep_le_deg: float
@@ -104,10 +105,6 @@ class AircraftSpec:
     def a2a_mass_kg(self) -> float:
         return (self.empty_kg + self.internal_fuel_kg
                 + A2A_MISSILE_COUNT * self.missile_mass_kg + PILOT_LOAD_KG)
-
-    @property
-    def max_payload_kg(self) -> float:
-        return self.mtow_kg - self.empty_kg - self.internal_fuel_kg - PILOT_LOAD_KG
 
 
 @dataclass(frozen=True)

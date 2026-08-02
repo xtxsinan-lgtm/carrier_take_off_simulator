@@ -50,7 +50,7 @@ BOUNDARY_HITS: dict[str, set[str]] = {
 AIRCRAFT: dict[str, AircraftSpec] = {
     'F-35B': AircraftSpec(
         id='F-35B', name='F-35B Lightning II', type_label='v/stol',
-        mtow_kg=27200, empty_kg=14651, internal_fuel_kg=6400,
+        mtow_kg=27200, empty_kg=14651, internal_fuel_kg=6400, max_payload_kg=6800,
         bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
         sweep_le_deg=35, wingspan_m=10.7, wing_area_m2=42.7, wing_height_m=1.96,
         cd0=0.039,
@@ -59,7 +59,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'AV-8B': AircraftSpec(
         id='AV-8B', name='AV-8B Harrier II', type_label='v/stol',
-        mtow_kg=14061, empty_kg=6340, internal_fuel_kg=3540,
+        mtow_kg=14061, empty_kg=6340, internal_fuel_kg=3540, max_payload_kg=4200,
         bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
         sweep_le_deg=37, wingspan_m=9.25, wing_area_m2=21.37, wing_height_m=1.55,
         cd0=0.043,
@@ -69,7 +69,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'J-15': AircraftSpec(
         id='J-15', name='歼-15', type_label='conventional',
-        mtow_kg=33000, empty_kg=17500, internal_fuel_kg=9800,
+        mtow_kg=33000, empty_kg=17500, internal_fuel_kg=9800, max_payload_kg=6500,
         bvr_missile='PL-12', missile_mass_kg=199.0,
         sweep_le_deg=42, wingspan_m=14.7, wing_area_m2=67.84, wing_height_m=2.55,
         cd0=0.0475, t_max_sl_n=251000,
@@ -77,7 +77,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'J-15T': AircraftSpec(
         id='J-15T', name='歼-15T', type_label='conventional',
-        mtow_kg=35900, empty_kg=17800, internal_fuel_kg=10000,
+        mtow_kg=35900, empty_kg=17800, internal_fuel_kg=10000, max_payload_kg=8000,
         bvr_missile='PL-15', missile_mass_kg=210.0,
         sweep_le_deg=42, wingspan_m=14.7, wing_area_m2=67.84, wing_height_m=2.55,
         cd0=0.0475, t_max_sl_n=264000,
@@ -85,7 +85,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'J-35': AircraftSpec(
         id='J-35', name='歼-35', type_label='conventional',
-        mtow_kg=29500, empty_kg=15500, internal_fuel_kg=8000,
+        mtow_kg=29500, empty_kg=15500, internal_fuel_kg=8000, max_payload_kg=8000,
         bvr_missile='PL-15', missile_mass_kg=210.0,
         sweep_le_deg=38, wingspan_m=13.6, wing_area_m2=66.9, wing_height_m=1.96,
         cd0=0.039, t_max_sl_n=186000,
@@ -93,7 +93,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'MiG-29K': AircraftSpec(
         id='MiG-29K', name='MiG-29K', type_label='conventional',
-        mtow_kg=24500, empty_kg=12000, internal_fuel_kg=4560,
+        mtow_kg=24500, empty_kg=12000, internal_fuel_kg=4560, max_payload_kg=5500,
         bvr_missile='RVV-AE (R-77)', missile_mass_kg=175.0,
         sweep_le_deg=40, wingspan_m=11.99, wing_area_m2=34.5, wing_height_m=1.89,
         cd0=0.043, t_max_sl_n=176380,
@@ -101,7 +101,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'Rafale-M': AircraftSpec(
         id='Rafale-M', name='阵风 M', type_label='conventional',
-        mtow_kg=24500, empty_kg=10600, internal_fuel_kg=4700,
+        mtow_kg=24500, empty_kg=10600, internal_fuel_kg=4700, max_payload_kg=9500,
         bvr_missile='MBDA Meteor', missile_mass_kg=190.0,
         sweep_le_deg=48, wingspan_m=10.80, wing_area_m2=45.7, wing_height_m=1.90,
         cd0=0.039, t_max_sl_n=150000,
@@ -109,7 +109,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'FA-18E': AircraftSpec(
         id='FA-18E', name='F/A-18E Super Hornet', type_label='conventional',
-        mtow_kg=29937, empty_kg=14552, internal_fuel_kg=6667,
+        mtow_kg=29937, empty_kg=14552, internal_fuel_kg=6667, max_payload_kg=8050,
         bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
         sweep_le_deg=20, wingspan_m=13.62, wing_area_m2=46.5, wing_height_m=1.55,
         cd0=0.044, t_max_sl_n=195800,
@@ -117,7 +117,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'FA-18C': AircraftSpec(
         id='FA-18C', name='F/A-18C/D Hornet', type_label='conventional',
-        mtow_kg=23541, empty_kg=10680, internal_fuel_kg=4930,
+        mtow_kg=23541, empty_kg=10680, internal_fuel_kg=4930, max_payload_kg=6215,
         bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
         sweep_le_deg=20, wingspan_m=11.43, wing_area_m2=38.0, wing_height_m=1.52,
         cd0=0.045, t_max_sl_n=156600,
@@ -125,7 +125,7 @@ AIRCRAFT: dict[str, AircraftSpec] = {
     ),
     'F-14': AircraftSpec(
         id='F-14', name='F-14 Tomcat', type_label='conventional',
-        mtow_kg=33724, empty_kg=18955, internal_fuel_kg=7348,
+        mtow_kg=33724, empty_kg=18955, internal_fuel_kg=7348, max_payload_kg=6700,
         bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
         sweep_le_deg=20, wingspan_m=19.54, wing_area_m2=52.49, wing_height_m=2.10,
         cd0=0.046, t_max_sl_n=250900,

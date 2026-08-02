@@ -94,7 +94,7 @@ function a2aMassKg(ac) {
 }
 
 function maxPayloadKg(ac) {
-  return ac.mtow_kg - ac.empty_kg - ac.internal_fuel_kg - PILOT_LOAD_KG;
+  return Number(ac.max_payload_kg);
 }
 
 function filterCarriersForMode(mode, carriers) {
