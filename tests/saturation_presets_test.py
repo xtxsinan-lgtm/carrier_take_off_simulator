@@ -1,4 +1,4 @@
-"""饱和打击预设单元测试。"""
+"""饱和打击 CSV 预设单元测试。"""
 from __future__ import annotations
 
 from utils.saturation_presets import (
@@ -8,7 +8,9 @@ from utils.saturation_presets import (
     SHIP_PRESETS,
     build_saturation_presets_payload,
     get_preset_by_id,
+    load_presets,
 )
+from utils.paths import SATURATION_EQUIPMENT_CSV
 
 
 def test_get_preset_by_id_found():
@@ -25,7 +27,7 @@ def test_get_preset_by_id_missing():
 
 
 def test_build_saturation_presets_payload_keys():
-    """目录载荷含四类预设且非空。"""
+    """目录载荷含四类预设且与 CSV 一致。"""
     payload = build_saturation_presets_payload()
     assert set(payload) == {'asm', 'aew', 'ship', 'sam'}
     assert len(payload['asm']) == len(ASM_PRESETS)
@@ -33,3 +35,16 @@ def test_build_saturation_presets_payload_keys():
     assert len(payload['ship']) == len(SHIP_PRESETS)
     assert len(payload['sam']) == len(SAM_PRESETS)
     assert all('id' in x and 'name' in x for x in payload['sam'])
+
+
+def test_load_presets_from_csv_path():
+    """显式路径加载与默认路径一致。"""
+    a = load_presets(SATURATION_EQUIPMENT_CSV)
+    b = load_presets()
+    assert [x['id'] for x in a['asm']] == [x['id'] for x in b['asm']]
+
+
+def test_load_presets_missing_file_returns_empty():
+    """CSV 不存在时返回空分组（Pyodide 等环境）。"""
+    empty = load_presets('/tmp/no-such-saturation-equipment.csv')
+    assert empty == {'asm': [], 'aew': [], 'ship': [], 'sam': []}

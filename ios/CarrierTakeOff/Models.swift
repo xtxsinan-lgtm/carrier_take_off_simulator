@@ -6,9 +6,20 @@ struct CatalogPayload: Codable {
     var modes: [String: String]
     var stovl_strategies: [String: String]?
     var tiltrotor_strategies: [String: String]?
+    var simulators: [SimulatorEntry]?
     var carriers: [Carrier]
     var aircraft: [Aircraft]
     var saturation_presets: SaturationPresets?
+}
+
+/// 启动页模拟器条目
+struct SimulatorEntry: Codable, Identifiable, Hashable {
+    var id: String
+    var name: String
+    var subtitle: String?
+    var html: String?
+    var miniprogram_page: String?
+    var ios_route: String?
 }
 
 /// 饱和打击四类预设

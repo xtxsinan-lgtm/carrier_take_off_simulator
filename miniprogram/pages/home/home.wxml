@@ -1,0 +1,16 @@
+<view class="home-page">
+  <text class="eyebrow">CARRIER COMBAT SIMULATOR</text>
+  <text class="title">舰载作战仿真终端</text>
+  <text class="sub">型号列表由 CSV → data.json 自动同步</text>
+
+  <block wx:for="{{simulators}}" wx:key="id">
+    <view class="card {{item.id}}" data-page="{{item.miniprogram_page}}" bindtap="onOpen">
+      <text class="card-id">{{item.id}}</text>
+      <text class="card-name">{{item.name}}</text>
+      <text class="card-sub">{{item.subtitle}}</text>
+      <view class="card-cta">进入仿真 →</view>
+    </view>
+  </block>
+
+  <view class="status {{error ? 'error' : ''}}">{{statusText}}</view>
+</view>

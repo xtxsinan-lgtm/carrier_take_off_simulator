@@ -13,6 +13,7 @@
 		EE05F5EEC20B5632A116556A /* Components/TrajectoryChart.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 45B15473805A5581B41C8F59 /* Components/TrajectoryChart.swift */; };
 		884071C748EA5EC79D6FF75D /* Config.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 7807FAB89078571E89A10816 /* Config.swift */; };
 		69A4DBD53E9158B580952826 /* ContentView.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 712D6BDDF2785D2FBFDA7180 /* ContentView.swift */; };
+		2ABB5C1D1EB15CA794386477 /* HubView.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 846EBED37C4F535CA9EAC705 /* HubView.swift */; };
 		FC78D417969C5E66B27F5BD2 /* LocalSimulatorEngine.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 8DEB6731BAE054BDB1E2B5BB /* LocalSimulatorEngine.swift */; };
 		083462D684ED58EE89A06F94 /* Models.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 828F37BC1B845EB6B4221C97 /* Models.swift */; };
 		DF995F993536557BB6E61BC0 /* Physics.swift in Sources/Resources */ = {isa = PBXBuildFile; fileRef = 69214A43FA7A5B09862DC795 /* Physics.swift */; };
@@ -36,6 +37,7 @@
 		45B15473805A5581B41C8F59 /* Components/TrajectoryChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrajectoryChart.swift"; sourceTree = "<group>"; };
 		7807FAB89078571E89A10816 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Config.swift"; sourceTree = "<group>"; };
 		712D6BDDF2785D2FBFDA7180 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContentView.swift"; sourceTree = "<group>"; };
+		846EBED37C4F535CA9EAC705 /* HubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HubView.swift"; sourceTree = "<group>"; };
 		8DEB6731BAE054BDB1E2B5BB /* LocalSimulatorEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalSimulatorEngine.swift"; sourceTree = "<group>"; };
 		828F37BC1B845EB6B4221C97 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models.swift"; sourceTree = "<group>"; };
 		69214A43FA7A5B09862DC795 /* Physics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Physics.swift"; sourceTree = "<group>"; };
@@ -75,6 +77,7 @@
 				13A7DD20326F53EDA63E7DE0 /* CatalogStore.swift */,
 				7807FAB89078571E89A10816 /* Config.swift */,
 				712D6BDDF2785D2FBFDA7180 /* ContentView.swift */,
+				846EBED37C4F535CA9EAC705 /* HubView.swift */,
 				8DEB6731BAE054BDB1E2B5BB /* LocalSimulatorEngine.swift */,
 				828F37BC1B845EB6B4221C97 /* Models.swift */,
 				69214A43FA7A5B09862DC795 /* Physics.swift */,
@@ -172,6 +175,7 @@
 				EE05F5EEC20B5632A116556A /* Components/TrajectoryChart.swift in Sources */,
 				884071C748EA5EC79D6FF75D /* Config.swift in Sources */,
 				69A4DBD53E9158B580952826 /* ContentView.swift in Sources */,
+				2ABB5C1D1EB15CA794386477 /* HubView.swift in Sources */,
 				FC78D417969C5E66B27F5BD2 /* LocalSimulatorEngine.swift in Sources */,
 				083462D684ED58EE89A06F94 /* Models.swift in Sources */,
 				DF995F993536557BB6E61BC0 /* Physics.swift in Sources */,

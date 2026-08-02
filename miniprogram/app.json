@@ -1,13 +1,14 @@
 {
   "pages": [
+    "pages/home/home",
     "pages/index/index",
     "pages/saturation/saturation"
   ],
   "window": {
-    "navigationBarTitleText": "航母起飞仿真",
-    "navigationBarBackgroundColor": "#1e3a5f",
+    "navigationBarTitleText": "舰载作战仿真",
+    "navigationBarBackgroundColor": "#071018",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#0f1419",
+    "backgroundColor": "#071018",
     "backgroundTextStyle": "light",
     "enablePullDownRefresh": false
   },
@@ -17,6 +18,12 @@
     "backgroundColor": "#0b1216",
     "borderStyle": "black",
     "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "启动",
+        "iconPath": "assets/tab-takeoff.png",
+        "selectedIconPath": "assets/tab-takeoff-active.png"
+      },
       {
         "pagePath": "pages/index/index",
         "text": "起飞仿真",

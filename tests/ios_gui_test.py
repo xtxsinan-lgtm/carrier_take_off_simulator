@@ -15,6 +15,7 @@ def test_ios_swift_sources_exist():
         'SaturationStrikeView.swift',
         'SaturationViewModel.swift',
         'SaturationTheme.swift',
+        'HubView.swift',
         'CatalogStore.swift',
         'LocalSimulatorEngine.swift',
         'Models.swift',
@@ -33,12 +34,15 @@ def test_ios_swift_sources_exist():
         assert path.is_file(), f'缺少 iOS 源文件: {rel}'
 
 
-def test_ios_app_has_tab_view_with_saturation():
-    """App 入口须为 TabView，含起飞与饱和打击。"""
-    text = (IOS_ROOT / 'CarrierTakeOffApp.swift').read_text(encoding='utf-8')
-    assert 'TabView' in text
-    assert 'SaturationStrikeView' in text
-    assert 'ContentView' in text
+def test_ios_app_has_hub_then_simulators():
+    """App 入口为启动页 HubView，可进入起飞与饱和打击。"""
+    app = (IOS_ROOT / 'CarrierTakeOffApp.swift').read_text(encoding='utf-8')
+    hub = (IOS_ROOT / 'HubView.swift').read_text(encoding='utf-8')
+    assert 'HubView' in app
+    assert 'NavigationStack' in app
+    assert 'SaturationStrikeView' in hub
+    assert 'ContentView' in hub
+    assert (IOS_ROOT / 'HubView.swift').is_file()
 
 
 def test_ios_content_view_has_six_sections():

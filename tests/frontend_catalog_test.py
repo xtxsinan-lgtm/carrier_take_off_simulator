@@ -38,27 +38,51 @@ def test_build_catalog_payload_modes():
 
 
 def test_docs_saturation_page_exists_and_links():
-    """饱和打击 HTML 页存在，并与起飞页互链。"""
+    """饱和打击 HTML 页存在，并与起飞页/启动页互链。"""
     import re
     from utils.paths import ROOT
 
     sat = ROOT / 'docs' / 'saturation-strike.html'
-    index = ROOT / 'docs' / 'index.html'
+    hub = ROOT / 'docs' / 'index.html'
+    takeoff = ROOT / 'docs' / 'takeoff.html'
     assert sat.is_file()
+    assert hub.is_file()
+    assert takeoff.is_file()
     assert (ROOT / 'docs' / 'js' / 'saturation.js').is_file()
     assert (ROOT / 'docs' / 'css' / 'saturation.css').is_file()
+    assert (ROOT / 'docs' / 'js' / 'hub.js').is_file()
     sat_html = sat.read_text(encoding='utf-8')
-    index_html = index.read_text(encoding='utf-8')
+    hub_html = hub.read_text(encoding='utf-8')
+    takeoff_html = takeoff.read_text(encoding='utf-8')
     sat_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
     assert 'saturation.js' in sat_html
     assert 'index.html' in sat_html
-    assert 'saturation-strike.html' in index_html
+    assert 'takeoff.html' in sat_html
+    assert 'saturation-strike.html' in takeoff_html
+    assert 'hub.js' in hub_html
     assert 'run_saturation_json' in sat_js
     assert 'rerunRequested' in sat_js
     ver_js = re.search(r'const APP_VERSION\s*=\s*(\d+)', sat_js)
     ver_html = re.search(r'saturation\.js\?v=(\d+)', sat_html)
     assert ver_js and ver_html
     assert ver_js.group(1) == ver_html.group(1)
+
+
+def test_build_catalog_payload_includes_simulators_and_csv_presets():
+    """catalog 须含启动页模拟器列表，且饱和预设与 CSV 一致。"""
+    from utils.database_csv import load_saturation_equipment_csv
+    from utils.paths import SATURATION_EQUIPMENT_CSV
+    from scripts.frontend_catalog import SIMULATORS
+
+    payload = build_catalog_payload(
+        load_aircraft_csv(AIRCRAFT_CSV),
+        load_carriers_csv(CARRIERS_CSV),
+    )
+    assert payload['simulators'] == SIMULATORS
+    csv_data = load_saturation_equipment_csv(SATURATION_EQUIPMENT_CSV)
+    assert [x['id'] for x in payload['saturation_presets']['asm']] == [x['id'] for x in csv_data['asm']]
+    assert len(payload['aircraft']) >= 1
+    assert len(payload['carriers']) >= 1
 
 
 def test_web_simulator_modes_match_frontend_catalog():
@@ -72,11 +96,11 @@ def test_web_simulator_modes_match_frontend_catalog():
 
 
 def test_docs_html_renders_modes_from_catalog_not_hardcoded():
-    """HTML 版模式按钮须由 data.modes 动态生成，禁止在 index.html 硬编码模式 id。"""
+    """起飞 HTML 模式按钮须由 data.modes 动态生成，禁止硬编码模式 id。"""
     import re
     from utils.paths import ROOT
 
-    html = (ROOT / 'docs' / 'index.html').read_text(encoding='utf-8')
+    html = (ROOT / 'docs' / 'takeoff.html').read_text(encoding='utf-8')
     app_js = (ROOT / 'docs' / 'js' / 'app.js').read_text(encoding='utf-8')
 
     assert 'id="modeGroup"' in html
@@ -85,13 +109,12 @@ def test_docs_html_renders_modes_from_catalog_not_hardcoded():
     assert 'function populateModeButtons' in app_js
     assert 'data.modes' in app_js
 
-    # index.html 的 app.js?v= 须与 APP_VERSION 一致，避免 Pages/浏览器继续用旧脚本
     ver_js = re.search(r'const APP_VERSION\s*=\s*(\d+)', app_js)
     ver_html = re.search(r'app\.js\?v=(\d+)', html)
     assert ver_js and ver_html
     assert ver_js.group(1) == ver_html.group(1), (
         f'缓存版本不一致: app.js APP_VERSION={ver_js.group(1)} '
-        f'vs index.html ?v={ver_html.group(1)}'
+        f'vs takeoff.html ?v={ver_html.group(1)}'
     )
 
 

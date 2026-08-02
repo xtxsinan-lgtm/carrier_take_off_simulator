@@ -3,123 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>航母舰载机起飞仿真</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>舰载作战仿真终端</title>
+  <link rel="stylesheet" href="css/hub.css?v=1">
 </head>
 <body>
-  <header>
-    <h1>航母舰载机起飞仿真</h1>
-    <p id="headerSubtitle">支持多种起飞模式（由 data.json 同步）</p>
-    <p style="margin:0.5rem 0 0;"><a href="saturation-strike.html" style="color:var(--accent);font-size:0.9rem;">→ 饱和打击 / 反导拦截仿真</a></p>
-  </header>
-
-  <main>
-    <section class="card">
-      <h2>1. 起飞模式</h2>
-      <div class="mode-group" id="modeGroup"></div>
-      <p id="modeHint" style="margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--muted);">
-        滑跃 / 短距滑跃需滑跃甲板；短距 / 倾转短距需平直甲板（STOVL 或倾转旋翼）。
-        尾流波及仅对 STOVL 短距模式计算；倾转短距暂无策略 C。
-        起飞轨迹图仅在<strong>滑跃起飞</strong>与<strong>短距滑跃起飞</strong>成功后显示（策略 C 暂无轨迹）。
-      </p>
-      <div id="strategySection" class="hidden" style="margin-top: 1rem;">
-        <h3 id="strategyTitle" style="margin: 0 0 0.5rem; font-size: 0.95rem; color: var(--accent);">喷口 / 短舱策略</h3>
-        <div class="mode-group" id="strategyGroup">
-          <button type="button" class="mode-btn strategy-btn active" data-strategy="A">策略 A</button>
-          <button type="button" class="mode-btn strategy-btn" data-strategy="B">策略 B</button>
-          <button type="button" class="mode-btn strategy-btn" data-strategy="C" id="strategyBtnC">策略 C</button>
-        </div>
-      </div>
-    </section>
-
-    <div class="grid-2">
-      <section class="card">
-        <h2>2. 航母</h2>
-        <label for="carrierSelect">选择航母</label>
-        <select id="carrierSelect"></select>
-        <table class="spec-table" style="margin-top: 1rem;">
-          <tbody id="carrierSpecs"></tbody>
-        </table>
-        <div id="skiJumpSection" class="hidden">
-          <p style="font-size: 0.85rem; color: var(--muted); margin: 1rem 0 0.5rem;">
-            滑跃参数（修改角度或弧长后，唇口高度自动重算）：
-          </p>
-          <div class="ski-edit-row">
-            <div>
-              <label for="skiAngle">滑跃角 (°)</label>
-              <input type="number" id="skiAngle" step="0.1" min="1" max="20">
-            </div>
-            <div>
-              <label for="skiArcLength">滑跃弧长 (m)</label>
-              <input type="number" id="skiArcLength" step="0.1" min="1">
-            </div>
-            <div class="readonly">
-              <label for="skiHeight">唇口高度 (m)</label>
-              <input type="number" id="skiHeight" readonly tabindex="-1">
-            </div>
-          </div>
-          <p style="font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0 0;">
-            滑跃水平投影：<span id="skiHorizontal">—</span> m
-          </p>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>3. 战斗机</h2>
-        <label for="aircraftSelect">选择战斗机</label>
-        <select id="aircraftSelect"></select>
-        <table class="spec-table" style="margin-top: 1rem;">
-          <tbody id="aircraftSpecs"></tbody>
-        </table>
-      </section>
-    </div>
-
-    <section class="card">
-      <h2>4. 仿真条件</h2>
-      <div class="run-row">
-        <div class="field">
-          <label for="windInput">甲板风 (kt)</label>
-          <input type="number" id="windInput" step="0.5" min="0" value="">
-        </div>
-        <div class="field">
-          <label for="tempInput">环境温度 (°C)</label>
-          <input type="number" id="tempInput" step="0.5" value="30">
-        </div>
-        <div class="field">
-          <label for="massInput">起飞重量 (kg)</label>
-          <input type="number" id="massInput" step="10" min="1000">
-        </div>
-        <button type="button" id="preloadBtn" class="secondary">预加载引擎</button>
-        <button type="button" id="runBtn" class="primary">开始仿真</button>
-      </div>
-      <div id="status"></div>
-    </section>
-
-    <section class="card">
-      <h2>5. 仿真输出</h2>
-      <pre id="output" class="empty">选择参数后点击「开始仿真」，结果将显示在此处。</pre>
-    </section>
-
-    <section class="card hidden" id="trajectorySection">
-      <h2>6. 起飞轨迹</h2>
-      <p class="trajectory-hint">侧视剖面：甲板折线与飞机质心轨迹（水平 x、高度 y，单位 m）</p>
-      <p class="trajectory-meta" id="trajectoryMeta"></p>
-      <canvas id="trajectoryCanvas" width="1060" height="320"></canvas>
-      <div class="trajectory-legend">
-        <span class="legend-item"><i class="swatch deck"></i>甲板</span>
-        <span class="legend-item"><i class="swatch path"></i>飞机轨迹</span>
-        <span class="legend-item"><i class="swatch limit"></i>离舰点 / 滑跑距离</span>
-        <span class="legend-item"><i class="swatch marker start"></i>起点</span>
-        <span class="legend-item"><i class="swatch marker exit"></i>离舰</span>
-        <span class="legend-item"><i class="swatch marker end"></i>轨迹终点</span>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    仿真在浏览器内通过 Pyodide 运行 Python 物理模型 · 数据来自 aircraft_database.csv / carriers_database.csv
-  </footer>
-
-  <script type="module" src="js/app.js?v=16"></script>
+  <div class="hub">
+    <header class="hub-header">
+      <p class="hub-eyebrow">CARRIER COMBAT SIMULATOR SUITE</p>
+      <h1 class="hub-title">舰载作战仿真终端</h1>
+      <p class="hub-sub">从 CSV 机库自动同步型号 · 选择下方模拟器进入</p>
+    </header>
+    <main class="hub-grid" id="simGrid">
+      <p class="hub-loading" id="hubStatus">正在加载模拟器目录…</p>
+    </main>
+    <footer class="hub-footer">data.json 与 Python 仿真核心同源 · GitHub Pages</footer>
+  </div>
+  <script type="module" src="js/hub.js?v=1"></script>
 </body>
 </html>

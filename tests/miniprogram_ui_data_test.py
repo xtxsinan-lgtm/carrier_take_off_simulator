@@ -46,13 +46,16 @@ def test_trajectory_chart_is_inline_below_sim_output():
     assert wxml.index('6. 起飞轨迹') < wxml.index('page-footer')
 
 def test_miniprogram_saturation_page_and_tabbar():
-    """小程序须注册饱和打击页与 tabBar。"""
+    """小程序须注册启动页、起飞与饱和打击，且 tabBar 含三者。"""
     app = json.loads((ROOT / 'miniprogram' / 'app.json').read_text(encoding='utf-8'))
+    assert app['pages'][0] == 'pages/home/home'
     assert 'pages/saturation/saturation' in app['pages']
     assert 'tabBar' in app
     paths = [x['pagePath'] for x in app['tabBar']['list']]
+    assert 'pages/home/home' in paths
     assert 'pages/saturation/saturation' in paths
     assert (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.js').is_file()
+    assert (ROOT / 'miniprogram' / 'pages' / 'home' / 'home.js').is_file()
     api_js = (ROOT / 'miniprogram' / 'utils' / 'api.js').read_text(encoding='utf-8')
     assert 'runSaturationSimulation' in api_js
     assert '/api/saturation/simulate' in api_js

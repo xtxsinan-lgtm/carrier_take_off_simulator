@@ -1,0 +1,25 @@
+category,id,name,vm_ma,rcs_m2,traj,area_m2,radar_type,standoff_km,vi_ma,dia_m,guidance,range_km,notes
+asm,exocet,飞鱼 Exocet MM40 Block3 (法国),0.93,0.15,sea,,,,,,,,公开资料速度/弹道；RCS 为量级估计
+asm,harpoon,鱼叉 Harpoon (美国),0.85,0.3,sea,,,,,,,,公开资料速度/弹道；RCS 为量级估计
+asm,yj12,鹰击-12 YJ-12 (中国),3.5,0.3,high,,,,,,,,公开资料速度/弹道；RCS 为量级估计
+asm,yj18,"鹰击-18 YJ-18 (中国, 末端超音速)",3.0,0.2,sea,,,,,,,,公开资料速度/弹道；RCS 为量级估计
+asm,kalibr,口径 3M-54 Kalibr (俄罗斯),2.9,0.2,sea,,,,,,,,公开资料速度/弹道；RCS 为量级估计
+asm,brahmos,布拉莫斯 BrahMos (印度/俄罗斯),3.0,0.3,sea,,,,,,,,公开资料速度/弹道；RCS 为量级估计
+asm,nsm,"海军打击导弹 NSM (挪威, 隐身外形)",0.93,0.05,sea,,,,,,,,公开资料速度/弹道；RCS 为量级估计
+aew,e2d,"E-2D 先进鹰眼 (美国, 固定翼舰载)",,,,40,aesa,150,,,,,天线面积由公开外形尺寸推估
+aew,e2c,"E-2C 鹰眼 (美国, 固定翼舰载, 早期型)",,,,40,mechanical,150,,,,,天线面积由公开外形尺寸推估
+aew,kj600,"空警-600 KJ-600 (中国, 固定翼舰载)",,,,40,aesa,150,,,,,天线面积由公开外形尺寸推估
+aew,ka31,卡-31 Ka-31 预警直升机 (俄/中/印),,,,6,pesa,100,,,,,天线面积由公开外形尺寸推估
+ship,burke3,"阿利·伯克 Flight III (美国, SPY-6)",,,,13.5,gan_aesa,,,,,,天线面积由公开外形尺寸推估
+ship,burke2a,"阿利·伯克 Flight IIA (美国, SPY-1D)",,,,12,pesa,,,,,,天线面积由公开外形尺寸推估
+ship,type052d,"052D (中国, Type 346A)",,,,14,aesa,,,,,,天线面积由公开外形尺寸推估
+ship,type055,"055 (中国, Type 346B)",,,,21,aesa,,,,,,天线面积由公开外形尺寸推估
+ship,type45,"45型 Type 45 (英国, SAMPSON)",,,,6,aesa,,,,,,天线面积由公开外形尺寸推估
+sam,sm2,SM-2MR 标准-2 (美国),,,,,,,3.5,0.343,semi_active,167,公开资料速度/直径/射程
+sam,sm6,SM-6 标准-6 (美国),,,,,,,3.5,0.343,active_mech,240,公开资料速度/直径/射程
+sam,aster30,Aster 30 (法国/欧洲),,,,,,,4.5,0.18,active_mech,120,公开资料速度/直径/射程
+sam,essm,ESSM Block2 (北约通用),,,,,,,4.0,0.254,active_mech,50,公开资料速度/直径/射程
+sam,hhq9,海红旗-9 HHQ-9 (中国),,,,,,,4.2,0.56,active_mech,200,公开资料速度/直径/射程
+sam,barak8,巴拉克-8 Barak 8 (以色列/印度),,,,,,,2.0,0.225,active_mech,100,公开资料速度/直径/射程
+sam,seaceptor,海上拦截者 Sea Ceptor/CAMM (英国),,,,,,,3.0,0.166,active_aesa,25,公开资料速度/直径/射程
+sam,s300f,里夫/48N6 S-300F (俄罗斯),,,,,,,6.0,0.52,semi_active,150,公开资料速度/直径/射程

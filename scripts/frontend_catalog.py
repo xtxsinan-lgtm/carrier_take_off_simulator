@@ -26,7 +26,27 @@ TILTROTOR_STRATEGIES = {
 }
 
 # data.json 结构版本；字段变更时递增
-DATA_VERSION = 13
+DATA_VERSION = 14
+
+# 启动页可选模拟器（HTML / 小程序 / iOS 同源）
+SIMULATORS = [
+    {
+        'id': 'takeoff',
+        'name': '航母舰载机起飞仿真',
+        'subtitle': '滑跃 / 短距 / 短距滑跃 / 倾转短距',
+        'html': 'takeoff.html',
+        'miniprogram_page': '/pages/index/index',
+        'ios_route': 'takeoff',
+    },
+    {
+        'id': 'saturation',
+        'name': '饱和打击 / 反导拦截仿真',
+        'subtitle': '蒙特卡洛弹药分配 · 探测距离与 Pk 估算',
+        'html': 'saturation-strike.html',
+        'miniprogram_page': '/pages/saturation/saturation',
+        'ios_route': 'saturation',
+    },
+]
 
 _AIRCRAFT_KEYS = (
     'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg', 'max_payload_kg',
@@ -72,8 +92,9 @@ def build_catalog_payload(aircraft: dict, carriers: list) -> dict:
         'modes': dict(MODES),
         'stovl_strategies': dict(STOVL_STRATEGIES),
         'tiltrotor_strategies': dict(TILTROTOR_STRATEGIES),
+        'simulators': [dict(s) for s in SIMULATORS],
         'aircraft': [aircraft_to_dict(ac) for ac in aircraft.values()],
         'carriers': [carrier_to_dict(c) for c in carriers],
-        # 第二功能：饱和打击 / 拦截仿真预设
+        # 第二功能：饱和打击预设（由 CSV 自动识别型号）
         'saturation_presets': build_saturation_presets_payload(),
     }

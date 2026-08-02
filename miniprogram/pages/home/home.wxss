@@ -1,0 +1,60 @@
+.home-page {
+  min-height: 100vh;
+  padding: 48rpx 32rpx;
+  background: #071018;
+  color: #e8eef0;
+}
+.eyebrow {
+  font-size: 20rpx;
+  letter-spacing: 4rpx;
+  color: #5fd8e8;
+}
+.title {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 44rpx;
+  font-weight: 600;
+}
+.sub {
+  display: block;
+  margin-top: 12rpx;
+  color: #8aa0a8;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+.card {
+  margin-top: 28rpx;
+  padding: 32rpx 28rpx;
+  background: #0d1820;
+  border: 1px solid #243540;
+}
+.card.takeoff { border-top: 6rpx solid #38bdf8; }
+.card.saturation { border-top: 6rpx solid #ffb020; }
+.card-id {
+  font-size: 20rpx;
+  color: #8aa0a8;
+  letter-spacing: 2rpx;
+}
+.card-name {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.card-sub {
+  display: block;
+  margin-top: 8rpx;
+  color: #8aa0a8;
+  font-size: 24rpx;
+}
+.card-cta {
+  margin-top: 24rpx;
+  color: #ffb020;
+  font-size: 22rpx;
+}
+.status {
+  margin-top: 24rpx;
+  color: #8aa0a8;
+  font-size: 22rpx;
+}
+.error { color: #f87171; }

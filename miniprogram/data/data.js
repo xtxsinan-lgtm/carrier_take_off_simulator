@@ -3,7 +3,7 @@
  * 请勿手改；修改 CSV 后运行 python3 scripts/build_all.py。
  */
 module.exports = {
-  "version": 13,
+  "version": 14,
   "pilot_load_kg": 100.0,
   "a2a_missile_count": 4,
   "pitch_max_deg": 20.0,
@@ -22,6 +22,24 @@ module.exports = {
     "A": "策略 A — 延迟倾转短舱",
     "B": "策略 B — 全程固定短舱角"
   },
+  "simulators": [
+    {
+      "id": "takeoff",
+      "name": "航母舰载机起飞仿真",
+      "subtitle": "滑跃 / 短距 / 短距滑跃 / 倾转短距",
+      "html": "takeoff.html",
+      "miniprogram_page": "/pages/index/index",
+      "ios_route": "takeoff"
+    },
+    {
+      "id": "saturation",
+      "name": "饱和打击 / 反导拦截仿真",
+      "subtitle": "蒙特卡洛弹药分配 · 探测距离与 Pk 估算",
+      "html": "saturation-strike.html",
+      "miniprogram_page": "/pages/saturation/saturation",
+      "ios_route": "saturation"
+    }
+  ],
   "aircraft": [
     {
       "id": "F-35B",
@@ -445,6 +463,7 @@ module.exports = {
       {
         "id": "exocet",
         "name": "飞鱼 Exocet MM40 Block3 (法国)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.15,
         "traj": "sea"
@@ -452,6 +471,7 @@ module.exports = {
       {
         "id": "harpoon",
         "name": "鱼叉 Harpoon (美国)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.85,
         "rcs": 0.3,
         "traj": "sea"
@@ -459,6 +479,7 @@ module.exports = {
       {
         "id": "yj12",
         "name": "鹰击-12 YJ-12 (中国)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.5,
         "rcs": 0.3,
         "traj": "high"
@@ -466,6 +487,7 @@ module.exports = {
       {
         "id": "yj18",
         "name": "鹰击-18 YJ-18 (中国, 末端超音速)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.2,
         "traj": "sea"
@@ -473,6 +495,7 @@ module.exports = {
       {
         "id": "kalibr",
         "name": "口径 3M-54 Kalibr (俄罗斯)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 2.9,
         "rcs": 0.2,
         "traj": "sea"
@@ -480,6 +503,7 @@ module.exports = {
       {
         "id": "brahmos",
         "name": "布拉莫斯 BrahMos (印度/俄罗斯)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.3,
         "traj": "sea"
@@ -487,6 +511,7 @@ module.exports = {
       {
         "id": "nsm",
         "name": "海军打击导弹 NSM (挪威, 隐身外形)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.05,
         "traj": "sea"
@@ -496,61 +521,70 @@ module.exports = {
       {
         "id": "e2d",
         "name": "E-2D 先进鹰眼 (美国, 固定翼舰载)",
-        "area": 40,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 40.0,
         "type": "aesa",
-        "standoff": 150
+        "standoff": 150.0
       },
       {
         "id": "e2c",
         "name": "E-2C 鹰眼 (美国, 固定翼舰载, 早期型)",
-        "area": 40,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 40.0,
         "type": "mechanical",
-        "standoff": 150
+        "standoff": 150.0
       },
       {
         "id": "kj600",
         "name": "空警-600 KJ-600 (中国, 固定翼舰载)",
-        "area": 40,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 40.0,
         "type": "aesa",
-        "standoff": 150
+        "standoff": 150.0
       },
       {
         "id": "ka31",
         "name": "卡-31 Ka-31 预警直升机 (俄/中/印)",
-        "area": 6,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 6.0,
         "type": "pesa",
-        "standoff": 100
+        "standoff": 100.0
       }
     ],
     "ship": [
       {
         "id": "burke3",
         "name": "阿利·伯克 Flight III (美国, SPY-6)",
+        "notes": "天线面积由公开外形尺寸推估",
         "area": 13.5,
         "type": "gan_aesa"
       },
       {
         "id": "burke2a",
         "name": "阿利·伯克 Flight IIA (美国, SPY-1D)",
-        "area": 12,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 12.0,
         "type": "pesa"
       },
       {
         "id": "type052d",
         "name": "052D (中国, Type 346A)",
-        "area": 14,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 14.0,
         "type": "aesa"
       },
       {
         "id": "type055",
         "name": "055 (中国, Type 346B)",
-        "area": 21,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 21.0,
         "type": "aesa"
       },
       {
         "id": "type45",
         "name": "45型 Type 45 (英国, SAMPSON)",
-        "area": 6,
+        "notes": "天线面积由公开外形尺寸推估",
+        "area": 6.0,
         "type": "aesa"
       }
     ],
@@ -558,66 +592,74 @@ module.exports = {
       {
         "id": "sm2",
         "name": "SM-2MR 标准-2 (美国)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 3.5,
         "dia": 0.343,
         "guidance": "semi_active",
-        "range": 167
+        "range": 167.0
       },
       {
         "id": "sm6",
         "name": "SM-6 标准-6 (美国)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 3.5,
         "dia": 0.343,
         "guidance": "active_mech",
-        "range": 240
+        "range": 240.0
       },
       {
         "id": "aster30",
         "name": "Aster 30 (法国/欧洲)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 4.5,
         "dia": 0.18,
         "guidance": "active_mech",
-        "range": 120
+        "range": 120.0
       },
       {
         "id": "essm",
         "name": "ESSM Block2 (北约通用)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 4.0,
         "dia": 0.254,
         "guidance": "active_mech",
-        "range": 50
+        "range": 50.0
       },
       {
         "id": "hhq9",
         "name": "海红旗-9 HHQ-9 (中国)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 4.2,
         "dia": 0.56,
         "guidance": "active_mech",
-        "range": 200
+        "range": 200.0
       },
       {
         "id": "barak8",
         "name": "巴拉克-8 Barak 8 (以色列/印度)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 2.0,
         "dia": 0.225,
         "guidance": "active_mech",
-        "range": 100
+        "range": 100.0
       },
       {
         "id": "seaceptor",
         "name": "海上拦截者 Sea Ceptor/CAMM (英国)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 3.0,
         "dia": 0.166,
         "guidance": "active_aesa",
-        "range": 25
+        "range": 25.0
       },
       {
         "id": "s300f",
         "name": "里夫/48N6 S-300F (俄罗斯)",
+        "notes": "公开资料速度/直径/射程",
         "vi": 6.0,
         "dia": 0.52,
         "guidance": "semi_active",
-        "range": 150
+        "range": 150.0
       }
     ]
   }

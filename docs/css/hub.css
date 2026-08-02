@@ -1,0 +1,122 @@
+:root {
+  --bg: #071018;
+  --panel: #0d1820;
+  --line: #243540;
+  --text: #e8eef0;
+  --muted: #8aa0a8;
+  --amber: #ffb020;
+  --cyan: #5fd8e8;
+  --blue: #38bdf8;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "SF Mono", "Cascadia Code", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(56, 189, 248, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 80%, rgba(255, 176, 32, 0.1), transparent),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.hub {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 2rem;
+}
+
+.hub-eyebrow {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  color: var(--cyan);
+}
+
+.hub-title {
+  margin: 0.6rem 0 0.4rem;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.hub-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.hub-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2.2rem;
+}
+
+@media (min-width: 720px) {
+  .hub-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.sim-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 1.4rem 1.3rem 1.3rem;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.sim-card:hover {
+  border-color: var(--amber);
+  transform: translateY(-2px);
+}
+
+.sim-card.takeoff { border-top: 3px solid var(--blue); }
+.sim-card.saturation { border-top: 3px solid var(--amber); }
+
+.sim-id {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.sim-name {
+  margin: 0.55rem 0 0.35rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.sim-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.sim-cta {
+  margin-top: 1.1rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--amber);
+}
+
+.hub-loading, .hub-error {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.hub-error { color: #f87171; }
+
+.hub-footer {
+  margin-top: 2.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
