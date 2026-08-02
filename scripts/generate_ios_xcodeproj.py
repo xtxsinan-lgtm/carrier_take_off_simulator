@@ -276,6 +276,8 @@ def main() -> None:
     common_tgt = '''
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphonesimulator*]" = "-";
+				"CODE_SIGNING_REQUIRED[sdk=iphonesimulator*]" = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = NO;

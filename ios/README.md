@@ -33,6 +33,8 @@ open ios/CarrierTakeOff.xcodeproj
 
 选模拟器或真机 → Run。首次启动会从 CDN 拉取 Pyodide/numpy（仅引擎运行时）；仿真计算在本机完成。
 
+若模拟器仍报 *Your team has no devices…*：确认目标是 **iOS Simulators** 下的设备（名称旁有模拟器图标），然后 **Product → Clean Build Folder** 再 Run。工程已对 `iphonesimulator` SDK 关闭强制签名。
+
 ## 与其他通道同步
 
 | 项目 | 来源 |
