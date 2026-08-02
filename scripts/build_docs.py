@@ -25,13 +25,19 @@ PY_LOAD_ORDER = [
     'utils/exhaust_plume.py',
     'utils/propeller_thrust.py',
     'utils/specs.py',
+    'utils/saturation_presets.py',
+    'utils/saturation_radar.py',
+    'utils/saturation_windows.py',
+    'utils/saturation_monte_carlo.py',
     'simulators/__init__.py',
     'simulators/short_take_off.py',
     'simulators/short_ski_jump_take_off.py',
     'simulators/ski_jump_take_off.py',
     'simulators/tiltrotor_short_take_off.py',
+    'simulators/saturation_strike.py',
     'apps/__init__.py',
     'apps/web_simulator.py',
+    'apps/saturation_strike_web.py',
 ]
 
 PY_IMPORT_ORDER = [
@@ -44,11 +50,17 @@ PY_IMPORT_ORDER = [
     'utils.exhaust_plume',
     'utils.propeller_thrust',
     'utils.specs',
+    'utils.saturation_presets',
+    'utils.saturation_radar',
+    'utils.saturation_windows',
+    'utils.saturation_monte_carlo',
     'simulators.short_take_off',
     'simulators.short_ski_jump_take_off',
     'simulators.ski_jump_take_off',
     'simulators.tiltrotor_short_take_off',
+    'simulators.saturation_strike',
     'apps.web_simulator',
+    'apps.saturation_strike_web',
 ]
 
 

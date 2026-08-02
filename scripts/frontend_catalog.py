@@ -26,7 +26,7 @@ TILTROTOR_STRATEGIES = {
 }
 
 # data.json 结构版本；字段变更时递增
-DATA_VERSION = 12
+DATA_VERSION = 13
 
 _AIRCRAFT_KEYS = (
     'id', 'name', 'type_label', 'mtow_kg', 'empty_kg', 'internal_fuel_kg', 'max_payload_kg',
@@ -62,6 +62,8 @@ def aircraft_to_dict(ac: Any) -> dict:
 
 def build_catalog_payload(aircraft: dict, carriers: list) -> dict:
     """构建不含 py_sources 的共享目录数据（小程序 / API / Web 公共部分）。"""
+    from utils.saturation_presets import build_saturation_presets_payload
+
     return {
         'version': DATA_VERSION,
         'pilot_load_kg': float(PILOT_LOAD_KG),
@@ -72,4 +74,6 @@ def build_catalog_payload(aircraft: dict, carriers: list) -> dict:
         'tiltrotor_strategies': dict(TILTROTOR_STRATEGIES),
         'aircraft': [aircraft_to_dict(ac) for ac in aircraft.values()],
         'carriers': [carrier_to_dict(c) for c in carriers],
+        # 第二功能：饱和打击 / 拦截仿真预设
+        'saturation_presets': build_saturation_presets_payload(),
     }

@@ -84,7 +84,7 @@ async function initEngine() {
 }
 
 /**
- * 运行仿真：payload 为普通对象，返回 JSON 可序列化结果。
+ * 运行起飞仿真：payload 为普通对象，返回 JSON 可序列化结果。
  */
 async function runSimulation(payload) {
   if (!ready || !pyodide) {
@@ -99,9 +99,30 @@ json.dumps(run_simulation_json(_payload_json), ensure_ascii=False)
   return JSON.parse(raw);
 }
 
+/**
+ * 运行饱和打击仿真 / 估算：payload 含 action 与 params。
+ */
+async function runSaturation(payload) {
+  if (!ready || !pyodide) {
+    throw new Error('仿真引擎尚未就绪');
+  }
+  pyodide.globals.set('_sat_payload_json', JSON.stringify(payload));
+  const raw = pyodide.runPython(`
+import json
+from apps.saturation_strike_web import run_saturation_json
+json.dumps(run_saturation_json(_sat_payload_json), ensure_ascii=False)
+`);
+  return JSON.parse(raw);
+}
+
 window.__carrierSim = {
   init: initEngine,
   run: runSimulation,
+  isReady: () => ready,
+};
+
+window.__saturationSim = {
+  run: runSaturation,
   isReady: () => ready,
 };
 

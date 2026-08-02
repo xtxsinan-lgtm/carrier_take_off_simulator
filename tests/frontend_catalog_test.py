@@ -31,6 +31,27 @@ def test_build_catalog_payload_modes():
     assert set(payload['tiltrotor_strategies']) == {'A', 'B'}
     assert 'py_sources' not in payload
     assert any(a['id'] == 'MV-22' for a in payload['aircraft'])
+    # 第二功能：饱和打击预设
+    assert 'saturation_presets' in payload
+    assert set(payload['saturation_presets']) == {'asm', 'aew', 'ship', 'sam'}
+    assert len(payload['saturation_presets']['asm']) >= 1
+
+
+def test_docs_saturation_page_exists_and_links():
+    """饱和打击 HTML 页存在，并与起飞页互链。"""
+    from utils.paths import ROOT
+
+    sat = ROOT / 'docs' / 'saturation-strike.html'
+    index = ROOT / 'docs' / 'index.html'
+    assert sat.is_file()
+    assert (ROOT / 'docs' / 'js' / 'saturation.js').is_file()
+    assert (ROOT / 'docs' / 'css' / 'saturation.css').is_file()
+    sat_html = sat.read_text(encoding='utf-8')
+    index_html = index.read_text(encoding='utf-8')
+    assert 'saturation.js' in sat_html
+    assert 'index.html' in sat_html
+    assert 'saturation-strike.html' in index_html
+    assert 'run_saturation_json' in (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
 
 
 def test_web_simulator_modes_match_frontend_catalog():

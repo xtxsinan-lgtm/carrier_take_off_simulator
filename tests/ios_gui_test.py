@@ -12,6 +12,9 @@ def test_ios_swift_sources_exist():
         'CarrierTakeOffApp.swift',
         'ContentView.swift',
         'SimulatorViewModel.swift',
+        'SaturationStrikeView.swift',
+        'SaturationViewModel.swift',
+        'SaturationTheme.swift',
         'CatalogStore.swift',
         'LocalSimulatorEngine.swift',
         'Models.swift',
@@ -30,8 +33,16 @@ def test_ios_swift_sources_exist():
         assert path.is_file(), f'缺少 iOS 源文件: {rel}'
 
 
+def test_ios_app_has_tab_view_with_saturation():
+    """App 入口须为 TabView，含起飞与饱和打击。"""
+    text = (IOS_ROOT / 'CarrierTakeOffApp.swift').read_text(encoding='utf-8')
+    assert 'TabView' in text
+    assert 'SaturationStrikeView' in text
+    assert 'ContentView' in text
+
+
 def test_ios_content_view_has_six_sections():
-    """主界面文案须覆盖与小程序相同的 1–6 段卡片标题。"""
+    """起飞主界面文案须覆盖与小程序相同的 1–6 段卡片标题。"""
     text = (IOS_ROOT / 'ContentView.swift').read_text(encoding='utf-8')
     for title in (
         '1. 起飞模式',
@@ -52,10 +63,13 @@ def test_ios_uses_local_engine_not_http_api():
     assert 'APIClient' not in vm
     engine_js = (IOS_ROOT / 'Resources' / 'engine.js').read_text(encoding='utf-8')
     assert 'run_simulation_json' in engine_js
+    assert 'run_saturation_json' in engine_js
+    assert '__saturationSim' in engine_js
     assert 'loadPyodide' in engine_js
     assert '__BUNDLED_CATALOG__' in engine_js
     engine_swift = (IOS_ROOT / 'LocalSimulatorEngine.swift').read_text(encoding='utf-8')
     assert '__BUNDLED_CATALOG__' in engine_swift
+    assert 'runSaturation' in engine_swift
 
 
 def test_ios_project_yml_exists():

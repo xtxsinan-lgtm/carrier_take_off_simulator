@@ -40,7 +40,7 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
         }
     }
 
-    /// 在本地 Pyodide 中运行仿真
+    /// 在本地 Pyodide 中运行起飞仿真
     func run(payload: [String: Any]) async throws -> SimulationResult {
         try await prepare()
         guard let webView else {
@@ -64,6 +64,32 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
         }
         let data = try JSONSerialization.data(withJSONObject: obj)
         return try JSONDecoder().decode(SimulationResult.self, from: data)
+    }
+
+    /// 在本地 Pyodide 中运行饱和打击仿真 / 估算
+    func runSaturation(payload: [String: Any]) async throws -> SaturationResult {
+        try await prepare()
+        guard let webView else {
+            throw NSError(
+                domain: "LocalSimulatorEngine",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "仿真引擎 WebView 未初始化"]
+            )
+        }
+        let result = try await webView.callAsyncJavaScript(
+            "return await window.__saturationSim.run(payload);",
+            arguments: ["payload": payload],
+            contentWorld: .page
+        )
+        guard let obj = result else {
+            throw NSError(
+                domain: "LocalSimulatorEngine",
+                code: 4,
+                userInfo: [NSLocalizedDescriptionKey: "饱和打击仿真无返回"]
+            )
+        }
+        let data = try JSONSerialization.data(withJSONObject: obj)
+        return try JSONDecoder().decode(SaturationResult.self, from: data)
     }
 
     nonisolated func userContentController(

@@ -1,6 +1,7 @@
 {
   "pages": [
-    "pages/index/index"
+    "pages/index/index",
+    "pages/saturation/saturation"
   ],
   "window": {
     "navigationBarTitleText": "航母起飞仿真",
@@ -9,6 +10,26 @@
     "backgroundColor": "#0f1419",
     "backgroundTextStyle": "light",
     "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#7b8e92",
+    "selectedColor": "#ffb020",
+    "backgroundColor": "#0b1216",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "起飞仿真",
+        "iconPath": "assets/tab-takeoff.png",
+        "selectedIconPath": "assets/tab-takeoff-active.png"
+      },
+      {
+        "pagePath": "pages/saturation/saturation",
+        "text": "饱和打击",
+        "iconPath": "assets/tab-saturation.png",
+        "selectedIconPath": "assets/tab-saturation-active.png"
+      }
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",

@@ -44,3 +44,15 @@ def test_trajectory_chart_is_inline_below_sim_output():
     # 轨迹区块须出现在仿真输出之后，保证滚动时随内容离开视口
     assert wxml.index('5. 仿真输出') < wxml.index('6. 起飞轨迹')
     assert wxml.index('6. 起飞轨迹') < wxml.index('page-footer')
+
+def test_miniprogram_saturation_page_and_tabbar():
+    """小程序须注册饱和打击页与 tabBar。"""
+    app = json.loads((ROOT / 'miniprogram' / 'app.json').read_text(encoding='utf-8'))
+    assert 'pages/saturation/saturation' in app['pages']
+    assert 'tabBar' in app
+    paths = [x['pagePath'] for x in app['tabBar']['list']]
+    assert 'pages/saturation/saturation' in paths
+    assert (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.js').is_file()
+    api_js = (ROOT / 'miniprogram' / 'utils' / 'api.js').read_text(encoding='utf-8')
+    assert 'runSaturationSimulation' in api_js
+    assert '/api/saturation/simulate' in api_js

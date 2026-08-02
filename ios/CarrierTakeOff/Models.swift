@@ -8,6 +8,87 @@ struct CatalogPayload: Codable {
     var tiltrotor_strategies: [String: String]?
     var carriers: [Carrier]
     var aircraft: [Aircraft]
+    var saturation_presets: SaturationPresets?
+}
+
+/// 饱和打击四类预设
+struct SaturationPresets: Codable {
+    var asm: [SaturationPresetItem]?
+    var aew: [SaturationPresetItem]?
+    var ship: [SaturationPresetItem]?
+    var sam: [SaturationPresetItem]?
+}
+
+/// 饱和打击单项预设（字段按类型可选）
+struct SaturationPresetItem: Codable, Identifiable, Hashable {
+    var id: String
+    var name: String
+    var vm: Double?
+    var rcs: Double?
+    var traj: String?
+    var area: Double?
+    var type: String?
+    var standoff: Double?
+    var vi: Double?
+    var dia: Double?
+    var guidance: String?
+    var range: Double?
+}
+
+/// 饱和打击仿真结果
+struct SaturationResult: Codable {
+    var success: Bool
+    var error: String?
+    var nm: Int?
+    var ni: Int?
+    var pk: Double?
+    var t_lock_s: Double?
+    var n_rounds: Int?
+    var expected_leak: Double?
+    var intercept_rate: Double?
+    var final_trials: Int?
+    var note: String?
+    var windows: [SaturationWindow]?
+    var best: SaturationPlan?
+    var avg_survivors: [Double]?
+    var all_candidates: [SaturationCandidate]?
+    var engage_dist: Double?
+    var binding: String?
+    var speed_factor: Double?
+    var ship_radar_factor: Double?
+    var seeker_factor: Double?
+    var rcs_factor: Double?
+    var ecm_factor: Double?
+    var traj_factor: Double?
+    var awacs_detect: Double?
+    var awacs_power: Double?
+    var awacs_horizon: Double?
+    var awacs_total: Double?
+    var ship_lock: Double?
+    var ship_search: Double?
+    var sam_range: Double?
+    var standoff: Double?
+}
+
+struct SaturationWindow: Codable, Identifiable, Hashable {
+    var round: Int
+    var dist_start_km: Double
+    var t_fly_s: Double
+    var total_t_s: Double
+    var dist_end_km: Double
+    var id: Int { round }
+}
+
+struct SaturationPlan: Codable, Hashable {
+    var name: String
+    var plan: [Int]
+}
+
+struct SaturationCandidate: Codable, Identifiable, Hashable {
+    var name: String
+    var plan: [Int]
+    var expected_leak: Double
+    var id: String { "\(name)-\(plan.map(String.init).joined(separator: ","))" }
 }
 
 /// 航母记录

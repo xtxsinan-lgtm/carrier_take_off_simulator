@@ -79,6 +79,36 @@ function runSimulation(payload) {
   });
 }
 
+/** 调用后端饱和打击仿真 API */
+function runSaturationSimulation(payload) {
+  const base = config.apiBaseUrl;
+  if (!base) {
+    return Promise.reject(
+      new Error('未配置 apiBaseUrl。请在 config.js 填写后端地址，或运行 python3 apps/miniprogram_api.py')
+    );
+  }
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: `${base}/api/saturation/simulate`,
+      method: 'POST',
+      header: { 'content-type': 'application/json' },
+      data: payload,
+      timeout: 180000,
+      success(res) {
+        if (res.statusCode >= 200 && res.statusCode < 300 && res.data) {
+          resolve(res.data);
+        } else {
+          const msg = (res.data && res.data.error) || `饱和打击请求失败 (${res.statusCode})`;
+          reject(new Error(msg));
+        }
+      },
+      fail(err) {
+        reject(new Error(err.errMsg || '饱和打击网络请求失败'));
+      },
+    });
+  });
+}
+
 /** 将 modes 对象转为 [{id, label}]，供小程序可靠渲染 */
 function modesToList(modes) {
   const src = modes || {};
@@ -89,5 +119,6 @@ module.exports = {
   loadLocalData,
   loadSimulatorData,
   runSimulation,
+  runSaturationSimulation,
   modesToList,
 };
