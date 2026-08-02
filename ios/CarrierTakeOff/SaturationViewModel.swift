@@ -123,7 +123,7 @@ final class SaturationViewModel: ObservableObject {
     func estimateDistance() async {
         statusTag = "COMPUTING"
         do {
-            let r = try await LocalSimulatorEngine.shared.runSaturation([
+            let r = try await LocalSimulatorEngine.shared.runSaturation(payload: [
                 "action": "estimate_distance",
                 "params": estimateParams(),
             ])
@@ -144,7 +144,7 @@ final class SaturationViewModel: ObservableObject {
     func estimatePk() async {
         statusTag = "COMPUTING"
         do {
-            let r = try await LocalSimulatorEngine.shared.runSaturation([
+            let r = try await LocalSimulatorEngine.shared.runSaturation(payload: [
                 "action": "estimate_pk",
                 "params": estimateParams(),
             ])
@@ -178,7 +178,7 @@ final class SaturationViewModel: ObservableObject {
                 "tlock": Double(tlock) ?? 6,
                 "minr": Double(minr) ?? 3,
             ]
-            let r = try await LocalSimulatorEngine.shared.runSaturation([
+            let r = try await LocalSimulatorEngine.shared.runSaturation(payload: [
                 "action": "simulate",
                 "params": params,
             ])

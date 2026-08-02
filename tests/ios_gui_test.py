@@ -77,6 +77,10 @@ def test_ios_uses_local_engine_not_http_api():
     engine_swift = (IOS_ROOT / 'LocalSimulatorEngine.swift').read_text(encoding='utf-8')
     assert '__BUNDLED_CATALOG__' in engine_swift
     assert 'runSaturation' in engine_swift
+    assert 'func runSaturation(payload:' in engine_swift
+    sat_vm = (IOS_ROOT / 'SaturationViewModel.swift').read_text(encoding='utf-8')
+    assert 'runSaturation(payload:' in sat_vm
+    assert 'runSaturation([' not in sat_vm
 
 
 def test_ios_project_yml_exists():
