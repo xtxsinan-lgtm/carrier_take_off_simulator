@@ -115,6 +115,22 @@ AIRCRAFT: dict[str, AircraftSpec] = {
         cd0=0.044, t_max_sl_n=195800,
         notes='2×F414-GE-400 加力各 97.9 kN（15°C SL）；Cd0=20°襟翼+落架+挂载',
     ),
+    'FA-18C': AircraftSpec(
+        id='FA-18C', name='F/A-18C/D Hornet', type_label='conventional',
+        mtow_kg=23541, empty_kg=10680, internal_fuel_kg=4930,
+        bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
+        sweep_le_deg=20, wingspan_m=11.43, wing_area_m2=38.0, wing_height_m=1.52,
+        cd0=0.045, t_max_sl_n=156600,
+        notes='2×F404-GE-402 加力各 78.3 kN（15°C SL）；Classic Hornet',
+    ),
+    'F-14': AircraftSpec(
+        id='F-14', name='F-14 Tomcat', type_label='conventional',
+        mtow_kg=33724, empty_kg=18955, internal_fuel_kg=7348,
+        bvr_missile='AIM-120C AMRAAM', missile_mass_kg=152.0,
+        sweep_le_deg=20, wingspan_m=19.54, wing_area_m2=52.49, wing_height_m=2.10,
+        cd0=0.046, t_max_sl_n=250900,
+        notes='F-14B/D；2×F110-GE-400 加力共约 251 kN；起飞翼后掠 20°',
+    ),
 }
 
 CARRIERS: list[CarrierSpec] = [
@@ -670,7 +686,7 @@ def format_survey_report(f35b_results: list[dict], conv_results: list[dict]) -> 
     # ── 常规型明细 ──
     lines += ['', sep, '二、常规舰载机 × STOBAR 航母优化结果', sep, '']
     conv_carriers = [c for c in CARRIERS if c.ski_jump and not c.f35b_capable]
-    conv_ac_ids = ('J-15', 'J-15T', 'J-35', 'MiG-29K', 'Rafale-M', 'FA-18E')
+    conv_ac_ids = ('J-15', 'J-15T', 'J-35', 'MiG-29K', 'Rafale-M', 'FA-18E', 'FA-18C', 'F-14')
     for aid in conv_ac_ids:
         ac = AIRCRAFT[aid]
         lines.append(f"【{ac.name}】")
@@ -833,7 +849,7 @@ def run_survey():
     print_carrier_database()
 
     stovl_carriers = [c for c in CARRIERS if c.f35b_capable]
-    conv_ac = [AIRCRAFT[k] for k in ('J-15', 'J-15T', 'J-35', 'MiG-29K', 'Rafale-M', 'FA-18E')]
+    conv_ac = [AIRCRAFT[k] for k in ('J-15', 'J-15T', 'J-35', 'MiG-29K', 'Rafale-M', 'FA-18E', 'FA-18C', 'F-14')]
     conv_carriers = [c for c in CARRIERS if c.ski_jump and not c.f35b_capable]
 
     print('\n' + '=' * 88)
