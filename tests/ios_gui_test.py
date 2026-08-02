@@ -53,6 +53,9 @@ def test_ios_uses_local_engine_not_http_api():
     engine_js = (IOS_ROOT / 'Resources' / 'engine.js').read_text(encoding='utf-8')
     assert 'run_simulation_json' in engine_js
     assert 'loadPyodide' in engine_js
+    assert '__BUNDLED_CATALOG__' in engine_js
+    engine_swift = (IOS_ROOT / 'LocalSimulatorEngine.swift').read_text(encoding='utf-8')
+    assert '__BUNDLED_CATALOG__' in engine_swift
 
 
 def test_ios_project_yml_exists():

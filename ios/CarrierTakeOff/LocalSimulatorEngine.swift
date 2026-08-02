@@ -19,6 +19,11 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
     /// 预加载 Pyodide（首次可能需从 CDN 拉取 wasm；仿真计算始终在本机）
     func prepare() async throws {
         if isReady { return }
+        // 允许失败后重试（例如修复 Bundle / 网络后）
+        if lastError != nil, !preparing {
+            lastError = nil
+            webView = nil
+        }
         if let lastError {
             throw NSError(
                 domain: "LocalSimulatorEngine",
@@ -76,6 +81,7 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
         case "ready":
             isReady = true
             preparing = false
+            lastError = nil
             let conts = readyContinuations
             readyContinuations.removeAll()
             conts.forEach { $0.resume() }
@@ -100,9 +106,21 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
     }
 
     private func bootstrapWebView() {
+        guard let dataURL = Bundle.main.url(forResource: "data", withExtension: "json"),
+              let catalogJSON = try? String(contentsOf: dataURL, encoding: .utf8),
+              !catalogJSON.isEmpty
+        else {
+            failBootstrap("缺少 data.json，请在仓库根目录运行 python3 scripts/build_all.py 后重新编译")
+            return
+        }
+
         let config = WKWebViewConfiguration()
         config.userContentController.add(self, name: "simBridge")
-        // 允许 file:// 页加载 CDN 模块与本地 data.json
+        // 由 Swift 注入目录 JSON，避免 WKWebView 在 file:// 下 fetch 失败（status 0）
+        let inject = "window.__BUNDLED_CATALOG__ = \(catalogJSON);"
+        config.userContentController.addUserScript(
+            WKUserScript(source: inject, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        )
         config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
         config.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
 

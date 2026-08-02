@@ -17,9 +17,14 @@ function post(msg) {
 }
 
 async function loadCatalog() {
-  const resp = await fetch('data.json');
-  if (!resp.ok) throw new Error(`无法加载 data.json (${resp.status})`);
-  catalog = await resp.json();
+  // 优先使用 Swift 注入的 Bundle 数据（file:// 下 fetch 常返回 status 0）
+  if (window.__BUNDLED_CATALOG__) {
+    catalog = window.__BUNDLED_CATALOG__;
+  } else {
+    const resp = await fetch('data.json');
+    if (!resp.ok) throw new Error(`无法加载 data.json (${resp.status})`);
+    catalog = await resp.json();
+  }
   if (!catalog.py_sources || !catalog.py_load_order) {
     throw new Error('data.json 缺少 py_sources，请运行 python3 scripts/build_all.py');
   }
