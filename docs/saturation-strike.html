@@ -25,14 +25,19 @@
   <div class="panel">
     <div class="panel-head"><span>参数输入</span><span class="tag">INPUT</span></div>
 
+    <div class="field">
+      <label>来袭导弹数量 <span class="unit">枚</span></label>
+      <input type="number" id="Nm" value="24" min="1">
+    </div>
+    <div class="field">
+      <label>防空拦截弹数量 <span class="unit">枚</span></label>
+      <input type="number" id="Ni" value="16" min="1">
+    </div>
+
     <div class="section-label red">▸ 打击方 / ATTACKER</div>
     <div class="field">
       <label>反舰导弹型号预设 <span class="unit">可选</span></label>
       <select id="asmPreset"></select>
-    </div>
-    <div class="field">
-      <label>来袭导弹数量 <span class="unit">枚</span></label>
-      <input type="number" id="Nm" value="24" min="1">
     </div>
     <div class="field">
       <label>导弹飞行速度 <span class="unit">马赫 Ma</span></label>
@@ -98,10 +103,6 @@
     <div class="field">
       <label>防空拦截弹射程 <span class="unit">km</span></label>
       <input type="number" id="samRange" value="40" min="1" step="1">
-    </div>
-    <div class="field">
-      <label>防空拦截弹数量 <span class="unit">枚</span></label>
-      <input type="number" id="Ni" value="16" min="1">
     </div>
     <div class="field">
       <label>拦截弹飞行速度 <span class="unit">马赫 Ma</span></label>

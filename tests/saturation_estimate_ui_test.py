@@ -148,3 +148,30 @@ def test_saturation_ui_no_ecm_fields():
     assert 'ecm:' not in mp_js
     assert '抗干扰' not in view
     assert '"ecm"' not in vm
+
+
+def _assert_missile_counts_first(text: str, channel: str, nm_keys: tuple[str, ...], ni_keys: tuple[str, ...]) -> None:
+    """断言来袭数量与拦截弹数量为参数区最先出现的两个数量输入。"""
+    nm_key, nm_idx = _first_match_index(text, nm_keys)
+    ni_key, ni_idx = _first_match_index(text, ni_keys)
+    assert nm_idx < ni_idx, f'{channel} 应先「{nm_key}」后「{ni_key}」'
+    # 二者须早于后续分区标题与预设
+    for later in ('打击方', '预警机', '舰载雷达'):
+        assert later in text, f'{channel} 缺少分区「{later}」'
+        assert nm_idx < text.index(later) and ni_idx < text.index(later), (
+            f'{channel} 导弹数量字段须位于「{later}」分区之前'
+        )
+
+
+def test_missile_counts_at_top_of_inputs():
+    """三端：反舰/来袭数量与防空/拦截弹数量位于所有输入参数最上方。"""
+    html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.wxml').read_text(
+        encoding='utf-8'
+    )
+    view = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationStrikeView.swift').read_text(
+        encoding='utf-8'
+    )
+    _assert_missile_counts_first(html, 'HTML', ('来袭导弹数量',), ('防空拦截弹数量', '拦截弹数量'))
+    _assert_missile_counts_first(wxml, '小程序', ('来袭导弹数量',), ('拦截弹数量',))
+    _assert_missile_counts_first(view, 'iOS', ('来袭数量',), ('拦截弹数量',))

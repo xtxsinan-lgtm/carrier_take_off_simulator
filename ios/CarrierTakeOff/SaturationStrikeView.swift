@@ -13,11 +13,13 @@ struct SaturationStrikeView: View {
                     .foregroundStyle(SaturationTheme.green)
 
                 panel(title: "参数输入") {
+                    field("来袭数量 (枚)", text: $vm.nm)
+                    field("拦截弹数量", text: $vm.ni)
+
                     sectionLabel("▸ 打击方", color: SaturationTheme.red)
                     presetPicker("反舰导弹预设", selection: $vm.selectedAsmId, items: vm.asmPresets) {
                         vm.applyAsmPreset()
                     }
-                    field("来袭数量 (枚)", text: $vm.nm)
                     field("速度 (Ma)", text: $vm.vm)
                     field("RCS (m²)", text: $vm.rcs)
                     pickerRow("弹道", selection: $vm.traj, options: vm.trajOptions)
@@ -40,7 +42,6 @@ struct SaturationStrikeView: View {
                     field("舰载天线 (m²)", text: $vm.shipArea)
                     pickerRow("舰载体制", selection: $vm.shipType, options: vm.radarOptions)
                     field("拦截弹射程 (km)", text: $vm.samRange)
-                    field("拦截弹数量", text: $vm.ni)
                     field("拦截弹速度 (Ma)", text: $vm.vi)
                     field("拦截弹直径 (m)", text: $vm.interceptorDia)
                     pickerRow("制导头", selection: $vm.seekerType, options: vm.seekerOptions)

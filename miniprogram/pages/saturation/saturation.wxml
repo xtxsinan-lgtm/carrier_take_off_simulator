@@ -7,16 +7,21 @@
   <view class="panel">
     <view class="panel-head">参数输入 · INPUT</view>
 
+    <view class="field">
+      <view class="field-label"><text>来袭导弹数量</text><text class="unit">枚</text></view>
+      <input class="input" type="digit" value="{{nm}}" data-key="nm" bindinput="onField"/>
+    </view>
+    <view class="field">
+      <view class="field-label"><text>拦截弹数量</text><text class="unit">枚</text></view>
+      <input class="input" type="number" value="{{ni}}" data-key="ni" bindinput="onField"/>
+    </view>
+
     <view class="section red">▸ 打击方</view>
     <view class="field">
       <view class="field-label"><text>反舰导弹预设</text></view>
       <picker mode="selector" range="{{asmNames}}" value="{{asmIndex}}" bindchange="onAsmPreset">
         <view class="picker-val">{{asmNames[asmIndex] || '自定义'}}</view>
       </picker>
-    </view>
-    <view class="field">
-      <view class="field-label"><text>来袭导弹数量</text><text class="unit">枚</text></view>
-      <input class="input" type="digit" value="{{nm}}" data-key="nm" bindinput="onField"/>
     </view>
     <view class="field">
       <view class="field-label"><text>导弹速度</text><text class="unit">Ma</text></view>
@@ -81,10 +86,6 @@
     <view class="field">
       <view class="field-label"><text>拦截弹射程</text><text class="unit">km</text></view>
       <input class="input" type="digit" value="{{samRange}}" data-key="samRange" bindinput="onField"/>
-    </view>
-    <view class="field">
-      <view class="field-label"><text>拦截弹数量</text><text class="unit">枚</text></view>
-      <input class="input" type="number" value="{{ni}}" data-key="ni" bindinput="onField"/>
     </view>
     <view class="field">
       <view class="field-label"><text>拦截弹速度</text><text class="unit">Ma</text></view>
