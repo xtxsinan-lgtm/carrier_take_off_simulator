@@ -190,6 +190,35 @@ def _assert_missile_counts_first(text: str, channel: str, nm_keys: tuple[str, ..
         )
 
 
+def test_no_awacs_option_present_in_all_channels():
+    """三端均需支持"无预警机"选项：Web/小程序/iOS 均能设置 has_awacs=False。"""
+    html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')
+    web_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.wxml').read_text(
+        encoding='utf-8'
+    )
+    mp_js = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.js').read_text(
+        encoding='utf-8'
+    )
+    view = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationStrikeView.swift').read_text(
+        encoding='utf-8'
+    )
+    vm = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationViewModel.swift').read_text(
+        encoding='utf-8'
+    )
+
+    assert '无预警机' in html, 'HTML 缺少无预警机选项文案'
+    assert '__none__' in html and '__none__' in web_js, 'HTML/JS 缺少无预警机 __none__ value'
+    assert 'has_awacs' in web_js, 'Web 估算参数缺少 has_awacs'
+
+    assert '无预警机' in wxml, '小程序 wxml 缺少无预警机相关提示文案'
+    assert '无预警机' in mp_js, '小程序 js 缺少无预警机选项名称'
+    assert 'has_awacs' in mp_js, '小程序估算参数缺少 has_awacs'
+
+    assert '无预警机' in (view + vm), 'iOS 缺少无预警机相关文案'
+    assert 'has_awacs' in vm, 'iOS 估算参数缺少 has_awacs'
+
+
 def test_missile_counts_at_top_of_inputs():
     """三端：反舰/来袭数量与防空/拦截弹数量位于所有输入参数最上方。"""
     html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')

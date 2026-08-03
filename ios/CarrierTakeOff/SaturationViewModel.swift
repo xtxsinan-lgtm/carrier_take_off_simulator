@@ -56,13 +56,16 @@ final class SaturationViewModel: ObservableObject {
         loadPresets()
     }
 
-    /// 从 Bundle catalog 读取预设
+    /// 「无预警机」合成预设项的固定 id
+    static let noAewId = "__none__"
+
+    /// 从 Bundle catalog 读取预设；预警机列表最前插入「无预警机」合成项
     func loadPresets() {
         do {
             let catalog = try CatalogStore.loadBundledCatalog()
             let p = catalog.saturation_presets
             asmPresets = p?.asm ?? []
-            aewPresets = p?.aew ?? []
+            aewPresets = [SaturationPresetItem(id: Self.noAewId, name: "无预警机")] + (p?.aew ?? [])
             shipPresets = p?.ship ?? []
             samPresets = p?.sam ?? []
             statusText = "预设已加载"
@@ -72,6 +75,9 @@ final class SaturationViewModel: ObservableObject {
             statusTag = "ERROR"
         }
     }
+
+    /// 当前是否选择了预警机（未选择「无预警机」即视为有预警机，含自定义/空选项）
+    var hasAwacs: Bool { selectedAewId != Self.noAewId }
 
     func applyAsmPreset() {
         guard let p = asmPresets.first(where: { $0.id == selectedAsmId }) else { return }
@@ -115,6 +121,7 @@ final class SaturationViewModel: ObservableObject {
             "vi": Double(vi) ?? 3.8,
             "interceptor_dia": Double(interceptorDia) ?? 0.35,
             "seeker_type": seekerType,
+            "has_awacs": hasAwacs,
         ]
     }
 
@@ -142,7 +149,12 @@ final class SaturationViewModel: ObservableObject {
                 ])
             }
             discoveryKm = String(format: "%.1f", dist)
-            distNote = "交战距离 \(String(format: "%.1f", dist)) km（\(distR.binding ?? "")）"
+            if distR.has_awacs ?? true {
+                distNote = "交战距离 \(String(format: "%.1f", dist)) km（受限于：\(distR.binding ?? "")）"
+            } else {
+                let hTarget = String(format: "%.0f", distR.h_target_m ?? 0)
+                distNote = "无预警机：假设目标高度 \(hTarget)m，交战距离 \(String(format: "%.1f", dist)) km（受限于：\(distR.binding ?? "")）"
+            }
             pk = String(format: "%.2f", value)
             pkNote = "估算拦截率（单发）= \(String(format: "%.2f", value))"
             statusTag = "READY"

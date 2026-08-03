@@ -71,6 +71,22 @@ def test_e2e_saturation_estimate_paths():
 
 
 @pytest.mark.e2e
+def test_e2e_saturation_estimate_distance_no_awacs():
+    """无预警机（has_awacs=False）交战距离估算全链路可用。"""
+    params = {
+        'rcs': 0.5, 'traj': 'sea', 'awacs_area': 8, 'awacs_type': 'aesa',
+        'standoff': 150, 'ship_area': 12, 'ship_type': 'aesa', 'sam_range': 200,
+        'vm': 2.6, 'vi': 3.8, 'interceptor_dia': 0.35,
+        'seeker_type': 'active_aesa', 'has_awacs': False,
+    }
+    dist = run_saturation_json({'action': 'estimate_distance', 'params': params})
+    assert dist['success'] is True
+    assert dist['has_awacs'] is False
+    assert dist['engage_dist'] == pytest.approx(min(dist['ship_search'], dist['sam_range']))
+    assert dist['binding'] != '预警机总探测距离'
+
+
+@pytest.mark.e2e
 def test_e2e_saturation_http_api():
     """小程序 HTTP API 饱和打击路由。"""
     payload = {

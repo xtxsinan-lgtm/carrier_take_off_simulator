@@ -79,6 +79,8 @@ struct SaturationResult: Codable {
     var ship_search: Double?
     var sam_range: Double?
     var standoff: Double?
+    var has_awacs: Bool?
+    var h_target_m: Double?
 }
 
 struct SaturationWindow: Codable, Identifiable, Hashable {

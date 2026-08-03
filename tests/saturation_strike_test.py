@@ -49,13 +49,37 @@ def test_run_saturation_strike_no_windows():
 
 
 def test_run_estimate_distance_from_params():
-    """距离估算含 binding 标签。"""
+    """距离估算含 binding 标签（默认有预警机）。"""
     r = run_estimate_distance_from_params({
         'rcs': 0.5, 'traj': 'high', 'awacs_area': 8, 'awacs_type': 'aesa',
         'standoff': 150, 'ship_area': 12, 'ship_type': 'aesa', 'sam_range': 40,
     })
     assert r['engage_dist'] == 40
     assert r['binding'] == '拦截弹射程'
+    assert r['has_awacs'] is True
+
+
+def test_run_estimate_distance_from_params_no_awacs():
+    """params 传 has_awacs=False（各种可解析形式）时不使用预警机总探测。"""
+    for raw in (False, 0, '0', 'false', 'no'):
+        r = run_estimate_distance_from_params({
+            'rcs': 0.5, 'traj': 'sea', 'awacs_area': 8, 'awacs_type': 'aesa',
+            'standoff': 150, 'ship_area': 12, 'ship_type': 'aesa', 'sam_range': 200,
+            'has_awacs': raw,
+        })
+        assert r['has_awacs'] is False, raw
+        assert r['engage_dist'] == min(r['ship_search'], r['sam_range'])
+        assert r['binding'] != '预警机总探测距离'
+
+
+def test_run_estimate_distance_from_params_awacs_type_none_implies_no_awacs():
+    """未显式传 has_awacs 但 awacs_type 为 'none' 时视为无预警机。"""
+    r = run_estimate_distance_from_params({
+        'rcs': 0.5, 'traj': 'high', 'awacs_area': 8, 'awacs_type': 'none',
+        'standoff': 150, 'ship_area': 12, 'ship_type': 'aesa', 'sam_range': 200,
+    })
+    assert r['has_awacs'] is False
+    assert r['engage_dist'] == min(r['ship_search'], r['sam_range'])
 
 
 def test_run_estimate_pk_from_params():

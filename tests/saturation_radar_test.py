@@ -4,6 +4,7 @@ from __future__ import annotations
 import math
 
 from utils.saturation_radar import (
+    H_TARGET,
     TECH_MULT,
     binding_limit_label,
     clamp,
@@ -12,6 +13,7 @@ from utils.saturation_radar import (
     power_range_km,
     radar_gain_factor,
     radar_horizon_km,
+    target_altitude_m,
 )
 
 
@@ -51,13 +53,53 @@ def test_radar_gain_factor_bounded():
 
 
 def test_estimate_engagement_distance_sam_limited():
-    """短程拦截弹时交战距离受射程限制。"""
+    """短程拦截弹时交战距离受射程限制（默认 has_awacs=True 仍成立）。"""
     r = estimate_engagement_distance(
         rcs=0.5, traj='high', awacs_area=8, awacs_type='aesa',
         standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=40,
     )
+    assert r['has_awacs'] is True
     assert r['engage_dist'] == 40
     assert binding_limit_label(r) == '拦截弹射程'
+
+
+def test_target_altitude_m():
+    """target_altitude_m 按弹道类型返回高度估计，未知类型回退高空值。"""
+    assert target_altitude_m('sea') == H_TARGET['sea'] == 10.0
+    assert target_altitude_m('high') == H_TARGET['high'] == 12000.0
+    assert target_altitude_m('unknown_traj') == H_TARGET['high']
+
+
+def test_estimate_no_awacs_uses_ship_search_and_horizon():
+    """无预警机时：交战距离 = min(舰载探测, 拦截弹射程)，且不使用预警机总探测。"""
+    r = estimate_engagement_distance(
+        rcs=0.5, traj='sea', awacs_area=8, awacs_type='aesa',
+        standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=200,
+        has_awacs=False,
+    )
+    assert r['has_awacs'] is False
+    assert r['ship_search'] == min(r['ship_power'], r['ship_horizon'])
+    assert r['engage_dist'] == min(r['ship_search'], r['sam_range'])
+    assert r['awacs_power'] == 0.0
+    assert r['awacs_horizon'] == 0.0
+    assert r['awacs_detect'] == 0.0
+    assert r['awacs_total'] == 0.0
+    assert binding_limit_label(r) != '预警机总探测距离'
+
+
+def test_estimate_no_awacs_sea_shorter_horizon_than_high():
+    """同一舰载雷达下，掠海目标的地球曲率视距应短于高空目标。"""
+    sea = estimate_engagement_distance(
+        rcs=0.5, traj='sea', awacs_area=8, awacs_type='aesa',
+        standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=500,
+        has_awacs=False,
+    )
+    high = estimate_engagement_distance(
+        rcs=0.5, traj='high', awacs_area=8, awacs_type='aesa',
+        standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=500,
+        has_awacs=False,
+    )
+    assert sea['ship_horizon'] < high['ship_horizon']
 
 
 def test_estimate_pk_range():

@@ -118,17 +118,43 @@ def run_saturation_strike(
     return base
 
 
+def _opt_bool(v: Any, default: bool = True) -> bool:
+    """解析可选布尔参数（兼容 bool / 数字 / 字符串多种传参形式），空值用默认。"""
+    if v is None or v == '':
+        return default
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, (int, float)):
+        return bool(v)
+    s = str(v).strip().lower()
+    if s in ('0', 'false', 'no', 'off', 'none'):
+        return False
+    if s in ('1', 'true', 'yes', 'on'):
+        return True
+    return default
+
+
 def run_estimate_distance_from_params(params: dict[str, Any]) -> dict[str, Any]:
     """从参数字典估算交战距离（供 Web/API）。"""
+    awacs_type = str(params.get('awacs_type', 'aesa'))
+    has_awacs_raw = params.get('has_awacs')
+    if has_awacs_raw is None or has_awacs_raw == '':
+        # 未显式传 has_awacs 时，预警机体制/预设为 none 也视为「无预警机」
+        implied_none = awacs_type == 'none' or str(params.get('awacs_preset', '')) == 'none'
+        has_awacs = not implied_none
+    else:
+        has_awacs = _opt_bool(has_awacs_raw, True)
+
     result = estimate_engagement_distance(
         rcs=float(params.get('rcs', 0.5)),
         traj=str(params.get('traj', 'high')),
         awacs_area=float(params.get('awacs_area', 8)),
-        awacs_type=str(params.get('awacs_type', 'aesa')),
+        awacs_type=awacs_type,
         standoff_km=float(params.get('standoff', 150)),
         ship_area=float(params.get('ship_area', 12)),
         ship_type=str(params.get('ship_type', 'aesa')),
         sam_range_km=float(params.get('sam_range', 40)),
+        has_awacs=has_awacs,
     )
     result['binding'] = binding_limit_label(result)
     return result

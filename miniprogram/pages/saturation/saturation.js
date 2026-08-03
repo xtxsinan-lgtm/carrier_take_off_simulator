@@ -19,9 +19,11 @@ function fmt(n, d) {
 Page({
   data: {
     asmList: [], aewList: [], shipList: [], samList: [],
-    asmNames: ['— 自定义 —'], aewNames: ['— 自定义 —'],
+    // 预警机预设下标 0 固定为「无预警机」，1 为「— 自定义 —」，>=2 为 aewList 预设
+    asmNames: ['— 自定义 —'], aewNames: ['无预警机', '— 自定义 —'],
     shipNames: ['— 自定义 —'], samNames: ['— 自定义 —'],
-    asmIndex: 0, aewIndex: 0, shipIndex: 0, samIndex: 0,
+    asmIndex: 0, aewIndex: 1, shipIndex: 0, samIndex: 0,
+    hasAwacs: true,
     trajNames: TRAJ_NAMES, trajIndex: 0,
     radarTypeNames: RADAR_TYPE_NAMES,
     awacsTypeIndex: 2, shipTypeIndex: 2, seekerIndex: 0,
@@ -49,7 +51,7 @@ Page({
       this.setData({
         asmList, aewList, shipList, samList,
         asmNames: ['— 自定义 —'].concat(asmList.map((x) => x.name)),
-        aewNames: ['— 自定义 —'].concat(aewList.map((x) => x.name)),
+        aewNames: ['无预警机', '— 自定义 —'].concat(aewList.map((x) => x.name)),
         shipNames: ['— 自定义 —'].concat(shipList.map((x) => x.name)),
         samNames: ['— 自定义 —'].concat(samList.map((x) => x.name)),
         statusText: '预设已加载。请配置后端 apiBaseUrl 后运行仿真。',
@@ -80,10 +82,11 @@ Page({
     });
   },
   onAewPreset(e) {
+    // 0=无预警机 1=自定义 >=2=aewList[idx-2] 预设
     const idx = Number(e.detail.value);
-    this.setData({ aewIndex: idx });
-    if (idx <= 0) return;
-    const p = this.data.aewList[idx - 1];
+    this.setData({ aewIndex: idx, hasAwacs: idx !== 0 });
+    if (idx <= 1) return;
+    const p = this.data.aewList[idx - 2];
     this.setData({
       awacsArea: String(p.area), standoff: String(p.standoff),
       awacsTypeIndex: Math.max(0, RADAR_TYPES.indexOf(p.type)),
@@ -125,6 +128,7 @@ Page({
       vi: num(d.vi, 3.8),
       interceptor_dia: num(d.interceptorDia, 0.35),
       seeker_type: SEEKERS[d.seekerIndex] || 'active_aesa',
+      has_awacs: d.aewIndex !== 0,
     };
   },
 
@@ -136,9 +140,12 @@ Page({
         if (!dist.success) throw new Error(dist.error || '交战距离估算失败');
         return api.runSaturationSimulation({ action: 'estimate_pk', params }).then((pkR) => {
           if (!pkR.success) throw new Error(pkR.error || '拦截率估算失败');
+          const distNote = dist.has_awacs
+            ? `交战距离 ${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`
+            : `无预警机：假设目标高度 ${fmt(dist.h_target_m, 0)}m，舰载探测=min(功率,视距)=${fmt(dist.ship_search, 0)}km，交战距离 ${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`;
           this.setData({
             discoveryKm: fmt(dist.engage_dist, 1),
-            distNote: `交战距离 ${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`,
+            distNote,
             pk: fmt(pkR.pk, 2),
             pkNote: `估算拦截率（单发）= ${fmt(pkR.pk, 2)}`,
           });

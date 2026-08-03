@@ -44,6 +44,7 @@
       <picker mode="selector" range="{{aewNames}}" value="{{aewIndex}}" bindchange="onAewPreset">
         <view class="picker-val">{{aewNames[aewIndex] || '自定义'}}</view>
       </picker>
+      <view class="note" wx:if="{{!hasAwacs}}">已选择「无预警机」：发现距离退化为仅取决于舰载雷达（功率/视距取小），下方预警机字段不参与计算。</view>
     </view>
     <view class="field">
       <view class="field-label"><text>天线面积</text><text class="unit">m²</text></view>
