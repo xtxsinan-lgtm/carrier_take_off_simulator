@@ -33,7 +33,8 @@ SIMULATORS = [
     {
         'id': 'takeoff',
         'name': '航母舰载机起飞距离仿真',
-        'subtitle': 'CARRIER TAKEOFF · 滑跃 / 短距 / 短距滑跃 / 倾转短距',
+        'eyebrow': 'CARRIER TAKEOFF',
+        'subtitle': '滑跃 / 短距 / 短距滑跃 / 倾转短距',
         'html': 'takeoff.html',
         'miniprogram_page': '/pages/index/index',
         'ios_route': 'takeoff',
@@ -41,6 +42,7 @@ SIMULATORS = [
     {
         'id': 'saturation',
         'name': '饱和打击 / 反导拦截仿真',
+        'eyebrow': 'SHIPBORNE MISSILE INTERCEPTION',
         'subtitle': '蒙特卡洛弹药分配 · 交战距离与拦截率估算',
         'html': 'saturation-strike.html',
         'miniprogram_page': '/pages/saturation/saturation',

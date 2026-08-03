@@ -1,4 +1,4 @@
-"""Unit tests for web_simulator.py."""
+"""web_simulator 单元测试。"""
 import json
 
 import pytest
@@ -7,6 +7,7 @@ from apps.web_simulator import (
     compute_aircraft_aero,
     filter_aircraft_for_mode,
     filter_carriers_for_mode,
+    format_output_summary,
     resolve_ski_jump_geom,
     run_simulation,
     run_simulation_json,
@@ -23,6 +24,22 @@ def aircraft():
 @pytest.fixture(scope='module')
 def carriers():
     return load_carriers_csv(CARRIERS_CSV)
+
+
+def test_format_output_summary_with_margin():
+    """有余量时显示起飞距离与甲板余量。"""
+    assert format_output_summary(85.6, 120.4) == '起飞 85.6 m · 余量 120.4 m'
+
+
+def test_format_output_summary_with_overrun():
+    """甲板不足时显示超出距离。"""
+    assert format_output_summary(300.0, -12.3) == '起飞 300.0 m · 超出 12.3 m'
+
+
+def test_format_output_summary_distance_only():
+    """仅有起飞距离时不附带甲板字段。"""
+    assert format_output_summary(52.4, None) == '起飞 52.4 m'
+    assert format_output_summary(None, 10.0) == ''
 
 
 def test_resolve_ski_jump_from_height():
@@ -73,6 +90,8 @@ def test_run_simulation_ski_jump_j15(aircraft, carriers):
     assert result['success'] is True
     assert result['distance_m'] == pytest.approx(85.6, rel=0.02)
     assert result['deck_launch_ok'] is True
+    assert '起飞' in result['output_summary']
+    assert '余量' in result['output_summary']
     assert result['plume_applicable'] is False
     assert result['min_plume_trailing_edge_m'] is None
     assert result['trajectory']

@@ -78,12 +78,28 @@ scroll-view {
   margin-bottom: 20rpx;
   letter-spacing: 3rpx;
   text-transform: uppercase;
+  gap: 16rpx;
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  min-width: 0;
 }
 
 .card-tag {
   color: var(--accent);
   font-size: 20rpx;
   letter-spacing: 2rpx;
+}
+
+.output-summary {
+  color: var(--accent);
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .card-hint {

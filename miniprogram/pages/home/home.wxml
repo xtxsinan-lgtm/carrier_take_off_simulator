@@ -4,7 +4,7 @@
 
   <block wx:for="{{simulators}}" wx:key="id">
     <view class="card {{item.id}}" data-page="{{item.miniprogram_page}}" bindtap="onOpen">
-      <text class="card-id">{{item.id}}</text>
+      <text class="card-id">{{item.eyebrow}}</text>
       <text class="card-name">{{item.name}}</text>
       <text class="card-sub">{{item.subtitle}}</text>
       <view class="card-cta">进入仿真 →</view>

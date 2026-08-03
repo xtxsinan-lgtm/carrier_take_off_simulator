@@ -16,6 +16,7 @@ struct CatalogPayload: Codable {
 struct SimulatorEntry: Codable, Identifiable, Hashable {
     var id: String
     var name: String
+    var eyebrow: String?
     var subtitle: String?
     var html: String?
     var miniprogram_page: String?
@@ -168,6 +169,7 @@ struct SimulationResult: Codable {
     var deck_launch_ok: Bool?
     var deck_margin_m: Double?
     var distance_m: Double?
+    var output_summary: String?
     var trajectory: [TrajectoryPoint]?
     var deck_profile: DeckProfile?
 }

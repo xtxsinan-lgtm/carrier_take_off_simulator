@@ -13,7 +13,7 @@ import {
 
 const PYODIDE_VERSION = '0.26.4';
 /** 与 takeoff.html 中 app.js?v= 及 data.json?v= 同步递增，避免 CDN/浏览器缓存旧资源 */
-const APP_VERSION = 20;
+const APP_VERSION = 21;
 let data = null;
 let pyodide = null;
 let pyReady = false;
@@ -79,6 +79,25 @@ function setStatus(text, cls = '') {
   els.status.className = cls;
 }
 
+/** 仿真输出卡片标题右侧：优先用 API output_summary，否则本地拼装 */
+function formatOutputSummary(result) {
+  if (result?.output_summary) return result.output_summary;
+  if (!result || result.distance_m == null) return '';
+  const dist = `起飞 ${fmtNum(result.distance_m, 1)} m`;
+  if (result.deck_margin_m == null) return dist;
+  const margin = Number(result.deck_margin_m);
+  const deck =
+    margin >= 0
+      ? `余量 ${fmtNum(margin, 1)} m`
+      : `超出 ${fmtNum(-margin, 1)} m`;
+  return `${dist} · ${deck}`;
+}
+
+function setOutputSummary(text) {
+  if (!els.outputSummary) return;
+  els.outputSummary.textContent = text || '';
+}
+
 function modeNeedsSkiJump(mode) {
   return mode === 'ski_jump' || mode === 'short_ski_jump';
 }
@@ -112,11 +131,6 @@ function populateModeButtons() {
     )
     .join('');
   els.modeBtns = [...els.modeGroup.querySelectorAll('.mode-btn')];
-
-  const labels = ids.map((id) => modes[id]).join('、');
-  if (els.headerSubtitle) {
-    els.headerSubtitle.textContent = `支持${labels}等起飞模式`;
-  }
 }
 
 function refreshModeButtons() {
@@ -531,6 +545,7 @@ async function runSimulation() {
   setStatus('仿真计算中（可能需要数秒至数十秒）…', 'loading');
   els.output.classList.remove('empty');
   els.output.textContent = '计算中…';
+  setOutputSummary('');
   hideTrajectory();
 
   const payload = {
@@ -565,23 +580,24 @@ json.dumps(run_simulation_json(_payload_json), ensure_ascii=False)
     els.output.textContent = result.output || '(无输出)';
     if (result.success) {
       drawTrajectory(result);
+      setOutputSummary(formatOutputSummary(result));
       const trajNote =
         modeHasTrajectory(currentMode) && result.trajectory?.length
           ? ` · 轨迹 ${result.trajectory.length} 点`
           : '';
       setStatus(
-        (result.deck_launch_ok
-          ? `仿真完成 — 甲板可用（余量 ${fmtNum(result.deck_margin_m, 1)} m）`
-          : `仿真完成 — 甲板不足（超出 ${fmtNum(-result.deck_margin_m, 1)} m）`) + trajNote,
+        (result.deck_launch_ok ? '仿真完成 — 甲板可用' : '仿真完成 — 甲板不足') + trajNote,
         result.deck_launch_ok ? 'ok' : 'error'
       );
     } else {
       hideTrajectory();
+      setOutputSummary('');
       setStatus(result.error || '仿真失败', 'error');
     }
   } catch (e) {
     hideTrajectory();
     els.output.textContent = String(e);
+    setOutputSummary('');
     setStatus(`仿真出错: ${e.message}`, 'error');
   } finally {
     els.runBtn.disabled = false;
@@ -656,6 +672,7 @@ async function main() {
   els.runBtn = $('runBtn');
   els.preloadBtn = $('preloadBtn');
   els.output = $('output');
+  els.outputSummary = $('outputSummary');
   els.status = $('status');
   els.trajectorySection = $('trajectorySection');
   els.trajectoryCanvas = $('trajectoryCanvas');

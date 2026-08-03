@@ -65,7 +65,7 @@ final class SaturationViewModel: ObservableObject {
             aewPresets = p?.aew ?? []
             shipPresets = p?.ship ?? []
             samPresets = p?.sam ?? []
-            statusText = "预设已加载（本地 Pyodide）"
+            statusText = "预设已加载"
             statusTag = "READY"
         } catch {
             statusText = error.localizedDescription

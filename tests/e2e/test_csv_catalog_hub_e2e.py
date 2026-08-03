@@ -57,15 +57,26 @@ def test_e2e_takeoff_terminal_gui_three_channels():
 
     html = (ROOT / 'docs' / 'takeoff.html').read_text(encoding='utf-8')
     css = (ROOT / 'docs' / 'css' / 'style.css').read_text(encoding='utf-8')
+    app_js = (ROOT / 'docs' / 'js' / 'app.js').read_text(encoding='utf-8')
     wxml = (ROOT / 'miniprogram' / 'pages' / 'index' / 'index.wxml').read_text(encoding='utf-8')
     wxss = (ROOT / 'miniprogram' / 'app.wxss').read_text(encoding='utf-8')
+    index_js = (ROOT / 'miniprogram' / 'pages' / 'index' / 'index.js').read_text(encoding='utf-8')
     ios = (ROOT / 'ios' / 'CarrierTakeOff' / 'ContentView.swift').read_text(encoding='utf-8')
     theme = (ROOT / 'ios' / 'CarrierTakeOff' / 'Theme.swift').read_text(encoding='utf-8')
+    vm = (ROOT / 'ios' / 'CarrierTakeOff' / 'SimulatorViewModel.swift').read_text(encoding='utf-8')
 
     for blob in (html, wxml, ios):
         assert title in blob
         for tag in tags:
             assert tag in blob
+
+    assert 'id="outputSummary"' in html
+    assert 'formatOutputSummary' in app_js
+    assert 'output-summary' in wxml
+    assert 'formatOutputSummary' in index_js
+    assert 'outputSummary' in ios or 'trailingSummary' in ios
+    assert 'formatOutputSummary' in vm
+    assert 's.eyebrow' in (ROOT / 'docs' / 'js' / 'hub.js').read_text(encoding='utf-8')
 
     assert 'scanline' in html and '.scanline' in css
     assert '#38bdf8' in css and '#38bdf8' in wxss

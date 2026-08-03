@@ -122,7 +122,7 @@ struct ContentView: View {
                     }
                 }
 
-                CardView(title: "5. 仿真输出", tag: "OUTPUT") {
+                CardView(title: "5. 仿真输出", tag: "OUTPUT", trailingSummary: vm.outputSummary) {
                     ScrollView {
                         Text(vm.outputText)
                             .font(.system(size: 11, design: .monospaced))
@@ -141,15 +141,6 @@ struct ContentView: View {
                         TrajectoryChart(result: vm.chartResult)
                     }
                 }
-
-                Text("PYODIDE LOCAL ENGINE · CSV DATA SYNC")
-                    .font(.system(size: 9, design: .monospaced))
-                    .foregroundStyle(AppTheme.muted)
-                    .tracking(1)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
-                    .opacity(0.7)
             }
             .padding(.horizontal, 14)
             .padding(.top, 8)

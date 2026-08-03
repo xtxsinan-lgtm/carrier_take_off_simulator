@@ -21,7 +21,7 @@ struct HubView: View {
                         destination(for: sim)
                     } label: {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(sim.id.uppercased())
+                            Text(sim.eyebrow ?? sim.id.uppercased())
                                 .font(.system(size: 10, design: .monospaced))
                                 .foregroundStyle(Color(hex: 0x8AA0A8))
                             Text(sim.name)

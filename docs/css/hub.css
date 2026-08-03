@@ -84,6 +84,8 @@ html, body {
   letter-spacing: 0.12em;
   color: var(--muted);
   text-transform: uppercase;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .sim-name {

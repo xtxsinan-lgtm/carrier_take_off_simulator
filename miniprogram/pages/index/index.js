@@ -16,6 +16,20 @@ const {
 const { trajectoryCanvasHeightRpx } = require('../../utils/responsive.js');
 const config = require('../../config.js');
 
+/** 仿真输出卡片标题右侧：优先用 API output_summary，否则本地拼装 */
+function formatOutputSummary(result) {
+  if (result && result.output_summary) return result.output_summary;
+  if (!result || result.distance_m == null) return '';
+  const dist = `起飞 ${fmtNum(result.distance_m, 1)} m`;
+  if (result.deck_margin_m == null) return dist;
+  const margin = Number(result.deck_margin_m);
+  const deck =
+    margin >= 0
+      ? `余量 ${fmtNum(margin, 1)} m`
+      : `超出 ${fmtNum(-margin, 1)} m`;
+  return `${dist} · ${deck}`;
+}
+
 Page({
   data: {
     modeList: [],
@@ -46,6 +60,7 @@ Page({
     statusClass: '',
     outputText: '选择参数后点击「开始仿真」，结果将显示在此处。',
     outputEmpty: true,
+    outputSummary: '',
     running: false,
     simResult: null,
     showTrajectory: false,
@@ -354,6 +369,7 @@ Page({
       running: true,
       outputEmpty: false,
       outputText: '计算中…',
+      outputSummary: '',
       showTrajectory: false,
       simResult: null,
     });
@@ -405,6 +421,7 @@ Page({
 
       this.setData({
         outputText: result.output || '(无输出)',
+        outputSummary: result.success ? formatOutputSummary(result) : '',
         simResult: chartResult,
         showTrajectory: showTraj,
       });
@@ -416,8 +433,8 @@ Page({
             ? ' · 未返回轨迹数据'
             : '';
         const msg = result.deck_launch_ok
-          ? `仿真完成 — 甲板可用（余量 ${fmtNum(result.deck_margin_m, 1)} m）${trajNote}${missingTrajNote}`
-          : `仿真完成 — 甲板不足（超出 ${fmtNum(-result.deck_margin_m, 1)} m）${trajNote}${missingTrajNote}`;
+          ? `仿真完成 — 甲板可用${trajNote}${missingTrajNote}`
+          : `仿真完成 — 甲板不足${trajNote}${missingTrajNote}`;
         this.setStatus(msg, result.deck_launch_ok ? 'ok' : 'error');
       } else {
         this.setStatus(result.error || '仿真失败', 'error');
@@ -425,6 +442,7 @@ Page({
     } catch (e) {
       this.setData({
         outputText: String(e.message || e),
+        outputSummary: '',
         showTrajectory: false,
         simResult: null,
       });

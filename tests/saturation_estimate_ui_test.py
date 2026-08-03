@@ -122,6 +122,33 @@ def test_catalog_saturation_subtitle_mentions_intercept_rate():
     sat = next(s for s in SIMULATORS if s['id'] == 'saturation')
     assert '拦截率' in sat['subtitle']
     assert 'Pk 估算' not in sat['subtitle']
+    assert sat['eyebrow'] == 'SHIPBORNE MISSILE INTERCEPTION'
+
+
+def test_catalog_takeoff_eyebrow_is_carrier_takeoff():
+    """起飞仿真启动页英文眉题为 CARRIER TAKEOFF。"""
+    from scripts.frontend_catalog import SIMULATORS
+
+    takeoff = next(s for s in SIMULATORS if s['id'] == 'takeoff')
+    assert takeoff['eyebrow'] == 'CARRIER TAKEOFF'
+
+
+def test_saturation_pages_english_eyebrow():
+    """饱和打击页标题下方英文须为 SHIPBORNE MISSILE INTERCEPTION，且无 LOCAL PYODIDE。"""
+    html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.wxml').read_text(
+        encoding='utf-8'
+    )
+    view = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationStrikeView.swift').read_text(
+        encoding='utf-8'
+    )
+    label = 'SHIPBORNE MISSILE INTERCEPTION'
+    assert label in html
+    assert label in wxml
+    assert label in view
+    assert 'LOCAL PYODIDE' not in view
+    assert 'SATURATION ATTACK' not in html
+    assert 'SATURATION ATTACK' not in view
 
 
 def test_saturation_ui_no_ecm_fields():

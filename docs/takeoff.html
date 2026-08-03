@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>航母舰载机起飞距离仿真</title>
-  <link rel="stylesheet" href="css/style.css?v=20">
+  <link rel="stylesheet" href="css/style.css?v=21">
 </head>
 <body>
   <div class="scanline" aria-hidden="true"></div>
@@ -99,7 +99,13 @@
     </section>
 
     <section class="card">
-      <h2><span>5. 仿真输出</span><span class="tag">OUTPUT</span></h2>
+      <h2>
+        <span class="card-heading">
+          <span>5. 仿真输出</span>
+          <span class="tag">OUTPUT</span>
+        </span>
+        <span class="output-summary" id="outputSummary"></span>
+      </h2>
       <pre id="output" class="empty">选择参数后点击「开始仿真」，结果将显示在此处。</pre>
     </section>
 
@@ -120,9 +126,9 @@
   </main>
 
   <footer>
-    PYODIDE LOCAL ENGINE · DATA FROM AIRCRAFT_DATABASE.CSV / CARRIERS_DATABASE.CSV
+    仿真由 Python 物理模型计算 · 数据来自 aircraft_database.csv / carriers_database.csv
   </footer>
 
-  <script type="module" src="js/app.js?v=20"></script>
+  <script type="module" src="js/app.js?v=21"></script>
 </body>
 </html>

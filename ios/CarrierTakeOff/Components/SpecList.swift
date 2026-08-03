@@ -40,20 +40,27 @@ struct SpecListView: View {
 struct CardView<Content: View>: View {
     let title: String
     var tag: String = "PANEL"
+    var trailingSummary: String? = nil
     @ViewBuilder var content: Content
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(title.uppercased())
                     .font(.system(size: 10, weight: .regular, design: .monospaced))
                     .foregroundStyle(AppTheme.muted)
                     .tracking(2)
-                Spacer()
                 Text(tag)
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundStyle(AppTheme.accent)
                     .tracking(1)
+                Spacer(minLength: 8)
+                if let trailingSummary, !trailingSummary.isEmpty {
+                    Text(trailingSummary)
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundStyle(AppTheme.accent)
+                        .multilineTextAlignment(.trailing)
+                }
             }
             content
         }

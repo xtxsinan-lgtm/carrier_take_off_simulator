@@ -216,6 +216,22 @@ def _deck_launch_label(success: bool, distance_m: float | None, deck_length_m: f
     return f'甲板不足（超出 {-margin:.1f} m）'
 
 
+def format_output_summary(
+    distance_m: float | None,
+    deck_margin_m: float | None,
+) -> str:
+    """仿真输出卡片标题右侧摘要：起飞总距离 + 甲板余量/超出。"""
+    if distance_m is None:
+        return ''
+    dist = f'起飞 {float(distance_m):.1f} m'
+    if deck_margin_m is None:
+        return dist
+    margin = float(deck_margin_m)
+    if margin >= 0:
+        return f'{dist} · 余量 {margin:.1f} m'
+    return f'{dist} · 超出 {-margin:.1f} m'
+
+
 def _configure_flat_stovl(ac: AircraftSpec, mass_kg: float, temp_c: float, wind_kt: float):
     geom = dict(mass_kg=mass_kg, s_ref_m2=ac.wing_area_m2, wingspan_m=ac.wingspan_m,
                 wing_height_m=ac.wing_height_m, sweep_le_deg=ac.sweep_le_deg, cd0=ac.cd0)
@@ -487,6 +503,7 @@ def run_simulation(
             mode, mod, result, deck_length, stovl_strategy)
         plume_applicable = simulation_uses_plume_model(mode, aircraft)
         plume_edge = result.get('min_plume_trailing_edge_m') if plume_applicable else None
+        deck_margin_m = deck_length - distance_m if distance_m is not None else None
 
         return {
             'success': True,
@@ -495,7 +512,8 @@ def run_simulation(
             'output': '\n'.join(output_lines),
             'distance_m': distance_m,
             'deck_launch_ok': distance_m is not None and distance_m <= deck_length,
-            'deck_margin_m': deck_length - distance_m if distance_m is not None else None,
+            'deck_margin_m': deck_margin_m,
+            'output_summary': format_output_summary(distance_m, deck_margin_m),
             'plume_applicable': plume_applicable,
             'min_plume_trailing_edge_m': plume_edge,
             'result': _json_safe(result),

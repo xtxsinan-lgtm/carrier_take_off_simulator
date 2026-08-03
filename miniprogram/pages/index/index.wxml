@@ -106,7 +106,13 @@
 
   <!-- 5. 仿真输出 -->
   <view class="card">
-    <view class="card-title"><text>5. 仿真输出</text><text class="card-tag">OUTPUT</text></view>
+    <view class="card-title">
+      <view class="card-heading">
+        <text>5. 仿真输出</text>
+        <text class="card-tag">OUTPUT</text>
+      </view>
+      <text class="output-summary" wx:if="{{outputSummary}}">{{outputSummary}}</text>
+    </view>
     <text class="output-pre {{outputEmpty ? 'empty' : ''}}">{{outputText}}</text>
   </view>
 

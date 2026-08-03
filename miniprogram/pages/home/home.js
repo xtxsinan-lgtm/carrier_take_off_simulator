@@ -10,7 +10,10 @@ Page({
   onShow() {
     api.loadSimulatorData()
       .then((data) => {
-        const sims = data.simulators || [];
+        const sims = (data.simulators || []).map((s) => ({
+          ...s,
+          eyebrow: s.eyebrow || String(s.id || '').toUpperCase(),
+        }));
         this.setData({
           simulators: sims,
           statusText: sims.length

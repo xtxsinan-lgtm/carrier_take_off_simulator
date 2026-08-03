@@ -33,6 +33,7 @@ final class SimulatorViewModel: ObservableObject {
     @Published var statusKind: StatusKind = .idle
     @Published var outputText: String = "选择参数后点击「开始仿真」，结果将显示在此处。"
     @Published var outputEmpty: Bool = true
+    @Published var outputSummary: String = ""
     @Published var running: Bool = false
     @Published var showTrajectory: Bool = false
     @Published var chartResult: SimulationResult?
@@ -240,6 +241,7 @@ final class SimulatorViewModel: ObservableObject {
         running = true
         outputEmpty = false
         outputText = "计算中…"
+        outputSummary = ""
         showTrajectory = false
         chartResult = nil
         setStatus("仿真计算中（可能需要数秒至数十秒）…", .loading)
@@ -278,26 +280,41 @@ final class SimulatorViewModel: ObservableObject {
             showTrajectory = showTraj
 
             if result.success {
+                outputSummary = Self.formatOutputSummary(result)
                 let trajNote = showTraj ? " · 轨迹 \(traj?.count ?? 0) 点" : ""
                 let missing =
                     Physics.modeHasTrajectory(currentMode) && !showTraj ? " · 未返回轨迹数据" : ""
                 if result.deck_launch_ok == true {
-                    let margin = Physics.fmtNum(result.deck_margin_m, digits: 1)
-                    setStatus("仿真完成 — 甲板可用（余量 \(margin) m）\(trajNote)\(missing)", .ok)
+                    setStatus("仿真完成 — 甲板可用\(trajNote)\(missing)", .ok)
                 } else {
-                    let over = Physics.fmtNum(-(result.deck_margin_m ?? 0), digits: 1)
-                    setStatus("仿真完成 — 甲板不足（超出 \(over) m）\(trajNote)\(missing)", .error)
+                    setStatus("仿真完成 — 甲板不足\(trajNote)\(missing)", .error)
                 }
             } else {
+                outputSummary = ""
                 setStatus(result.error ?? "仿真失败", .error)
             }
         } catch {
             outputText = error.localizedDescription
+            outputSummary = ""
             showTrajectory = false
             chartResult = nil
             setStatus("仿真出错: \(error.localizedDescription)", .error)
         }
         running = false
+    }
+
+    /// 仿真输出卡片标题右侧摘要：优先 API 字段，否则本地拼装
+    private static func formatOutputSummary(_ result: SimulationResult) -> String {
+        if let summary = result.output_summary, !summary.isEmpty {
+            return summary
+        }
+        guard let distance = result.distance_m else { return "" }
+        let dist = "起飞 \(Physics.fmtNum(distance, digits: 1)) m"
+        guard let margin = result.deck_margin_m else { return dist }
+        let deck = margin >= 0
+            ? "余量 \(Physics.fmtNum(margin, digits: 1)) m"
+            : "超出 \(Physics.fmtNum(-margin, digits: 1)) m"
+        return "\(dist) · \(deck)"
     }
 
     private func modesToList(_ modes: [String: String]) -> [ModeItem] {

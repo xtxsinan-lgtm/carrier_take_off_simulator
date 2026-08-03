@@ -1,7 +1,7 @@
 <view class="sat-page">
   <view class="sat-header">
     <text class="sat-title">饱和打击 / 反导拦截仿真终端</text>
-    <text class="sat-sub">Python 后端同源 · 蒙特卡洛弹药分配</text>
+    <text class="sat-sub">SHIPBORNE MISSILE INTERCEPTION</text>
   </view>
 
   <view class="panel">

@@ -83,7 +83,7 @@ struct SaturationStrikeView: View {
             Text("饱和打击 / 反导拦截仿真终端")
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .foregroundStyle(SaturationTheme.amber)
-            Text("SATURATION ATTACK · LOCAL PYODIDE")
+            Text("SHIPBORNE MISSILE INTERCEPTION")
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(SaturationTheme.textDim)
             Text(vm.statusTag)

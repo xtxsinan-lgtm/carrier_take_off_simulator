@@ -1,7 +1,7 @@
 /**
  * 启动页：从 data.json.simulators 动态列出可选模拟器。
  */
-const HUB_VERSION = 2;
+const HUB_VERSION = 3;
 
 async function main() {
   const grid = document.getElementById('simGrid');
@@ -18,8 +18,9 @@ async function main() {
       const a = document.createElement('a');
       a.className = `sim-card ${s.id}`;
       a.href = s.html || '#';
+      const eyebrow = s.eyebrow || String(s.id || '').toUpperCase();
       a.innerHTML = `
-        <div class="sim-id">${s.id}</div>
+        <div class="sim-id">${eyebrow}</div>
         <h2 class="sim-name">${s.name}</h2>
         <p class="sim-sub">${s.subtitle || ''}</p>
         <div class="sim-cta">进入仿真 →</div>
