@@ -69,7 +69,8 @@ def test_run_estimate_distance_from_params_no_awacs():
         })
         assert r['has_awacs'] is False, raw
         assert r['engage_dist'] == min(r['ship_search'], r['sam_range'])
-        assert r['binding'] != '预警机总探测距离'
+        assert r['awacs_detect_km'] == 0.0
+        assert r['binding'] != '预警机雷达探测距离'
 
 
 def test_run_estimate_distance_from_params_awacs_type_none_implies_no_awacs():

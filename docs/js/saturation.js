@@ -3,7 +3,7 @@
  */
 const PYODIDE_VERSION = '0.26.4';
 /** 与 saturation-strike.html 中 ?v= 同步递增 */
-const APP_VERSION = 9;
+const APP_VERSION = 10;
 
 /** 预警机预设中「无预警机」的特殊 value */
 const AEW_NONE_VALUE = '__none__';
@@ -389,10 +389,12 @@ async function onEstimateDistanceAndPk() {
     const params = collectEstimateParams();
     const dist = callPython('estimate_distance', params);
     if (!dist.success) throw new Error(dist.error || '交战距离估算失败');
+    $('awacsDetectKm').value = dist.has_awacs ? Number(dist.awacs_detect_km).toFixed(1) : '0';
+    $('shipDetectKm').value = Number(dist.ship_detect_km).toFixed(1);
     $('D').value = Number(dist.engage_dist).toFixed(1);
     $('distBreakdown').textContent = dist.has_awacs
-      ? `预警机探测: ${dist.awacs_detect.toFixed(0)}km(功率限${dist.awacs_power.toFixed(0)}/视距限${dist.awacs_horizon.toFixed(0)}) + 前出${dist.standoff.toFixed(0)}km = 总计${dist.awacs_total.toFixed(0)}km ｜ 舰载火控锁定: ${dist.ship_lock.toFixed(0)}km(搜索${dist.ship_search.toFixed(0)}×0.65) ｜ 拦截弹射程: ${dist.sam_range.toFixed(0)}km → 取最小值＝${dist.engage_dist.toFixed(1)}km（受限于：${dist.binding}）— 已填入下方「雷达发现距离」，可手动修改。`
-      : `无预警机：假设目标高度 ${dist.h_target_m.toFixed(0)}m ｜ 舰载探测＝min(功率限${dist.ship_power.toFixed(0)}km, 视距限${dist.ship_horizon.toFixed(0)}km)＝${dist.ship_search.toFixed(0)}km ｜ 拦截弹射程: ${dist.sam_range.toFixed(0)}km → 交战距离＝min(舰载探测, 拦截弹射程)＝${dist.engage_dist.toFixed(1)}km（受限于：${dist.binding}）— 已填入下方「雷达发现距离」，可手动修改。`;
+      ? `预警机雷达探测: ${dist.awacs_detect.toFixed(0)}km(功率限${dist.awacs_power.toFixed(0)}/视距限${dist.awacs_horizon.toFixed(0)}) + 前出${dist.standoff.toFixed(0)}km = ${dist.awacs_detect_km.toFixed(0)}km ｜ 舰载雷达探测: ${dist.ship_detect_km.toFixed(0)}km(功率限${dist.ship_power.toFixed(0)}/视距限${dist.ship_horizon.toFixed(0)}) ｜ 拦截弹射程: ${dist.sam_range.toFixed(0)}km → 交战距离＝min(max(预警机探测,舰载探测), 拦截弹射程)＝${dist.engage_dist.toFixed(1)}km（受限于：${dist.binding}）— 已填入下方「预警机/舰载雷达探测距离」与「交战距离」，可手动修改。`
+      : `无预警机：假设目标高度 ${dist.h_target_m.toFixed(0)}m ｜ 舰载雷达探测＝min(功率限${dist.ship_power.toFixed(0)}km, 视距限${dist.ship_horizon.toFixed(0)}km)＝${dist.ship_detect_km.toFixed(0)}km ｜ 拦截弹射程: ${dist.sam_range.toFixed(0)}km → 交战距离＝min(max(0,舰载探测), 拦截弹射程)＝${dist.engage_dist.toFixed(1)}km（受限于：${dist.binding}）— 已填入下方「舰载雷达探测距离」与「交战距离」，可手动修改。`;
 
     const pkR = callPython('estimate_pk', params);
     if (!pkR.success) throw new Error(pkR.error || '拦截率估算失败');

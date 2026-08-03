@@ -33,6 +33,7 @@ Page({
     shipArea: '12', samRange: '40',
     discoveryKm: '120', ni: '16', vi: '3.8',
     interceptorDia: '0.35', pk: '0.7', tlock: '6', minr: '3',
+    awacsDetectKm: '0', shipDetectKm: '0',
     distNote: '', pkNote: '', statusText: '', statusTag: 'STANDBY',
     running: false, hasResult: false,
     windows: [], planRows: [], strategies: [],
@@ -132,7 +133,7 @@ Page({
     };
   },
 
-  /** 一次估算交战距离与单发拦截成功概率，填入按钮下方两字段。 */
+  /** 一次估算交战距离与单发拦截成功概率，填入预警机/舰载探测距离与交战距离等字段。 */
   onEstimateDistanceAndPk() {
     const params = this.estimateParams();
     api.runSaturationSimulation({ action: 'estimate_distance', params })
@@ -141,9 +142,11 @@ Page({
         return api.runSaturationSimulation({ action: 'estimate_pk', params }).then((pkR) => {
           if (!pkR.success) throw new Error(pkR.error || '拦截率估算失败');
           const distNote = dist.has_awacs
-            ? `交战距离 ${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`
-            : `无预警机：假设目标高度 ${fmt(dist.h_target_m, 0)}m，舰载探测=min(功率,视距)=${fmt(dist.ship_search, 0)}km，交战距离 ${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`;
+            ? `预警机探测 ${fmt(dist.awacs_detect_km, 0)}km ｜ 舰载探测 ${fmt(dist.ship_detect_km, 0)}km → 交战距离=min(max(预警机,舰载),射程)=${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`
+            : `无预警机：假设目标高度 ${fmt(dist.h_target_m, 0)}m，舰载探测=min(功率,视距)=${fmt(dist.ship_detect_km, 0)}km，交战距离 ${fmt(dist.engage_dist, 1)} km（受限于：${dist.binding}）`;
           this.setData({
+            awacsDetectKm: dist.has_awacs ? fmt(dist.awacs_detect_km, 1) : '0',
+            shipDetectKm: fmt(dist.ship_detect_km, 1),
             discoveryKm: fmt(dist.engage_dist, 1),
             distNote,
             pk: fmt(pkR.pk, 2),

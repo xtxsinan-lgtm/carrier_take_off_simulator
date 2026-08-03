@@ -75,8 +75,11 @@ struct SaturationResult: Codable {
     var awacs_power: Double?
     var awacs_horizon: Double?
     var awacs_total: Double?
+    var awacs_detect_km: Double?
     var ship_lock: Double?
     var ship_search: Double?
+    var ship_detect_km: Double?
+    var detect_max_km: Double?
     var sam_range: Double?
     var standoff: Double?
     var has_awacs: Bool?

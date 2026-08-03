@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import math
 
+import pytest
+
 from utils.saturation_radar import (
     H_TARGET,
     TECH_MULT,
@@ -59,8 +61,44 @@ def test_estimate_engagement_distance_sam_limited():
         standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=40,
     )
     assert r['has_awacs'] is True
+    assert r['ship_detect_km'] == r['ship_search']
+    assert r['awacs_detect_km'] == r['awacs_total']
+    assert r['detect_max_km'] == max(r['awacs_detect_km'], r['ship_detect_km'])
     assert r['engage_dist'] == 40
     assert binding_limit_label(r) == '拦截弹射程'
+
+
+def test_estimate_engagement_distance_with_awacs_uses_max_then_sam():
+    """有预警机时：交战距离 = min(max(预警机总探测, 舰载探测), 拦截弹射程)。"""
+    r = estimate_engagement_distance(
+        rcs=0.5, traj='high', awacs_area=8, awacs_type='aesa',
+        standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=1000,
+    )
+    assert r['engage_dist'] == pytest.approx(
+        min(max(r['awacs_total'], r['ship_search']), r['sam_range'])
+    )
+
+
+def test_engage_dist_uses_max_of_sensors_awacs_farther():
+    """预警机总探测 > 舰载探测且二者均小于射程时：交战距离取预警机一路。"""
+    r = estimate_engagement_distance(
+        rcs=0.5, traj='high', awacs_area=8, awacs_type='aesa',
+        standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=1000,
+    )
+    assert r['awacs_total'] > r['ship_search']
+    assert r['engage_dist'] == pytest.approx(r['awacs_total'])
+    assert binding_limit_label(r) == '预警机雷达探测距离'
+
+
+def test_engage_dist_uses_max_of_sensors_ship_farther():
+    """舰载探测 > 预警机总探测且二者均小于射程时：交战距离取舰载一路（而非二者取小）。"""
+    r = estimate_engagement_distance(
+        rcs=0.5, traj='high', awacs_area=0.5, awacs_type='mechanical',
+        standoff_km=0, ship_area=1000, ship_type='gan_aesa', sam_range_km=5000,
+    )
+    assert r['ship_search'] > r['awacs_total']
+    assert r['engage_dist'] == pytest.approx(r['ship_search'])
+    assert binding_limit_label(r) == '舰载雷达探测距离'
 
 
 def test_target_altitude_m():
@@ -71,7 +109,7 @@ def test_target_altitude_m():
 
 
 def test_estimate_no_awacs_uses_ship_search_and_horizon():
-    """无预警机时：交战距离 = min(舰载探测, 拦截弹射程)，且不使用预警机总探测。"""
+    """无预警机时：交战距离 = min(舰载探测, 拦截弹射程)，且不使用预警机探测。"""
     r = estimate_engagement_distance(
         rcs=0.5, traj='sea', awacs_area=8, awacs_type='aesa',
         standoff_km=150, ship_area=12, ship_type='aesa', sam_range_km=200,
@@ -84,7 +122,9 @@ def test_estimate_no_awacs_uses_ship_search_and_horizon():
     assert r['awacs_horizon'] == 0.0
     assert r['awacs_detect'] == 0.0
     assert r['awacs_total'] == 0.0
-    assert binding_limit_label(r) != '预警机总探测距离'
+    assert r['awacs_detect_km'] == 0.0
+    assert r['detect_max_km'] == r['ship_detect_km'] == r['ship_search']
+    assert binding_limit_label(r) != '预警机雷达探测距离'
 
 
 def test_estimate_no_awacs_sea_shorter_horizon_than_high():

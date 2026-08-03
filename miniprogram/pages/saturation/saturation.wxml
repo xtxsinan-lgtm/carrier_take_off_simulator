@@ -114,9 +114,18 @@
     <view class="btn cyan" bindtap="onEstimateDistanceAndPk">◈ 估算交战距离与拦截率</view>
     <view class="note">{{distNote}}</view>
     <view class="note">{{pkNote}}</view>
+    <view class="note">交战距离 = min( max(预警机雷达探测距离, 舰载雷达探测距离), 拦截弹射程 )。拦截仿真按该交战距离作为来袭弹发现/开火起始距离。</view>
 
     <view class="field">
-      <view class="field-label"><text>雷达发现距离</text><text class="unit">km</text></view>
+      <view class="field-label"><text>预警机雷达探测距离</text><text class="unit">km</text></view>
+      <input class="input" type="digit" value="{{awacsDetectKm}}" disabled="true"/>
+    </view>
+    <view class="field">
+      <view class="field-label"><text>舰载雷达探测距离</text><text class="unit">km</text></view>
+      <input class="input" type="digit" value="{{shipDetectKm}}" disabled="true"/>
+    </view>
+    <view class="field">
+      <view class="field-label"><text>交战距离</text><text class="unit">km</text></view>
       <input class="input" type="digit" value="{{discoveryKm}}" data-key="discoveryKm" bindinput="onField"/>
     </view>
     <view class="field">

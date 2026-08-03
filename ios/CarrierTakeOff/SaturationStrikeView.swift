@@ -58,8 +58,13 @@ struct SaturationStrikeView: View {
                     if !vm.pkNote.isEmpty {
                         Text(vm.pkNote).font(.system(size: 10, design: .monospaced)).foregroundStyle(SaturationTheme.textDim)
                     }
+                    Text("交战距离 = min( max(预警机雷达探测距离, 舰载雷达探测距离), 拦截弹射程 )。拦截仿真按该交战距离作为来袭弹发现/开火起始距离。")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(SaturationTheme.textDim)
 
-                    field("雷达发现距离 (km)", text: $vm.discoveryKm)
+                    readonlyField("预警机雷达探测距离 (km)", text: vm.awacsDetectKm)
+                    readonlyField("舰载雷达探测距离 (km)", text: vm.shipDetectKm)
+                    field("交战距离 (km)", text: $vm.discoveryKm)
                     field("单发拦截成功概率", text: $vm.pk)
 
                     Button(vm.running ? "计算中…" : "▶ 运行仿真") {
@@ -158,6 +163,22 @@ struct SaturationStrikeView: View {
                 .overlay(Rectangle().stroke(SaturationTheme.line, lineWidth: 1))
                 .foregroundStyle(SaturationTheme.text)
                 .font(.system(size: 13, design: .monospaced))
+        }
+    }
+
+    /// 只读展示字段（估算结果，如预警机/舰载雷达探测距离），不可编辑。
+    private func readonlyField(_ label: String, text: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(SaturationTheme.textDim)
+            Text(text)
+                .font(.system(size: 13, design: .monospaced))
+                .foregroundStyle(SaturationTheme.cyan)
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(SaturationTheme.panel2)
+                .overlay(Rectangle().stroke(SaturationTheme.line, lineWidth: 1))
         }
     }
 

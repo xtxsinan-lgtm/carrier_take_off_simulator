@@ -28,6 +28,7 @@ page {
 .input, .picker-val {
   background: #0e161b; border: 1px solid #1c2b30; color: #d7e2e4; padding: 14rpx 16rpx; font-size: 26rpx;
 }
+.input[disabled] { color: #3ddad0; background: #0b1216; }
 .btn {
   background: #ffb020; color: #1a1300; text-align: center; padding: 20rpx; font-weight: bold;
   letter-spacing: 4rpx; margin-top: 12rpx; font-size: 26rpx;

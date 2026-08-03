@@ -461,6 +461,7 @@
       {
         "id": "exocet",
         "name": "飞鱼 Exocet MM40 Block3 (法国)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.15,
         "traj": "sea"
@@ -468,6 +469,7 @@
       {
         "id": "harpoon",
         "name": "鱼叉 Harpoon (美国)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.85,
         "rcs": 0.3,
         "traj": "sea"
@@ -475,6 +477,7 @@
       {
         "id": "yj12",
         "name": "鹰击-12 YJ-12 (中国)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.5,
         "rcs": 0.3,
         "traj": "high"
@@ -482,6 +485,7 @@
       {
         "id": "yj18",
         "name": "鹰击-18 YJ-18 (中国, 末端超音速)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.2,
         "traj": "sea"
@@ -489,6 +493,7 @@
       {
         "id": "kalibr",
         "name": "口径 3M-54 Kalibr (俄罗斯)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 2.9,
         "rcs": 0.2,
         "traj": "sea"
@@ -496,6 +501,7 @@
       {
         "id": "brahmos",
         "name": "布拉莫斯 BrahMos (印度/俄罗斯)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.3,
         "traj": "sea"
@@ -503,9 +509,202 @@
       {
         "id": "nsm",
         "name": "海军打击导弹 NSM (挪威, 隐身外形)",
+        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.05,
         "traj": "sea"
+      },
+      {
+        "id": "yj83",
+        "name": "鹰击-83/C-802 YJ-83 (中国)",
+        "notes": "公开资料亚音速掠海反舰弹·射程约180km；部分资料称末端可加速至1.2-1.4Ma；RCS为量级估计",
+        "vm": 0.9,
+        "rcs": 0.2,
+        "traj": "sea"
+      },
+      {
+        "id": "yj62",
+        "name": "鹰击-62 YJ-62 (中国)",
+        "notes": "公开资料亚音速掠海反舰弹·巡航高度30m/末段7-10m·射程约280-400km；RCS为量级估计",
+        "vm": 0.8,
+        "rcs": 0.25,
+        "traj": "sea"
+      },
+      {
+        "id": "yj91",
+        "name": "鹰击-91 YJ-91 (中国·改自Kh-31P)",
+        "notes": "反辐射弹改型反舰弹·末端掠海约1.2m·射程约110km；RCS为量级估计",
+        "vm": 3.5,
+        "rcs": 0.15,
+        "traj": "sea"
+      },
+      {
+        "id": "yj17",
+        "name": "鹰击-17 YJ-17 (中国·高超声速滑翔)",
+        "notes": "2025年阅兵公开的乘波体高超声速滑翔反舰弹·射程约1200km；RCS为滑翔体量级估计",
+        "vm": 8.0,
+        "rcs": 0.1,
+        "traj": "high"
+      },
+      {
+        "id": "yj19",
+        "name": "鹰击-19 YJ-19 (中国·超燃冲压)",
+        "notes": "超燃冲压发动机高超声速反舰弹·2025年阅兵公开·部分资料称可达10Ma以上；RCS为量级估计",
+        "vm": 8.5,
+        "rcs": 0.15,
+        "traj": "high"
+      },
+      {
+        "id": "yj20",
+        "name": "鹰击-20 YJ-20 (中国·高超声速弹道)",
+        "notes": "双锥体高超声速反舰弹道弹·射程约1500-2000km·由055型垂发冷发射；RCS为量级估计",
+        "vm": 10.0,
+        "rcs": 0.1,
+        "traj": "high"
+      },
+      {
+        "id": "yj21",
+        "name": "鹰击-21 YJ-21 (中国·高超声速弹道)",
+        "notes": "准弹道式反舰弹·巡航6Ma/末端10Ma·055型/H-6发射·射程约1500km；RCS为量级估计",
+        "vm": 10.0,
+        "rcs": 0.12,
+        "traj": "high"
+      },
+      {
+        "id": "lrasm",
+        "name": "LRASM AGM-158C (美国)",
+        "notes": "JASSM衍生低RCS隐身反舰弹·多模复合导引头(GPS/INS+成像红外+无源ESM)含自主目标识别；RCS为量级估计",
+        "vm": 0.9,
+        "rcs": 0.04,
+        "traj": "sea"
+      },
+      {
+        "id": "jsm",
+        "name": "JSM联合打击导弹 (挪威)",
+        "notes": "F-35内埋弹舱适配隐身反舰弹·可高-高-低/低-低-低多剖面飞行；RCS为量级估计",
+        "vm": 0.9,
+        "rcs": 0.05,
+        "traj": "sea"
+      },
+      {
+        "id": "zircon",
+        "name": "3M22锆石 Zircon (俄罗斯)",
+        "notes": "超燃冲压高超声速反舰/对陆巡航弹·2023年服役·射程超1000km；RCS为量级估计",
+        "vm": 8.0,
+        "rcs": 0.2,
+        "traj": "high"
+      },
+      {
+        "id": "p500",
+        "name": "P-500玄武岩 Bazalt (俄罗斯)",
+        "notes": "大型冲压反舰弹·巡航高度50-5000m·末端2.0Ma掠海俯冲·射程550km；RCS为量级估计",
+        "vm": 2.5,
+        "rcs": 0.35,
+        "traj": "high"
+      },
+      {
+        "id": "p700",
+        "name": "P-700花岗岩 Granit (俄罗斯)",
+        "notes": "大型冲压反舰弹·高空巡航2.5Ma以上·射程约550-625km；RCS为量级估计",
+        "vm": 2.5,
+        "rcs": 0.35,
+        "traj": "high"
+      },
+      {
+        "id": "p270",
+        "name": "P-270白蛉 Moskit/SS-N-22 (俄罗斯)",
+        "notes": "超低空掠海反舰弹(10-20m/末段小于7m)·高空模式可达3Ma·射程120-250km；RCS为量级估计",
+        "vm": 2.2,
+        "rcs": 0.3,
+        "traj": "sea"
+      },
+      {
+        "id": "kh22",
+        "name": "Kh-22/AS-4厨房 (俄罗斯)",
+        "notes": "大型高空超音速反舰/对陆弹·高空模式爬升27000m后俯冲·射程约600km；RCS为量级估计",
+        "vm": 4.6,
+        "rcs": 0.4,
+        "traj": "high"
+      },
+      {
+        "id": "kh32",
+        "name": "Kh-32 (俄罗斯·Kh-22改进型)",
+        "notes": "Kh-22升级型·升限达40000m·射程约600-1000km；RCS为量级估计",
+        "vm": 4.6,
+        "rcs": 0.4,
+        "traj": "high"
+      },
+      {
+        "id": "kh31",
+        "name": "Kh-31/AS-17小妖精 (俄罗斯)",
+        "notes": "Kh-31A反舰型末端掠海·射程7.5-70km·衍生型号含鹰击-91；RCS为量级估计",
+        "vm": 2.5,
+        "rcs": 0.15,
+        "traj": "sea"
+      },
+      {
+        "id": "kh15",
+        "name": "Kh-15/AS-16厨刀 (俄罗斯)",
+        "notes": "空射弹道式导弹·爬升至40000m后俯冲末端5Ma·射程300km；RCS为量级估计",
+        "vm": 5.0,
+        "rcs": 0.15,
+        "traj": "high"
+      },
+      {
+        "id": "hf2",
+        "name": "雄风二型 Hsiung Feng II (台湾地区)",
+        "notes": "亚音速掠海反舰弹·射程约80km·弹径0.34m；RCS为量级估计",
+        "vm": 0.75,
+        "rcs": 0.2,
+        "traj": "sea"
+      },
+      {
+        "id": "hf3",
+        "name": "雄风三型 Hsiung Feng III (台湾地区)",
+        "notes": "固体助推加液体冲压超音速掠海反舰弹·射程150-300km(增程型更远)；RCS为量级估计",
+        "vm": 2.5,
+        "rcs": 0.25,
+        "traj": "sea"
+      },
+      {
+        "id": "rbs15",
+        "name": "RBS-15 Mk4 Gungnir (瑞典)",
+        "notes": "亚音速掠海反舰弹·惯性/抗干扰GPS/J波段主动雷达制导·射程超300km；RCS为量级估计",
+        "vm": 0.9,
+        "rcs": 0.2,
+        "traj": "sea"
+      },
+      {
+        "id": "taurus350",
+        "name": "Taurus KEPD 350 (德国/瑞典)",
+        "notes": "隐身外形亚音速巡航弹·地形跟踪低空突防(30-40m)·主要用于对陆/大型舰船·射程超500km；RCS为量级估计",
+        "vm": 0.9,
+        "rcs": 0.1,
+        "traj": "sea"
+      },
+      {
+        "id": "quicksink",
+        "name": "Quicksink制导炸弹 (美国)",
+        "notes": "GBU-31/GBU-38 JDAM改装反舰套件(加装雷达+成像红外导引头)·由高空投放滑翔·滑翔射程约74km；RCS为量级估计",
+        "vm": 0.9,
+        "rcs": 0.15,
+        "traj": "high"
+      },
+      {
+        "id": "tasm",
+        "name": "战斧反舰型 Maritime Strike Tomahawk (美国)",
+        "notes": "战斧Block Va海上打击型·GPS/INS加改进导引头可打击海上机动目标·射程约1600km；RCS为量级估计",
+        "vm": 0.75,
+        "rcs": 0.2,
+        "traj": "sea"
+      },
+      {
+        "id": "aargmer",
+        "name": "AGM-88G AARGM-ER (美国)",
+        "notes": "反辐射弹用于压制/摧毁舰载雷达等辐射源·射程约130km；RCS为量级估计",
+        "vm": 2.0,
+        "rcs": 0.07,
+        "traj": "high"
       }
     ],
     "aew": [
@@ -540,6 +739,22 @@
         "area": 6.0,
         "type": "pesa",
         "standoff": 100.0
+      },
+      {
+        "id": "z18j",
+        "name": "直-18J Z-18J预警直升机 (中国)",
+        "notes": "二维X波段有源相控阵可收放雷达天线·公开资料探测距离约200-320km·天线面积由公开外形尺寸推估",
+        "area": 7.0,
+        "type": "aesa",
+        "standoff": 100.0
+      },
+      {
+        "id": "aw101crowsnest",
+        "name": "AW101 Crowsnest预警直升机 (英国)",
+        "notes": "搜水2000(Searchwater 2000)机械扫描雷达加Cerberus任务系统·充气整流罩侧挂收放·取代海王ASaC7·天线面积由公开外形尺寸推估",
+        "area": 4.0,
+        "type": "mechanical",
+        "standoff": 110.0
       }
     ],
     "ship": [
@@ -577,6 +792,265 @@
         "notes": "天线面积由公开外形尺寸推估",
         "area": 6.0,
         "type": "aesa"
+      },
+      {
+        "id": "type054a",
+        "name": "054A护卫舰 (中国·Type 382)",
+        "notes": "Type 382三坐标对海对空雷达·双背靠背平面阵列旋转扫描·天线面积由公开外形尺寸推估",
+        "area": 8.0,
+        "type": "pesa"
+      },
+      {
+        "id": "type054b",
+        "name": "054B护卫舰 (中国)",
+        "notes": "新一代旋转双面S波段AESA加独立X波段AESA·公开资料有限·天线面积为量级推估",
+        "area": 7.0,
+        "type": "aesa"
+      },
+      {
+        "id": "type052c",
+        "name": "052C驱逐舰 (中国·Type 346)",
+        "notes": "「中华神盾」346雷达四面固定阵列·引用3.9x4.6m结构尺寸·早期型多归类为PESA",
+        "area": 18.0,
+        "type": "pesa"
+      },
+      {
+        "id": "type051c",
+        "name": "051C驱逐舰 (中国)",
+        "notes": "引进俄制Fregat-MAE-5三坐标警戒雷达(顶板)配合独立照射雷达制导S-300FM·天线面积由公开外形尺寸推估",
+        "area": 14.0,
+        "type": "pesa"
+      },
+      {
+        "id": "ticonderoga",
+        "name": "提康德罗加级巡洋舰 (美国·SPY-1A/B)",
+        "notes": "SPY-1A/B四面无源相控阵·天线面尺寸3.5x3.5m",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "perry",
+        "name": "佩里级护卫舰 (美国·SPS-49)",
+        "notes": "SPS-49二维搜索雷达机械扫描无三坐标测高功能·天线面积为量级推估",
+        "area": 5.0,
+        "type": "mechanical"
+      },
+      {
+        "id": "constellation",
+        "name": "星座级护卫舰 (美国·SPY-6V3)",
+        "notes": "SPY-6(V)3增强型护卫舰型AESA(EASR)收发组件数少于伯克III型(V)1·天线面积为量级推估",
+        "area": 4.0,
+        "type": "gan_aesa"
+      },
+      {
+        "id": "burke1",
+        "name": "阿利·伯克 Flight I伯克I型 (美国·SPY-1D)",
+        "notes": "与Flight IIA同为SPY-1D雷达阵面尺寸相同",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "burke2",
+        "name": "阿利·伯克 Flight II伯克II型 (美国·SPY-1D)",
+        "notes": "与Flight I/IIA同为SPY-1D雷达阵面尺寸相同",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "sovremenny",
+        "name": "现代级驱逐舰 (俄罗斯·MR-750)",
+        "notes": "MR-750「顶板」三坐标警戒雷达双背靠背频扫阵列·天线面积为量级推估",
+        "area": 16.0,
+        "type": "pesa"
+      },
+      {
+        "id": "udaloy",
+        "name": "无畏级驱逐舰 (俄罗斯·MR-760MA)",
+        "notes": "MR-760MA「顶板」三坐标警戒雷达与现代级同族",
+        "area": 16.0,
+        "type": "pesa"
+      },
+      {
+        "id": "kirov",
+        "name": "基洛夫级巡洋舰 (俄罗斯·MR-800)",
+        "notes": "MR-800「顶对」远程三坐标雷达反射面7.5x8.5m·核动力巡洋舰级超大型天线",
+        "area": 64.0,
+        "type": "pesa"
+      },
+      {
+        "id": "gorshkov",
+        "name": "22350型护卫舰 (俄罗斯·Poliment)",
+        "notes": "5P-20K「波利缅特」四面固定S波段AESA配Redut垂发·天线面积为量级推估",
+        "area": 6.0,
+        "type": "aesa"
+      },
+      {
+        "id": "grigorovich",
+        "name": "11356R型护卫舰 (俄罗斯·Fregat M2EM)",
+        "notes": "Fregat-M2EM三坐标警戒雷达探测战斗机型目标230km/掠海导弹50km",
+        "area": 16.0,
+        "type": "pesa"
+      },
+      {
+        "id": "kolkata",
+        "name": "加尔各答级驱逐舰 (印度·MF-STAR)",
+        "notes": "以色列IAI EL/M-2248 MF-STAR四面固定S波段AESA·天线口径约3m",
+        "area": 7.0,
+        "type": "aesa"
+      },
+      {
+        "id": "delhi",
+        "name": "德里级驱逐舰 (印度·Half Plate)",
+        "notes": "Half Plate(Fregat MR-755M2)三坐标警戒雷达为顶板简化型",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "visakhapatnam",
+        "name": "维沙卡帕特南级驱逐舰 (印度·MF-STAR)",
+        "notes": "沿用MF-STAR为加尔各答级改进型",
+        "area": 7.0,
+        "type": "aesa"
+      },
+      {
+        "id": "nilgiri",
+        "name": "尼尔吉里级护卫舰 (印度·Project 17A)",
+        "notes": "17A型护卫舰采用MF-STAR与加尔各答/维沙卡帕特南级同源",
+        "area": 7.0,
+        "type": "aesa"
+      },
+      {
+        "id": "kongo",
+        "name": "金刚级驱逐舰 (日本·SPY-1D)",
+        "notes": "日本首型宙斯盾舰·SPY-1D四面阵",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "atago",
+        "name": "爱宕级驱逐舰 (日本·SPY-1D V)",
+        "notes": "SPY-1D(V)改进型·阵面尺寸与金刚级相同",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "maya",
+        "name": "摩耶级驱逐舰 (日本·SPY-1D V)",
+        "notes": "与爱宕级同为SPY-1D(V)·具备协同作战能力(CEC)",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "akizuki",
+        "name": "秋月级驱逐舰 (日本·FCS-3A)",
+        "notes": "FCS-3A双波段(C加X)有源相控阵·全球首型实用化氮化镓GaN AESA",
+        "area": 5.0,
+        "type": "gan_aesa"
+      },
+      {
+        "id": "asahi",
+        "name": "朝日级驱逐舰 (日本·OPY-1)",
+        "notes": "OPY-1为FCS-3A双波段配置优化反潜整合·与秋月级同族",
+        "area": 5.0,
+        "type": "gan_aesa"
+      },
+      {
+        "id": "mogami",
+        "name": "最上级护卫舰 (日本·OPY-2)",
+        "notes": "OPY-2 X波段一体化AESA·由OPY-1衍生的独立强化版·隐身桅杆整合",
+        "area": 4.0,
+        "type": "gan_aesa"
+      },
+      {
+        "id": "sejong",
+        "name": "世宗大王级驱逐舰 (韩国·SPY-1D V)",
+        "notes": "Batch I搭载宙斯盾基线7第一阶段加SPY-1D(V)",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "jeongjo",
+        "name": "正祖大王级驱逐舰 (韩国·SPY-1D V)",
+        "notes": "Batch II搭载宙斯盾基线9.C2·雷达仍为SPY-1D(V)非AESA",
+        "area": 12.0,
+        "type": "pesa"
+      },
+      {
+        "id": "chungnam",
+        "name": "忠南级护卫舰 (韩国·FFX Batch III)",
+        "notes": "韩华FFX Batch III国产四面固定数字AESA多功能雷达·天线面积为量级推估",
+        "area": 6.0,
+        "type": "aesa"
+      },
+      {
+        "id": "daegu",
+        "name": "大邱级护卫舰 (韩国·SPS-550K)",
+        "notes": "SPS-550K旋转式线阵AESA(LIG Nex1)·天线尺寸为量级推估",
+        "area": 3.0,
+        "type": "aesa"
+      },
+      {
+        "id": "incheon",
+        "name": "仁川级护卫舰 (韩国·SPS-550K)",
+        "notes": "与大邱级同为SPS-550K旋转式线阵AESA",
+        "area": 3.0,
+        "type": "aesa"
+      },
+      {
+        "id": "horizon",
+        "name": "地平线级驱逐舰 (法国/意大利·EMPAR)",
+        "notes": "EMPAR单面旋转无源相控阵·天线口径约1.5x1.5m·球形整流罩直径5m",
+        "area": 2.25,
+        "type": "pesa"
+      },
+      {
+        "id": "f127",
+        "name": "F127型护卫舰 (德国·在研)",
+        "notes": "采用与伯克III型相同的SPY-6(V)1四面RMA模块化GaN AESA·尚在设计建造阶段预计2033-34年服役",
+        "area": 13.5,
+        "type": "gan_aesa"
+      },
+      {
+        "id": "type26",
+        "name": "26型护卫舰 (英国·Artisan 997)",
+        "notes": "997「工匠」三坐标对空对海雷达·中程搜索用途·天线重约700kg·面积为量级推估",
+        "area": 3.0,
+        "type": "aesa"
+      },
+      {
+        "id": "type31",
+        "name": "31型护卫舰 (英国·NS110)",
+        "notes": "泰雷兹NS110(NS100家族小型号)旋转AESA·天线面积为量级推估",
+        "area": 3.0,
+        "type": "aesa"
+      },
+      {
+        "id": "nansen",
+        "name": "南森级护卫舰 (挪威·SPY-1F)",
+        "notes": "SPY-1F为SPY-1家族小型化版本·适配4000吨级护卫舰·天线面积为量级推估",
+        "area": 4.0,
+        "type": "pesa"
+      },
+      {
+        "id": "fremmit",
+        "name": "FREMM护卫舰意大利型 (意大利·Kronos)",
+        "notes": "徕昂纳多「克罗诺斯」Grand Naval C波段AESA·搜索加火控一体·天线面积为量级推估",
+        "area": 6.0,
+        "type": "aesa"
+      },
+      {
+        "id": "fremmfr",
+        "name": "FREMM护卫舰法国型 (法国·Herakles)",
+        "notes": "泰雷兹「武仙座」Herakles无源相控阵·E/F波段探测距离250-300km·天线面积为量级推估",
+        "area": 5.0,
+        "type": "pesa"
+      },
+      {
+        "id": "bazan",
+        "name": "阿尔瓦罗·巴赞级护卫舰 (西班牙·SPY-1D)",
+        "notes": "F100型护卫舰采用SPY-1D·与提康德罗加/伯克同型阵面尺寸",
+        "area": 12.0,
+        "type": "pesa"
       }
     ],
     "sam": [
@@ -651,6 +1125,96 @@
         "dia": 0.52,
         "guidance": "semi_active",
         "range": 150.0
+      },
+      {
+        "id": "sm2er",
+        "name": "SM-2ER RIM-156标准-2增程型 (美国)",
+        "notes": "公开资料速度/直径/射程；与SM-6共用助推器与弹体",
+        "vi": 3.5,
+        "dia": 0.343,
+        "guidance": "semi_active",
+        "range": 240.0
+      },
+      {
+        "id": "hhq9b",
+        "name": "海红旗-9B HHQ-9B (中国)",
+        "notes": "公开资料速度/直径/射程；主动雷达加被动红外双模末制导增强抗干扰",
+        "vi": 4.4,
+        "dia": 0.56,
+        "guidance": "active_mech",
+        "range": 260.0
+      },
+      {
+        "id": "hhq16f",
+        "name": "海红旗-16F HQ-16FE参考型 (中国)",
+        "notes": "参考出口型HQ-16FE公开参数；射高15m-27km配相控阵雷达跟踪",
+        "vi": 3.0,
+        "dia": 0.34,
+        "guidance": "semi_active",
+        "range": 160.0
+      },
+      {
+        "id": "hq10",
+        "name": "红旗-10 HQ-10舰载型 (中国)",
+        "notes": "红外成像末制导舰载近程点防御弹·自主末制导不依赖照射(按active_mech归类)·射高低至1.5m",
+        "vi": 2.5,
+        "dia": 0.12,
+        "guidance": "active_mech",
+        "range": 9.0
+      },
+      {
+        "id": "rim116",
+        "name": "RIM-116 RAM滚转弹体导弹 (美国)",
+        "notes": "被动射频/红外复合导引自主末制导(按active_mech归类)·Block2性能",
+        "vi": 2.0,
+        "dia": 0.159,
+        "guidance": "active_mech",
+        "range": 15.0
+      },
+      {
+        "id": "hhq16b",
+        "name": "海红旗-16B HHQ-16B (中国)",
+        "notes": "公开资料速度/直径/射程；较HQ-16A增程并改进发动机与弹翼",
+        "vi": 3.0,
+        "dia": 0.34,
+        "guidance": "semi_active",
+        "range": 70.0
+      },
+      {
+        "id": "kmsam",
+        "name": "KM-SAM/天弓 Cheolmae-2 (韩国)",
+        "notes": "与俄罗斯金刚石-安泰协研·主要为陆基中程防空弹·公开资料速度/直径/射程",
+        "vi": 4.5,
+        "dia": 0.275,
+        "guidance": "semi_active",
+        "range": 40.0
+      },
+      {
+        "id": "ksaam",
+        "name": "K-SAAM/海龙 Haeryong (韩国)",
+        "notes": "双模微波/红外复合导引头自主末制导(按active_mech归类)·用于取代RIM-116",
+        "vi": 2.0,
+        "dia": 0.13,
+        "guidance": "active_mech",
+        "range": 20.0
+      },
+      {
+        "id": "aster15",
+        "name": "Aster 15 (法国/欧洲)",
+        "notes": "与Aster 30共用0.18m弹体仅助推器较小·公开资料速度/直径/射程",
+        "vi": 3.5,
+        "dia": 0.18,
+        "guidance": "active_mech",
+        "range": 30.0
+      },
+      {
+        "id": "vlmica",
+        "name": "VL MICA垂直发射型 (法国)",
+        "notes": "MICA陆射垂直发射型·射频型(MICA-RF/EM)加红外型(MICA-IR)并存此处按主动雷达型归类",
+        "vi": 4.0,
+        "dia": 0.16,
+        "guidance": "active_mech",
+        "range": 20.0
       }
     ]
   },
@@ -719,7 +1283,7 @@
     "utils/propeller_thrust.py": "\"\"\"涡桨 / 倾转旋翼：由轴功率与桨盘面积估算推力（含短舱遮挡）。\"\"\"\nfrom __future__ import annotations\n\nimport math\n\n# 默认桨盘品质因数（倾转旋翼悬停量级估计）\nDEFAULT_FIGURE_OF_MERIT = 0.78\n# 默认短舱/桨毂对桨盘的遮挡面积比（推力等效折减）\nDEFAULT_NACELLE_BLOCKAGE_FRAC = 0.10\n\n\ndef calc_prop_disk_area_m2(diameter_m: float, n_rotors: int = 2) -> float:\n    \"\"\"由桨盘直径与旋翼数量计算总桨盘面积，m²。\"\"\"\n    if diameter_m <= 0:\n        raise ValueError('桨盘直径必须为正')\n    if n_rotors < 1:\n        raise ValueError('旋翼数量至少为 1')\n    r = diameter_m / 2.0\n    return n_rotors * math.pi * r * r\n\n\ndef calc_effective_disk_area_m2(\n    disk_area_m2: float,\n    nacelle_blockage_frac: float = DEFAULT_NACELLE_BLOCKAGE_FRAC,\n) -> float:\n    \"\"\"扣除短舱遮挡后的有效桨盘面积，m²。\"\"\"\n    if disk_area_m2 <= 0:\n        raise ValueError('桨盘面积必须为正')\n    frac = min(max(float(nacelle_blockage_frac), 0.0), 0.5)\n    return disk_area_m2 * (1.0 - frac)\n\n\ndef calc_ideal_static_thrust_n(power_w: float, rho: float, disk_area_m2: float) -> float:\n    \"\"\"动量理论静推力：T = (P² · 2ρA)^(1/3)。\"\"\"\n    if power_w <= 0 or rho <= 0 or disk_area_m2 <= 0:\n        return 0.0\n    return (power_w * power_w * 2.0 * rho * disk_area_m2) ** (1.0 / 3.0)\n\n\ndef calc_ideal_thrust_with_axial_speed_n(\n    power_w: float,\n    rho: float,\n    disk_area_m2: float,\n    v_axial_mps: float,\n) -> float:\n    \"\"\"\n    轴向来流下的理想推力（动量理论）。\n\n    功率关系：P = T · (V/2 + sqrt((V/2)² + T/(2ρA)))。\n    V=0 时退化为静推力闭式解；V>0 时用牛顿迭代求 T。\n    \"\"\"\n    if power_w <= 0 or rho <= 0 or disk_area_m2 <= 0:\n        return 0.0\n    v = max(float(v_axial_mps), 0.0)\n    if v < 1e-9:\n        return calc_ideal_static_thrust_n(power_w, rho, disk_area_m2)\n\n    kappa = 2.0 * rho * disk_area_m2\n    # 初值：静推力与功率受限推力的较小者量级\n    t = min(calc_ideal_static_thrust_n(power_w, rho, disk_area_m2), power_w / max(v, 1e-3))\n    t = max(t, 1.0)\n\n    for _ in range(40):\n        u = 0.5 * v\n        root = math.sqrt(u * u + t / kappa)\n        f = t * (u + root) - power_w\n        # d/dt [t*(u+sqrt(u²+t/κ))] = u + root + t/(2κ·root)\n        df = u + root + t / (2.0 * kappa * root)\n        if abs(df) < 1e-12:\n            break\n        t_new = t - f / df\n        if t_new <= 0:\n            t_new = 0.5 * t\n        if abs(t_new - t) < 1e-3:\n            return t_new\n        t = t_new\n    return max(t, 0.0)\n\n\ndef calc_propeller_thrust_n(\n    power_w: float,\n    rho: float,\n    disk_area_m2: float,\n    v_axial_mps: float = 0.0,\n    figure_of_merit: float = DEFAULT_FIGURE_OF_MERIT,\n    nacelle_blockage_frac: float = DEFAULT_NACELLE_BLOCKAGE_FRAC,\n) -> float:\n    \"\"\"\n    实际可用推力：理想动量推力 × 品质因数，桨盘面积先扣除短舱遮挡。\n\n    figure_of_merit 综合桨叶型阻、非理想诱导等损失（典型倾转旋翼 0.75–0.82）。\n    \"\"\"\n    a_eff = calc_effective_disk_area_m2(disk_area_m2, nacelle_blockage_frac)\n    t_ideal = calc_ideal_thrust_with_axial_speed_n(power_w, rho, a_eff, v_axial_mps)\n    fm = min(max(float(figure_of_merit), 0.1), 1.0)\n    return fm * t_ideal\n",
     "utils/specs.py": "\"\"\"舰载机 / 航母参数规格。\"\"\"\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\n\nfrom utils.ski_jump_geometry import compute_ski_jump_arc\n\nPILOT_LOAD_KG = 100.0\nA2A_MISSILE_COUNT = 4\n\n# 数据库 type_label：垂直/短距起降（VTOL/STOVL）与倾转旋翼\nVTOL_TYPE_LABEL = 'v/stol'\nTILTROTOR_TYPE_LABEL = 'tiltrotor'\nCONVENTIONAL_TYPE_LABEL = 'conventional'\n\n# 需要主喷管尾流波及模型的 Web/仿真模式（须配合 VTOL 机型）\nPLUME_SIMULATION_MODES = frozenset({'short_takeoff', 'short_ski_jump'})\n\n\ndef is_vtol_aircraft(aircraft: AircraftSpec | str) -> bool:\n    \"\"\"是否为 VTOL/STOVL 机型（type_label == 'v/stol'）。\"\"\"\n    label = aircraft if isinstance(aircraft, str) else aircraft.type_label\n    return label == VTOL_TYPE_LABEL\n\n\ndef is_tiltrotor_aircraft(aircraft: AircraftSpec | str) -> bool:\n    \"\"\"是否为倾转旋翼机型（type_label == 'tiltrotor'）。\"\"\"\n    label = aircraft if isinstance(aircraft, str) else aircraft.type_label\n    return label == TILTROTOR_TYPE_LABEL\n\n\ndef is_conventional_aircraft(aircraft: AircraftSpec | str) -> bool:\n    \"\"\"是否为常规固定翼舰载机。\"\"\"\n    label = aircraft if isinstance(aircraft, str) else aircraft.type_label\n    return label == CONVENTIONAL_TYPE_LABEL\n\n\ndef simulation_uses_plume_model(mode: str, aircraft: AircraftSpec) -> bool:\n    \"\"\"当前仿真是否应计算主喷管尾流波及范围（仅 VTOL + 短距模式）。\"\"\"\n    return mode in PLUME_SIMULATION_MODES and is_vtol_aircraft(aircraft)\n\n\n@dataclass(frozen=True)\nclass AircraftSpec:\n    id: str\n    name: str\n    type_label: str  # 'conventional' | 'v/stol' | 'tiltrotor'\n    mtow_kg: float\n    empty_kg: float\n    internal_fuel_kg: float\n    max_payload_kg: float  # 最大外挂/载弹量（资料值，非 MTOW 推算）\n    bvr_missile: str\n    missile_mass_kg: float\n    sweep_le_deg: float\n    wingspan_m: float\n    wing_area_m2: float\n    wing_height_m: float\n    cd0: float = 0.039\n    t_max_sl_n: float | None = None\n    t_main_stovl_sl_n: float | None = None\n    t_liftfan_sl_n: float | None = None\n    t_rollposts_sl_n: float | None = None\n    exhaust_mdot_kg_s: float | None = None\n    exhaust_d0_m: float | None = None\n    exhaust_height_m: float | None = None\n    # 倾转旋翼 / 涡桨：海平面总轴功率与桨盘直径（推力由功率换算）\n    shaft_power_sl_w: float | None = None\n    prop_diameter_m: float | None = None\n    nacelle_blockage_frac: float | None = None\n    notes: str = ''\n\n    @property\n    def is_vtol(self) -> bool:\n        \"\"\"VTOL/STOVL 机型（如 F-35B、AV-8B）。\"\"\"\n        return is_vtol_aircraft(self)\n\n    @property\n    def is_tiltrotor(self) -> bool:\n        \"\"\"倾转旋翼机型（如 MV-22）。\"\"\"\n        return is_tiltrotor_aircraft(self)\n\n    @property\n    def has_lift_fan(self) -> bool:\n        \"\"\"是否配备升力风扇（F-35B 有，鹞式/AV-8B 无）。\"\"\"\n        return bool(self.t_liftfan_sl_n and self.t_liftfan_sl_n > 0)\n\n    def exhaust_plume_params(self):\n        \"\"\"构造本机尾流模型参数；未填 ṁ/d₀ 时用机型默认值或 Pegasus/F-35B 回退。\"\"\"\n        from utils.exhaust_plume import (\n            EXHAUST_D0_M,\n            EXHAUST_HEIGHT_M,\n            EXHAUST_MDOT_KG_S,\n            ExhaustPlumeParams,\n            PEGASUS_AIRFLOW_LB_S,\n            calc_exhaust_d0_from_engine_diameter,\n            calc_exhaust_u0_from_thrust_mdot,\n            lb_s_to_kg_s,\n        )\n\n        thrust = self.t_main_stovl_sl_n\n        if thrust is None or thrust <= 0:\n            return ExhaustPlumeParams()\n\n        if self.exhaust_mdot_kg_s is not None:\n            mdot = self.exhaust_mdot_kg_s\n        elif self.id == 'AV-8B':\n            mdot = lb_s_to_kg_s(PEGASUS_AIRFLOW_LB_S)\n        else:\n            mdot = EXHAUST_MDOT_KG_S\n\n        u0 = calc_exhaust_u0_from_thrust_mdot(thrust, mdot)\n        d0 = self.exhaust_d0_m\n        if d0 is None and self.id == 'AV-8B':\n            d0 = calc_exhaust_d0_from_engine_diameter(1.219)\n        if d0 is None:\n            d0 = EXHAUST_D0_M\n        height = self.exhaust_height_m if self.exhaust_height_m is not None else self.wing_height_m\n        if height is None:\n            height = EXHAUST_HEIGHT_M\n        return ExhaustPlumeParams(\n            mdot_kg_s=mdot,\n            u0_mps=u0,\n            d0_m=d0,\n            height_m=height,\n        )\n\n    @property\n    def a2a_mass_kg(self) -> float:\n        return (self.empty_kg + self.internal_fuel_kg\n                + A2A_MISSILE_COUNT * self.missile_mass_kg + PILOT_LOAD_KG)\n\n\n@dataclass(frozen=True)\nclass CarrierSpec:\n    id: str\n    name: str\n    nation: str\n    max_speed_kt: float\n    ski_jump: bool\n    total_deck_length_m: float\n    ski_jump_angle_deg: float = 0.0\n    ski_jump_height_m: float | None = None\n    f35b_capable: bool = False\n    notes: str = ''\n    deck_length_source: str = ''\n\n    def deck_wind_kt(self) -> float:\n        return self.max_speed_kt\n\n    def ski_jump_geom(self):\n        if not self.ski_jump:\n            return None\n        return compute_ski_jump_arc(self.ski_jump_angle_deg, lip_height_m=self.ski_jump_height_m)\n\n    def ski_jump_arc_m(self) -> float:\n        g = self.ski_jump_geom()\n        return g.arc_length_m if g else 0.0\n\n    def ski_jump_horizontal_m(self) -> float:\n        g = self.ski_jump_geom()\n        return g.horizontal_m if g else 0.0\n\n    def deck_fits_distance(self, required_m: float) -> bool:\n        return required_m <= self.total_deck_length_m\n",
     "utils/saturation_presets.py": "\"\"\"饱和打击仿真的公开资料预设（反舰弹 / 预警机 / 舰载雷达 / 防空弹）。\n\n型号列表以导弹库与雷达库 CSV 为数据源：\n  data/saturation_missile_database.csv（asm / sam）\n  data/saturation_radar_database.csv（aew / ship）\n前端经 build_all → data.json 的 saturation_presets 自动同步。\n\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\nfrom typing import Any\n\nfrom utils.database_csv import load_saturation_presets_csv\nfrom utils.paths import SATURATION_MISSILE_CSV, SATURATION_RADAR_CSV\n\n\ndef load_presets(\n    missile_path: str | Path | None = None,\n    radar_path: str | Path | None = None,\n) -> dict[str, list[dict[str, Any]]]:\n    \"\"\"从导弹库 + 雷达库加载四类预设；任一文件不存在时返回空分组（如 Pyodide 环境）。\"\"\"\n    m_path = Path(missile_path) if missile_path is not None else SATURATION_MISSILE_CSV\n    r_path = Path(radar_path) if radar_path is not None else SATURATION_RADAR_CSV\n    if not m_path.is_file() or not r_path.is_file():\n        return {'asm': [], 'aew': [], 'ship': [], 'sam': []}\n    return load_saturation_presets_csv(m_path, r_path)\n\n\ndef get_preset_by_id(presets: list[dict[str, Any]], preset_id: str) -> dict[str, Any] | None:\n    \"\"\"按 id 查找预设；找不到返回 None。\"\"\"\n    for item in presets:\n        if item['id'] == preset_id:\n            return item\n    return None\n\n\ndef build_saturation_presets_payload(\n    missile_path: str | Path | None = None,\n    radar_path: str | Path | None = None,\n) -> dict[str, list[dict[str, Any]]]:\n    \"\"\"构建前端/小程序/iOS 共用的饱和打击预设目录（源自双 CSV）。\"\"\"\n    data = load_presets(missile_path, radar_path)\n    return {\n        'asm': list(data['asm']),\n        'aew': list(data['aew']),\n        'ship': list(data['ship']),\n        'sam': list(data['sam']),\n    }\n\n\n# 兼容旧导入名：模块加载时从 CSV 填充（CLI/测试）\n_loaded = load_presets()\nASM_PRESETS: list[dict[str, Any]] = list(_loaded['asm'])\nAEW_PRESETS: list[dict[str, Any]] = list(_loaded['aew'])\nSHIP_PRESETS: list[dict[str, Any]] = list(_loaded['ship'])\nSAM_PRESETS: list[dict[str, Any]] = list(_loaded['sam'])\n",
-    "utils/saturation_radar.py": "\"\"\"饱和打击用简化雷达方程估算（探测距离 / 火控锁定 / 单发 Pk）。\n\n仅为演示用启发式模型，不对应任何真实型号实测参数。\n\"\"\"\nfrom __future__ import annotations\n\nimport math\nfrom typing import Any\n\n# 雷达体制灵敏度倍率（相对机械扫描）\nTECH_MULT: dict[str, float] = {\n    'mechanical': 1.0,\n    'pesa': 1.43,\n    'aesa': 2.10,\n    'gan_aesa': 3.74,\n}\n\n# 假设高度（米）\nH_AWACS = 9000.0  # 预警机/预警直升机典型巡航高度\nH_SHIP_RADAR = 25.0  # 舰载对空搜索雷达天线典型高度\nH_TARGET: dict[str, float] = {\n    'sea': 10.0,       # 掠海反舰导弹合理估计掠海高度\n    'high': 12000.0,   # 高空巡航反舰导弹合理估计高度（原 15000 调整为更贴近实际的 12000）\n}\n\n# 火控锁定距离占搜索探测距离的比例\nLOCK_FRACTION = 0.65\n\n# Pk 基线（相对中等 RCS、无机动目标）\nPK0 = 0.75\n\n\ndef clamp(x: float, lo: float, hi: float) -> float:\n    \"\"\"将数值限制在 [lo, hi]。\"\"\"\n    return max(lo, min(hi, x))\n\n\ndef radar_horizon_km(h1: float, h2: float) -> float:\n    \"\"\"地球曲率雷达视距（公里）；h1/h2 为天线与目标高度（米）。\"\"\"\n    return 4.12 * (math.sqrt(h1) + math.sqrt(h2))\n\n\ndef power_range_km(\n    ref_range_km: float,\n    area: float,\n    ref_area: float,\n    radar_type: str,\n    rcs: float,\n    ref_rcs: float,\n) -> float:\n    \"\"\"功率受限探测距离（公里），按雷达方程比例关系缩放。\"\"\"\n    mult = TECH_MULT.get(radar_type, 1.0)\n    return ref_range_km * math.sqrt(area / ref_area) * (rcs / ref_rcs) ** 0.25 * mult\n\n\ndef target_altitude_m(traj: str) -> float:\n    \"\"\"按弹道类型返回目标高度估计（米）；未知弹道类型按高空弹道回退。\"\"\"\n    return H_TARGET.get(traj, H_TARGET['high'])\n\n\ndef radar_gain_factor(area: float, radar_type: str, ref_area: float) -> float:\n    \"\"\"天线面积 + 体制的增益系数，归一到参考面积附近约 1.0。\"\"\"\n    mult = TECH_MULT.get(radar_type, 1.0)\n    g = math.sqrt(area / ref_area) * mult\n    return clamp(0.55 + 0.45 * min(g, 1.6), 0.55, 1.25)\n\n\ndef estimate_engagement_distance(\n    rcs: float,\n    traj: str,\n    awacs_area: float,\n    awacs_type: str,\n    standoff_km: float,\n    ship_area: float,\n    ship_type: str,\n    sam_range_km: float,\n    has_awacs: bool = True,\n) -> dict[str, Any]:\n    \"\"\"估算预警机探测、舰载火控锁定与最终交战距离（公里）。\n\n    - ``has_awacs=True``（默认，有预警机）：交战距离取\n      ``min(预警机总探测距离, 舰载火控锁定距离, 拦截弹射程)``。\n    - ``has_awacs=False``（无预警机）：不再有预警机前出探测，发现/交战距离仅由\n      舰载雷达决定 —— 先取 ``ship_search = min(舰载雷达功率探测距离, 地球曲率雷达视距)``，\n      再取 ``engage_dist = min(ship_search, 拦截弹射程)``（不再乘火控锁定折损系数，\n      因为此时「发现」与「交战」都受限于同一部舰载雷达，直接取探测距离与射程的较小值）。\n    \"\"\"\n    rcs = max(0.001, float(rcs))\n    h_target = target_altitude_m(traj)\n    awacs_area = max(0.1, float(awacs_area))\n    standoff_km = max(0.0, float(standoff_km))\n    ship_area = max(0.1, float(ship_area))\n    sam_range_km = max(0.1, float(sam_range_km))\n    has_awacs = bool(has_awacs)\n\n    # 舰载雷达：参考 10 m² 天线对 5 m² RCS 探测 200 km（示意）\n    ship_power = power_range_km(200.0, ship_area, 10.0, ship_type, rcs, 5.0)\n    ship_horizon = radar_horizon_km(H_SHIP_RADAR, h_target)\n    ship_search = min(ship_power, ship_horizon)\n    ship_lock = ship_search * LOCK_FRACTION\n\n    if has_awacs:\n        # 预警机：参考 8 m² 天线对 5 m² RCS 探测 400 km（示意）\n        awacs_power = power_range_km(400.0, awacs_area, 8.0, awacs_type, rcs, 5.0)\n        awacs_horizon = radar_horizon_km(H_AWACS, h_target)\n        awacs_detect = min(awacs_power, awacs_horizon)\n        awacs_total = standoff_km + awacs_detect\n        engage_dist = min(awacs_total, ship_lock, sam_range_km)\n    else:\n        # 无预警机：不使用预警机前出+探测（awacs_* 置零便于诊断/前端展示），\n        # 交战距离直接取「舰载雷达探测」与「拦截弹射程」的最小值。\n        awacs_power = 0.0\n        awacs_horizon = 0.0\n        awacs_detect = 0.0\n        awacs_total = 0.0\n        standoff_km = 0.0\n        engage_dist = min(ship_search, sam_range_km)\n\n    return {\n        'awacs_power': awacs_power,\n        'awacs_horizon': awacs_horizon,\n        'awacs_detect': awacs_detect,\n        'awacs_total': awacs_total,\n        'ship_power': ship_power,\n        'ship_horizon': ship_horizon,\n        'ship_search': ship_search,\n        'ship_lock': ship_lock,\n        'sam_range': sam_range_km,\n        'engage_dist': engage_dist,\n        'standoff': standoff_km,\n        'has_awacs': has_awacs,\n        'h_target_m': h_target,\n    }\n\n\ndef estimate_pk(\n    vm_ma: float,\n    vi_ma: float,\n    rcs: float,\n    traj: str,\n    ship_area: float,\n    ship_type: str,\n    interceptor_dia_m: float,\n    seeker_type: str,\n) -> dict[str, Any]:\n    \"\"\"估算单发拦截成功概率 Pk 及各因子分解（不含抗干扰/干扰能力）。\"\"\"\n    vm_ma = max(0.1, float(vm_ma))\n    vi_ma = max(0.1, float(vi_ma))\n    rcs = max(0.001, float(rcs))\n    ship_area = max(0.1, float(ship_area))\n    dia = max(0.05, float(interceptor_dia_m))\n\n    # 速度比：来袭越快相对拦截弹越难末端修正\n    ratio = vi_ma / vm_ma\n    speed_factor = clamp(0.55 + 0.5 * min(ratio / 1.3, 1.2), 0.5, 1.1)\n\n    ship_radar_factor = radar_gain_factor(ship_area, ship_type, 10.0)\n\n    if seeker_type == 'semi_active':\n        # 半主动依赖舰载照射，多目标能力通常弱于主动雷达\n        seeker_factor = ship_radar_factor * 0.9\n    else:\n        seeker_area = math.pi * (dia / 2.0) ** 2\n        seeker_tech = 'aesa' if seeker_type == 'active_aesa' else 'mechanical'\n        # 参考：约 20 cm 口径导引头孔径\n        seeker_factor = radar_gain_factor(seeker_area, seeker_tech, 0.03)\n\n    rcs_factor = clamp(1.0 + 0.15 * math.log10(rcs / 0.5), 0.55, 1.15)\n    traj_factor = 0.85 if traj == 'sea' else 1.0\n\n    pk = clamp(\n        PK0 * speed_factor * ship_radar_factor * seeker_factor * rcs_factor * traj_factor,\n        0.03,\n        0.97,\n    )\n    return {\n        'pk': pk,\n        'speed_factor': speed_factor,\n        'ship_radar_factor': ship_radar_factor,\n        'seeker_factor': seeker_factor,\n        'rcs_factor': rcs_factor,\n        'traj_factor': traj_factor,\n    }\n\n\ndef binding_limit_label(result: dict[str, Any]) -> str:\n    \"\"\"返回交战距离受限于哪一项（中文标签）。\n\n    用 ``math.isclose`` 做浮点近似比较，避免 ``==`` 在极端参数下因浮点误差误判；\n    优先按 ``has_awacs`` 区分有/无预警机两条路径的判定顺序。\n    \"\"\"\n    engage = result['engage_dist']\n    has_awacs = bool(result.get('has_awacs', True))\n    if has_awacs and math.isclose(engage, result['awacs_total'], rel_tol=0, abs_tol=1e-9):\n        return '预警机总探测距离'\n    if (not has_awacs) and math.isclose(engage, result['ship_search'], rel_tol=0, abs_tol=1e-9):\n        return '舰载雷达探测距离（功率/视距）'\n    if math.isclose(engage, result['ship_lock'], rel_tol=0, abs_tol=1e-9):\n        return '舰载火控锁定距离'\n    return '拦截弹射程'\n",
+    "utils/saturation_radar.py": "\"\"\"饱和打击用简化雷达方程估算（探测距离 / 火控锁定 / 单发 Pk）。\n\n仅为演示用启发式模型，不对应任何真实型号实测参数。\n\"\"\"\nfrom __future__ import annotations\n\nimport math\nfrom typing import Any\n\n# 雷达体制灵敏度倍率（相对机械扫描）\nTECH_MULT: dict[str, float] = {\n    'mechanical': 1.0,\n    'pesa': 1.43,\n    'aesa': 2.10,\n    'gan_aesa': 3.74,\n}\n\n# 假设高度（米）\nH_AWACS = 9000.0  # 预警机/预警直升机典型巡航高度\nH_SHIP_RADAR = 25.0  # 舰载对空搜索雷达天线典型高度\nH_TARGET: dict[str, float] = {\n    'sea': 10.0,       # 掠海反舰导弹合理估计掠海高度\n    'high': 12000.0,   # 高空巡航反舰导弹合理估计高度（原 15000 调整为更贴近实际的 12000）\n}\n\n# 火控锁定距离占搜索探测距离的比例\nLOCK_FRACTION = 0.65\n\n# Pk 基线（相对中等 RCS、无机动目标）\nPK0 = 0.75\n\n\ndef clamp(x: float, lo: float, hi: float) -> float:\n    \"\"\"将数值限制在 [lo, hi]。\"\"\"\n    return max(lo, min(hi, x))\n\n\ndef radar_horizon_km(h1: float, h2: float) -> float:\n    \"\"\"地球曲率雷达视距（公里）；h1/h2 为天线与目标高度（米）。\"\"\"\n    return 4.12 * (math.sqrt(h1) + math.sqrt(h2))\n\n\ndef power_range_km(\n    ref_range_km: float,\n    area: float,\n    ref_area: float,\n    radar_type: str,\n    rcs: float,\n    ref_rcs: float,\n) -> float:\n    \"\"\"功率受限探测距离（公里），按雷达方程比例关系缩放。\"\"\"\n    mult = TECH_MULT.get(radar_type, 1.0)\n    return ref_range_km * math.sqrt(area / ref_area) * (rcs / ref_rcs) ** 0.25 * mult\n\n\ndef target_altitude_m(traj: str) -> float:\n    \"\"\"按弹道类型返回目标高度估计（米）；未知弹道类型按高空弹道回退。\"\"\"\n    return H_TARGET.get(traj, H_TARGET['high'])\n\n\ndef radar_gain_factor(area: float, radar_type: str, ref_area: float) -> float:\n    \"\"\"天线面积 + 体制的增益系数，归一到参考面积附近约 1.0。\"\"\"\n    mult = TECH_MULT.get(radar_type, 1.0)\n    g = math.sqrt(area / ref_area) * mult\n    return clamp(0.55 + 0.45 * min(g, 1.6), 0.55, 1.25)\n\n\ndef estimate_engagement_distance(\n    rcs: float,\n    traj: str,\n    awacs_area: float,\n    awacs_type: str,\n    standoff_km: float,\n    ship_area: float,\n    ship_type: str,\n    sam_range_km: float,\n    has_awacs: bool = True,\n) -> dict[str, Any]:\n    \"\"\"分别估算舰载/预警机雷达探测距离，并据此推算最终交战距离（公里）。\n\n    两路探测独立估算：\n\n    - 舰载雷达探测距离 ``ship_detect_km = min(舰载雷达功率探测距离 ship_power,\n      地球曲率雷达视距 ship_horizon)``（即 ``ship_search``）。\n    - 预警机雷达探测距离 ``awacs_detect_km``：``has_awacs=True`` 时为\n      ``预警机前出距离 standoff_km + min(预警机雷达功率探测距离 awacs_power,\n      预警机地球曲率雷达视距 awacs_horizon)``（即 ``awacs_total``）；\n      ``has_awacs=False``（无预警机）时记为 0（同时不再计入预警机前出距离）。\n\n    交战距离取两路探测中「更远」的一路（哪路先发现即以其为准，代表更好的态势提示/引导），\n    再与拦截弹射程取较小值：\n\n    ``engage_dist = min(max(awacs_detect_km, ship_detect_km), sam_range_km)``\n\n    注：原「舰载火控锁定距离」``ship_lock = ship_detect_km * LOCK_FRACTION``\n    仍会计算并在返回值中提供，仅供界面展示/诊断参考，不再参与 ``engage_dist`` 的计算。\n    \"\"\"\n    rcs = max(0.001, float(rcs))\n    h_target = target_altitude_m(traj)\n    awacs_area = max(0.1, float(awacs_area))\n    standoff_km = max(0.0, float(standoff_km))\n    ship_area = max(0.1, float(ship_area))\n    sam_range_km = max(0.1, float(sam_range_km))\n    has_awacs = bool(has_awacs)\n\n    # 舰载雷达：参考 10 m² 天线对 5 m² RCS 探测 200 km（示意）\n    ship_power = power_range_km(200.0, ship_area, 10.0, ship_type, rcs, 5.0)\n    ship_horizon = radar_horizon_km(H_SHIP_RADAR, h_target)\n    ship_search = min(ship_power, ship_horizon)\n    ship_detect_km = ship_search\n    # 仅供展示/诊断，不参与 engage_dist 计算\n    ship_lock = ship_search * LOCK_FRACTION\n\n    if has_awacs:\n        # 预警机：参考 8 m² 天线对 5 m² RCS 探测 400 km（示意）\n        awacs_power = power_range_km(400.0, awacs_area, 8.0, awacs_type, rcs, 5.0)\n        awacs_horizon = radar_horizon_km(H_AWACS, h_target)\n        awacs_detect = min(awacs_power, awacs_horizon)\n        awacs_total = standoff_km + awacs_detect\n        awacs_detect_km = awacs_total\n    else:\n        # 无预警机：不使用预警机前出+探测（awacs_* 置零便于诊断/前端展示）\n        awacs_power = 0.0\n        awacs_horizon = 0.0\n        awacs_detect = 0.0\n        awacs_total = 0.0\n        awacs_detect_km = 0.0\n        standoff_km = 0.0\n\n    # 交战距离＝两路探测取更远者（更好的态势提示），再与拦截弹射程取较小值\n    detect_max_km = max(awacs_detect_km, ship_detect_km)\n    engage_dist = min(detect_max_km, sam_range_km)\n\n    return {\n        'awacs_power': awacs_power,\n        'awacs_horizon': awacs_horizon,\n        'awacs_detect': awacs_detect,\n        'awacs_total': awacs_total,\n        'awacs_detect_km': awacs_detect_km,\n        'ship_power': ship_power,\n        'ship_horizon': ship_horizon,\n        'ship_search': ship_search,\n        'ship_detect_km': ship_detect_km,\n        'ship_lock': ship_lock,\n        'detect_max_km': detect_max_km,\n        'sam_range': sam_range_km,\n        'engage_dist': engage_dist,\n        'standoff': standoff_km,\n        'has_awacs': has_awacs,\n        'h_target_m': h_target,\n    }\n\n\ndef estimate_pk(\n    vm_ma: float,\n    vi_ma: float,\n    rcs: float,\n    traj: str,\n    ship_area: float,\n    ship_type: str,\n    interceptor_dia_m: float,\n    seeker_type: str,\n) -> dict[str, Any]:\n    \"\"\"估算单发拦截成功概率 Pk 及各因子分解（不含抗干扰/干扰能力）。\"\"\"\n    vm_ma = max(0.1, float(vm_ma))\n    vi_ma = max(0.1, float(vi_ma))\n    rcs = max(0.001, float(rcs))\n    ship_area = max(0.1, float(ship_area))\n    dia = max(0.05, float(interceptor_dia_m))\n\n    # 速度比：来袭越快相对拦截弹越难末端修正\n    ratio = vi_ma / vm_ma\n    speed_factor = clamp(0.55 + 0.5 * min(ratio / 1.3, 1.2), 0.5, 1.1)\n\n    ship_radar_factor = radar_gain_factor(ship_area, ship_type, 10.0)\n\n    if seeker_type == 'semi_active':\n        # 半主动依赖舰载照射，多目标能力通常弱于主动雷达\n        seeker_factor = ship_radar_factor * 0.9\n    else:\n        seeker_area = math.pi * (dia / 2.0) ** 2\n        seeker_tech = 'aesa' if seeker_type == 'active_aesa' else 'mechanical'\n        # 参考：约 20 cm 口径导引头孔径\n        seeker_factor = radar_gain_factor(seeker_area, seeker_tech, 0.03)\n\n    rcs_factor = clamp(1.0 + 0.15 * math.log10(rcs / 0.5), 0.55, 1.15)\n    traj_factor = 0.85 if traj == 'sea' else 1.0\n\n    pk = clamp(\n        PK0 * speed_factor * ship_radar_factor * seeker_factor * rcs_factor * traj_factor,\n        0.03,\n        0.97,\n    )\n    return {\n        'pk': pk,\n        'speed_factor': speed_factor,\n        'ship_radar_factor': ship_radar_factor,\n        'seeker_factor': seeker_factor,\n        'rcs_factor': rcs_factor,\n        'traj_factor': traj_factor,\n    }\n\n\ndef binding_limit_label(result: dict[str, Any]) -> str:\n    \"\"\"返回交战距离受限于哪一项（中文标签）。\n\n    新公式下 ``engage_dist = min(max(awacs_detect_km, ship_detect_km), sam_range_km)``，\n    判定顺序为：先看是否被拦截弹射程封顶；否则看两路探测中较远的一路 —— 若为预警机\n    雷达探测距离（且预警机确实是更远的一路）则归为预警机，否则归为舰载雷达探测距离；\n    用 ``math.isclose`` 做浮点近似比较，避免 ``==`` 在极端参数下因浮点误差误判。\n    \"\"\"\n    engage = result['engage_dist']\n    sam_range = result['sam_range']\n    has_awacs = bool(result.get('has_awacs', True))\n    awacs_detect_km = result.get('awacs_detect_km', result.get('awacs_total', 0.0))\n    ship_detect_km = result.get('ship_detect_km', result.get('ship_search', 0.0))\n\n    if math.isclose(engage, sam_range, rel_tol=0, abs_tol=1e-9):\n        return '拦截弹射程'\n    awacs_is_farther = has_awacs and awacs_detect_km >= ship_detect_km\n    if awacs_is_farther and math.isclose(engage, awacs_detect_km, rel_tol=0, abs_tol=1e-9):\n        return '预警机雷达探测距离'\n    if math.isclose(engage, ship_detect_km, rel_tol=0, abs_tol=1e-9):\n        return '舰载雷达探测距离'\n    return '拦截弹射程'\n",
     "utils/saturation_windows.py": "\"\"\"饱和打击拦截窗口几何：由发现距离、双方速度与火控锁定时间反推轮次。\"\"\"\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\ndef compute_windows(\n    discovery_m: float,\n    vm_mps: float,\n    vi_mps: float,\n    t_lock_s: float,\n    min_range_m: float,\n    max_rounds: int = 200,\n) -> list[dict[str, Any]]:\n    \"\"\"计算拦截窗口序列。\n\n    所有来袭弹速度相同，故轮次时序与距离与存活数无关，可确定性推演。\n    每轮时长 = 锁定时间 + 拦截弹迎头飞行时间；导弹在该轮持续接近。\n    当轮末剩余距离 ≤ 最小交战距离时窗口关闭。\n    \"\"\"\n    rounds: list[dict[str, Any]] = []\n    distance = float(discovery_m)\n    closing = float(vm_mps) + float(vi_mps)\n    if closing <= 0:\n        return rounds\n\n    guard = 0\n    while guard < max_rounds:\n        guard += 1\n        t_fly = distance / closing\n        total_t = float(t_lock_s) + t_fly\n        dist_after = distance - float(vm_mps) * total_t\n        if dist_after <= float(min_range_m):\n            break\n        rounds.append({\n            'round': len(rounds) + 1,\n            'dist_start_m': distance,\n            't_fly_s': t_fly,\n            'total_t_s': total_t,\n            'dist_end_m': dist_after,\n        })\n        distance = dist_after\n    return rounds\n",
     "utils/saturation_monte_carlo.py": "\"\"\"饱和打击弹药分配：蒙特卡洛评估与局部爬山优化。\"\"\"\nfrom __future__ import annotations\n\nfrom typing import Any, Callable\n\n\ndef _to_i32(x: int) -> int:\n    \"\"\"转为有符号 32 位整数（对齐 JS `|0`）。\"\"\"\n    x &= 0xFFFFFFFF\n    if x >= 0x80000000:\n        x -= 0x100000000\n    return x\n\n\ndef _imul(a: int, b: int) -> int:\n    \"\"\"对齐 JS Math.imul 的 32 位有符号乘法。\"\"\"\n    return _to_i32(_to_i32(a) * _to_i32(b))\n\n\ndef mulberry32(seed: int) -> Callable[[], float]:\n    \"\"\"确定性 PRNG（与前端 JS mulberry32 对齐），返回 [0,1) 浮点。\"\"\"\n    state = _to_i32(seed)\n\n    def rng() -> float:\n        nonlocal state\n        state = _to_i32(state + 0x6D2B79F5)\n        t = _imul(state ^ ((state & 0xFFFFFFFF) >> 15), 1 | state)\n        t = _to_i32(t + _imul(t ^ ((t & 0xFFFFFFFF) >> 7), 61 | t)) ^ t\n        t = _to_i32(t)\n        return ((_to_i32(t ^ ((t & 0xFFFFFFFF) >> 14)) & 0xFFFFFFFF) / 4294967296.0)\n\n    return rng\n\n\ndef plan_key(plan: list[int]) -> str:\n    \"\"\"将弹药计划转为可比较的键。\"\"\"\n    return ','.join(str(x) for x in plan)\n\n\ndef fix_sum(plan: list[int], target: int) -> None:\n    \"\"\"原地修正 plan 各元素之和等于 target（轮转增减）。\"\"\"\n    s = sum(plan)\n    i = 0\n    while s != target:\n        idx = i % len(plan)\n        if s < target:\n            plan[idx] += 1\n            s += 1\n        else:\n            if plan[idx] > 0:\n                plan[idx] -= 1\n                s -= 1\n        i += 1\n        if i > 10000:\n            break\n\n\ndef generate_candidate_plans(ni: int, n_rounds: int) -> list[dict[str, Any]]:\n    \"\"\"生成种子候选弹药分配方案。\"\"\"\n    plans: list[dict[str, Any]] = []\n    if n_rounds == 0:\n        return plans\n    r = n_rounds\n\n    p0 = [0] * r\n    p0[0] = ni\n    plans.append({'name': '全部第一轮打光', 'plan': p0})\n\n    p_eq = [0] * r\n    base = ni // r\n    rem = ni - base * r\n    for i in range(r):\n        p_eq[i] = base + (1 if i < rem else 0)\n    plans.append({'name': '逐轮均分', 'plan': p_eq})\n\n    weights = [1.6 ** (r - 1 - i) for i in range(r)]\n    wsum = sum(weights)\n    p_front = [round(ni * w / wsum) for w in weights]\n    fix_sum(p_front, ni)\n    plans.append({'name': '前重后轻', 'plan': p_front})\n\n    weights_b = [1.6 ** i for i in range(r)]\n    wsum_b = sum(weights_b)\n    p_back = [round(ni * w / wsum_b) for w in weights_b]\n    fix_sum(p_back, ni)\n    plans.append({'name': '预留后重', 'plan': p_back})\n\n    if r >= 3:\n        mid = r // 2\n        weights_m = [1.0 / (1.0 + abs(i - mid)) for i in range(r)]\n        wsum_m = sum(weights_m)\n        p_mid = [round(ni * w / wsum_m) for w in weights_m]\n        fix_sum(p_mid, ni)\n        plans.append({'name': '中段集中', 'plan': p_mid})\n\n    return plans\n\n\ndef simulate_plan(\n    nm: int,\n    ni: int,\n    pk: float,\n    plan: list[int],\n    trials: int,\n    rng: Callable[[], float],\n) -> dict[str, Any]:\n    \"\"\"蒙特卡洛评估逐轮弹药预算计划。\n\n    plan[r] 为第 r 轮拦截弹预算（对该轮所有存活目标合计）。\n    轮内预算尽量均分到各存活目标；未用完不自动滚存。\n    \"\"\"\n    n_rounds = len(plan)\n    leak_sum = 0.0\n    survivors_by_round = [0.0] * (n_rounds + 1)\n\n    for _ in range(trials):\n        missiles = nm\n        interceptors_left = ni\n        survivors_by_round[0] += missiles\n        for r in range(n_rounds):\n            if missiles <= 0 or interceptors_left <= 0:\n                survivors_by_round[r + 1] += missiles\n                continue\n            budget = min(plan[r], interceptors_left)\n            base = budget // missiles\n            extra = budget - base * missiles\n            killed = 0\n            used = 0\n            for i in range(missiles):\n                k = base + (1 if i < extra else 0)\n                if k <= 0:\n                    continue\n                used += k\n                p_kill = 1.0 - (1.0 - pk) ** k\n                if rng() < p_kill:\n                    killed += 1\n            interceptors_left -= used\n            missiles -= killed\n            survivors_by_round[r + 1] += missiles\n        leak_sum += missiles\n\n    avg_survivors = [s / trials for s in survivors_by_round]\n    return {\n        'expected_leak': leak_sum / trials,\n        'avg_survivors': avg_survivors,\n    }\n\n\ndef optimize_plan(\n    nm: int,\n    ni: int,\n    pk: float,\n    n_rounds: int,\n    search_trials: int = 900,\n    final_trials: int = 6000,\n    search_seed: int = 12345,\n    final_seed: int = 999,\n) -> dict[str, Any]:\n    \"\"\"在种子方案上爬山优化，再以高试验次数公平终评。\"\"\"\n    search_rng = mulberry32(search_seed)\n    candidates = generate_candidate_plans(ni, n_rounds)\n    if not candidates:\n        return {\n            'best': {'name': '', 'plan': []},\n            'final_res': {'expected_leak': float(nm), 'avg_survivors': [float(nm)]},\n            'all_candidates': [],\n            'final_trials': final_trials,\n        }\n\n    scored = []\n    for c in candidates:\n        score = simulate_plan(nm, ni, pk, c['plan'], search_trials, search_rng)['expected_leak']\n        scored.append({'name': c['name'], 'plan': list(c['plan']), 'score': score})\n    scored.sort(key=lambda x: x['score'])\n    hill_plan = list(scored[0]['plan'])\n    hill_score = scored[0]['score']\n\n    improved = True\n    iters = 0\n    while improved and iters < 40 and n_rounds > 1:\n        improved = False\n        iters += 1\n        for i in range(n_rounds):\n            for j in range(n_rounds):\n                if i == j or hill_plan[i] <= 0:\n                    continue\n                trial = list(hill_plan)\n                trial[i] -= 1\n                trial[j] += 1\n                s = simulate_plan(nm, ni, pk, trial, search_trials, search_rng)['expected_leak']\n                if s < hill_score - 1e-9:\n                    hill_score = s\n                    hill_plan = trial\n                    improved = True\n\n    final_rng = mulberry32(final_seed)\n    pool = [{'name': c['name'], 'plan': list(c['plan'])} for c in candidates]\n    if not any(plan_key(c['plan']) == plan_key(hill_plan) for c in pool):\n        pool.append({'name': '优化方案(爬山搜索)', 'plan': list(hill_plan)})\n\n    final_scored = []\n    for c in pool:\n        res = simulate_plan(nm, ni, pk, c['plan'], final_trials, final_rng)\n        final_scored.append({\n            'name': c['name'],\n            'plan': c['plan'],\n            'expected_leak': res['expected_leak'],\n            'avg_survivors': res['avg_survivors'],\n        })\n    final_scored.sort(key=lambda x: x['expected_leak'])\n    best = {'name': final_scored[0]['name'], 'plan': final_scored[0]['plan']}\n    final_res = {\n        'expected_leak': final_scored[0]['expected_leak'],\n        'avg_survivors': final_scored[0]['avg_survivors'],\n    }\n    return {\n        'best': best,\n        'final_res': final_res,\n        'all_candidates': final_scored,\n        'final_trials': final_trials,\n    }\n",
     "simulators/__init__.py": "\"\"\"起飞仿真器模块。\"\"\"\n",

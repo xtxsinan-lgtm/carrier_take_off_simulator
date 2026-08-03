@@ -76,14 +76,24 @@ def estimate_engagement_distance(
     sam_range_km: float,
     has_awacs: bool = True,
 ) -> dict[str, Any]:
-    """估算预警机探测、舰载火控锁定与最终交战距离（公里）。
+    """分别估算舰载/预警机雷达探测距离，并据此推算最终交战距离（公里）。
 
-    - ``has_awacs=True``（默认，有预警机）：交战距离取
-      ``min(预警机总探测距离, 舰载火控锁定距离, 拦截弹射程)``。
-    - ``has_awacs=False``（无预警机）：不再有预警机前出探测，发现/交战距离仅由
-      舰载雷达决定 —— 先取 ``ship_search = min(舰载雷达功率探测距离, 地球曲率雷达视距)``，
-      再取 ``engage_dist = min(ship_search, 拦截弹射程)``（不再乘火控锁定折损系数，
-      因为此时「发现」与「交战」都受限于同一部舰载雷达，直接取探测距离与射程的较小值）。
+    两路探测独立估算：
+
+    - 舰载雷达探测距离 ``ship_detect_km = min(舰载雷达功率探测距离 ship_power,
+      地球曲率雷达视距 ship_horizon)``（即 ``ship_search``）。
+    - 预警机雷达探测距离 ``awacs_detect_km``：``has_awacs=True`` 时为
+      ``预警机前出距离 standoff_km + min(预警机雷达功率探测距离 awacs_power,
+      预警机地球曲率雷达视距 awacs_horizon)``（即 ``awacs_total``）；
+      ``has_awacs=False``（无预警机）时记为 0（同时不再计入预警机前出距离）。
+
+    交战距离取两路探测中「更远」的一路（哪路先发现即以其为准，代表更好的态势提示/引导），
+    再与拦截弹射程取较小值：
+
+    ``engage_dist = min(max(awacs_detect_km, ship_detect_km), sam_range_km)``
+
+    注：原「舰载火控锁定距离」``ship_lock = ship_detect_km * LOCK_FRACTION``
+    仍会计算并在返回值中提供，仅供界面展示/诊断参考，不再参与 ``engage_dist`` 的计算。
     """
     rcs = max(0.001, float(rcs))
     h_target = target_altitude_m(traj)
@@ -97,6 +107,8 @@ def estimate_engagement_distance(
     ship_power = power_range_km(200.0, ship_area, 10.0, ship_type, rcs, 5.0)
     ship_horizon = radar_horizon_km(H_SHIP_RADAR, h_target)
     ship_search = min(ship_power, ship_horizon)
+    ship_detect_km = ship_search
+    # 仅供展示/诊断，不参与 engage_dist 计算
     ship_lock = ship_search * LOCK_FRACTION
 
     if has_awacs:
@@ -105,26 +117,32 @@ def estimate_engagement_distance(
         awacs_horizon = radar_horizon_km(H_AWACS, h_target)
         awacs_detect = min(awacs_power, awacs_horizon)
         awacs_total = standoff_km + awacs_detect
-        engage_dist = min(awacs_total, ship_lock, sam_range_km)
+        awacs_detect_km = awacs_total
     else:
-        # 无预警机：不使用预警机前出+探测（awacs_* 置零便于诊断/前端展示），
-        # 交战距离直接取「舰载雷达探测」与「拦截弹射程」的最小值。
+        # 无预警机：不使用预警机前出+探测（awacs_* 置零便于诊断/前端展示）
         awacs_power = 0.0
         awacs_horizon = 0.0
         awacs_detect = 0.0
         awacs_total = 0.0
+        awacs_detect_km = 0.0
         standoff_km = 0.0
-        engage_dist = min(ship_search, sam_range_km)
+
+    # 交战距离＝两路探测取更远者（更好的态势提示），再与拦截弹射程取较小值
+    detect_max_km = max(awacs_detect_km, ship_detect_km)
+    engage_dist = min(detect_max_km, sam_range_km)
 
     return {
         'awacs_power': awacs_power,
         'awacs_horizon': awacs_horizon,
         'awacs_detect': awacs_detect,
         'awacs_total': awacs_total,
+        'awacs_detect_km': awacs_detect_km,
         'ship_power': ship_power,
         'ship_horizon': ship_horizon,
         'ship_search': ship_search,
+        'ship_detect_km': ship_detect_km,
         'ship_lock': ship_lock,
+        'detect_max_km': detect_max_km,
         'sam_range': sam_range_km,
         'engage_dist': engage_dist,
         'standoff': standoff_km,
@@ -186,15 +204,22 @@ def estimate_pk(
 def binding_limit_label(result: dict[str, Any]) -> str:
     """返回交战距离受限于哪一项（中文标签）。
 
-    用 ``math.isclose`` 做浮点近似比较，避免 ``==`` 在极端参数下因浮点误差误判；
-    优先按 ``has_awacs`` 区分有/无预警机两条路径的判定顺序。
+    新公式下 ``engage_dist = min(max(awacs_detect_km, ship_detect_km), sam_range_km)``，
+    判定顺序为：先看是否被拦截弹射程封顶；否则看两路探测中较远的一路 —— 若为预警机
+    雷达探测距离（且预警机确实是更远的一路）则归为预警机，否则归为舰载雷达探测距离；
+    用 ``math.isclose`` 做浮点近似比较，避免 ``==`` 在极端参数下因浮点误差误判。
     """
     engage = result['engage_dist']
+    sam_range = result['sam_range']
     has_awacs = bool(result.get('has_awacs', True))
-    if has_awacs and math.isclose(engage, result['awacs_total'], rel_tol=0, abs_tol=1e-9):
-        return '预警机总探测距离'
-    if (not has_awacs) and math.isclose(engage, result['ship_search'], rel_tol=0, abs_tol=1e-9):
-        return '舰载雷达探测距离（功率/视距）'
-    if math.isclose(engage, result['ship_lock'], rel_tol=0, abs_tol=1e-9):
-        return '舰载火控锁定距离'
+    awacs_detect_km = result.get('awacs_detect_km', result.get('awacs_total', 0.0))
+    ship_detect_km = result.get('ship_detect_km', result.get('ship_search', 0.0))
+
+    if math.isclose(engage, sam_range, rel_tol=0, abs_tol=1e-9):
+        return '拦截弹射程'
+    awacs_is_farther = has_awacs and awacs_detect_km >= ship_detect_km
+    if awacs_is_farther and math.isclose(engage, awacs_detect_km, rel_tol=0, abs_tol=1e-9):
+        return '预警机雷达探测距离'
+    if math.isclose(engage, ship_detect_km, rel_tol=0, abs_tol=1e-9):
+        return '舰载雷达探测距离'
     return '拦截弹射程'

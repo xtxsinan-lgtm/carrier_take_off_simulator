@@ -6,8 +6,10 @@ import re
 from utils.paths import ROOT
 
 ESTIMATE_BTN = '◈ 估算交战距离与拦截率'
-# 按钮下方仅保留的两字段（文案关键词，允许各端略有后缀）
-BELOW_LABELS = ('雷达发现距离', '单发拦截成功概率')
+# 按钮下方三项探测/拦截率结果字段（文案关键词，须按此顺序出现）
+BELOW_LABELS = ('预警机雷达探测距离', '舰载雷达探测距离', '单发拦截成功概率')
+# 交战距离公式说明文案关键片段（三端一致）
+FORMULA_NOTE_KEY = 'min( max(预警机雷达探测距离, 舰载雷达探测距离), 拦截弹射程 )'
 # 须移到按钮上方的字段关键词（各端文案略有差异时用元组表示任一即可）
 ABOVE_KEYS = (
     ('拦截弹数量',),
@@ -37,8 +39,12 @@ def test_first_match_index_prefers_earlier_option():
     assert idx2 == 0
 
 
-def _assert_merged_estimate_layout(text: str, channel: str) -> None:
-    """断言合并估算按钮、旧双按钮消失、下方仅两结果字段。"""
+def _assert_merged_estimate_layout(text: str, channel: str, engage_marker: str) -> None:
+    """断言合并估算按钮、旧双按钮消失、按钮下方三探测/交战距离字段与公式说明。
+
+    ``engage_marker`` 为该端「交战距离」输入字段的唯一标识子串（须包含足够上下文，
+    避免与「最小交战距离」标签、公式说明文案或按钮自身文案中的「交战距离」字样混淆）。
+    """
     assert ESTIMATE_BTN in text, f'{channel} 缺少合并估算按钮文案'
     assert text.count(ESTIMATE_BTN) == 1, f'{channel} 合并估算按钮应仅出现一次'
     # 旧独立按钮不得残留
@@ -46,27 +52,44 @@ def _assert_merged_estimate_layout(text: str, channel: str) -> None:
     assert '估算交战距离"' not in text and "估算交战距离'" not in text
     assert '◈ 估算交战距离\n' not in text
     assert '◈ 估算交战距离<' not in text
+    # 旧「雷达发现距离」标签须已被「交战距离」取代
+    assert '雷达发现距离' not in text, f'{channel} 仍残留旧「雷达发现距离」字段文案'
 
     btn_idx = text.index(ESTIMATE_BTN)
     for options in ABOVE_KEYS:
         key, idx = _first_match_index(text, options)
         assert idx < btn_idx, f'{channel} 字段「{key}」须在估算按钮上方'
 
+    assert FORMULA_NOTE_KEY in text, f'{channel} 缺少交战距离公式说明文案'
+    formula_idx = text.index(FORMULA_NOTE_KEY)
+    assert formula_idx > btn_idx, f'{channel} 公式说明须在估算按钮下方'
+
     for label in BELOW_LABELS:
         assert label in text, f'{channel} 缺少下方字段: {label}'
         assert text.index(label) > btn_idx, f'{channel} 字段「{label}」须在估算按钮下方'
 
-    # 下方两字段相对顺序：发现距离 → 单发拦截成功概率
-    assert text.index(BELOW_LABELS[0]) < text.index(BELOW_LABELS[1]), (
-        f'{channel} 下方字段顺序应为雷达发现距离 → 单发拦截成功概率'
+    assert engage_marker in text, f'{channel} 缺少「交战距离」输入字段: {engage_marker}'
+    engage_idx = text.index(engage_marker)
+    assert engage_idx > btn_idx, f'{channel} 「交战距离」字段须在估算按钮下方'
+
+    # 下方字段相对顺序：预警机雷达探测距离 → 舰载雷达探测距离 → 交战距离 → 单发拦截成功概率
+    awacs_idx = text.index(BELOW_LABELS[0])
+    ship_idx = text.index(BELOW_LABELS[1])
+    pk_idx = text.index(BELOW_LABELS[2])
+    assert awacs_idx < ship_idx < engage_idx < pk_idx, (
+        f'{channel} 下方字段顺序应为 预警机雷达探测距离 → 舰载雷达探测距离 → 交战距离 → 单发拦截成功概率'
     )
 
 
 def test_html_saturation_merged_estimate_ui():
-    """HTML 饱和页：合并估算按钮，仅 D/Pk 在下方。"""
+    """HTML 饱和页：合并估算按钮，预警机/舰载探测距离 + 交战距离 + Pk 在下方。"""
     html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')
     js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
-    _assert_merged_estimate_layout(html, 'HTML')
+    _assert_merged_estimate_layout(
+        html, 'HTML', '<label>交战距离 <span class="unit">km</span></label>'
+    )
+    assert 'id="awacsDetectKm"' in html
+    assert 'id="shipDetectKm"' in html
     assert 'id="estimateBtn"' in html
     assert 'id="distBtn"' not in html
     assert 'id="estBtn"' not in html
@@ -87,7 +110,12 @@ def test_miniprogram_saturation_merged_estimate_ui():
     js = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.js').read_text(
         encoding='utf-8'
     )
-    _assert_merged_estimate_layout(wxml, '小程序')
+    _assert_merged_estimate_layout(
+        wxml, '小程序',
+        '<view class="field-label"><text>交战距离</text><text class="unit">km</text></view>',
+    )
+    assert 'awacsDetectKm' in wxml
+    assert 'shipDetectKm' in wxml
     assert 'bindtap="onEstimateDistanceAndPk"' in wxml
     assert 'onEstimateDistanceAndPk' in js
     assert "action: 'estimate_distance'" in js
@@ -104,7 +132,11 @@ def test_ios_saturation_merged_estimate_ui():
     vm = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationViewModel.swift').read_text(
         encoding='utf-8'
     )
-    _assert_merged_estimate_layout(view, 'iOS')
+    _assert_merged_estimate_layout(
+        view, 'iOS', 'field("交战距离 (km)", text: $vm.discoveryKm)'
+    )
+    assert 'awacsDetectKm' in view and 'awacsDetectKm' in vm
+    assert 'shipDetectKm' in view and 'shipDetectKm' in vm
     assert 'estimateDistanceAndPk' in view
     assert 'func estimateDistanceAndPk' in vm
     assert '"estimate_distance"' in vm

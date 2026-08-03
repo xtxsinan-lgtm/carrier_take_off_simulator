@@ -56,6 +56,9 @@ def test_e2e_saturation_estimate_paths():
     dist = run_saturation_json({'action': 'estimate_distance', 'params': params})
     assert dist['success'] is True
     assert dist['engage_dist'] == pytest.approx(40.0)
+    assert dist['engage_dist'] == pytest.approx(
+        min(max(dist['awacs_total'], dist['ship_search']), dist['sam_range'])
+    )
     assert dist['binding']
 
     pk = run_saturation_json({'action': 'estimate_pk', 'params': params})
@@ -82,8 +85,9 @@ def test_e2e_saturation_estimate_distance_no_awacs():
     dist = run_saturation_json({'action': 'estimate_distance', 'params': params})
     assert dist['success'] is True
     assert dist['has_awacs'] is False
+    assert dist['awacs_detect_km'] == 0.0
     assert dist['engage_dist'] == pytest.approx(min(dist['ship_search'], dist['sam_range']))
-    assert dist['binding'] != '预警机总探测距离'
+    assert dist['binding'] != '预警机雷达探测距离'
 
 
 @pytest.mark.e2e

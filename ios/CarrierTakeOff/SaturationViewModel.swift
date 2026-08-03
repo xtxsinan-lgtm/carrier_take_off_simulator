@@ -38,6 +38,8 @@ final class SaturationViewModel: ObservableObject {
 
     @Published var distNote = ""
     @Published var pkNote = ""
+    @Published var awacsDetectKm = "0"
+    @Published var shipDetectKm = "0"
     @Published var hasResult = false
     @Published var result: SaturationResult?
 
@@ -125,7 +127,7 @@ final class SaturationViewModel: ObservableObject {
         ]
     }
 
-    /// 一次估算交战距离与单发拦截成功概率，填入按钮下方两字段。
+    /// 一次估算交战距离与单发拦截成功概率，填入预警机/舰载雷达探测距离与交战距离等字段。
     func estimateDistanceAndPk() async {
         statusTag = "COMPUTING"
         do {
@@ -134,7 +136,7 @@ final class SaturationViewModel: ObservableObject {
                 "action": "estimate_distance",
                 "params": params,
             ])
-            guard distR.success, let dist = distR.engage_dist else {
+            guard distR.success, let dist = distR.engage_dist, let shipDetect = distR.ship_detect_km else {
                 throw NSError(domain: "Saturation", code: 1, userInfo: [
                     NSLocalizedDescriptionKey: distR.error ?? "交战距离估算失败",
                 ])
@@ -148,12 +150,16 @@ final class SaturationViewModel: ObservableObject {
                     NSLocalizedDescriptionKey: pkR.error ?? "拦截率估算失败",
                 ])
             }
+            let hasAwacsResult = distR.has_awacs ?? true
+            let awacsDetect = hasAwacsResult ? (distR.awacs_detect_km ?? 0) : 0
+            awacsDetectKm = String(format: "%.1f", awacsDetect)
+            shipDetectKm = String(format: "%.1f", shipDetect)
             discoveryKm = String(format: "%.1f", dist)
-            if distR.has_awacs ?? true {
-                distNote = "交战距离 \(String(format: "%.1f", dist)) km（受限于：\(distR.binding ?? "")）"
+            if hasAwacsResult {
+                distNote = "预警机探测 \(String(format: "%.0f", awacsDetect))km ｜ 舰载探测 \(String(format: "%.0f", shipDetect))km → 交战距离=min(max(预警机,舰载),射程)=\(String(format: "%.1f", dist)) km（受限于：\(distR.binding ?? "")）"
             } else {
                 let hTarget = String(format: "%.0f", distR.h_target_m ?? 0)
-                distNote = "无预警机：假设目标高度 \(hTarget)m，交战距离 \(String(format: "%.1f", dist)) km（受限于：\(distR.binding ?? "")）"
+                distNote = "无预警机：假设目标高度 \(hTarget)m，舰载探测=\(String(format: "%.0f", shipDetect))km，交战距离 \(String(format: "%.1f", dist)) km（受限于：\(distR.binding ?? "")）"
             }
             pk = String(format: "%.2f", value)
             pkNote = "估算拦截率（单发）= \(String(format: "%.2f", value))"
