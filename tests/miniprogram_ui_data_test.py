@@ -50,7 +50,7 @@ def test_miniprogram_takeoff_cards_have_terminal_tags():
     """起飞页六段卡片须带与 HTML/iOS 一致的英文 card-tag。"""
     wxml = (ROOT / 'miniprogram' / 'pages' / 'index' / 'index.wxml').read_text(encoding='utf-8')
     wxss = (ROOT / 'miniprogram' / 'app.wxss').read_text(encoding='utf-8')
-    assert '▲ 航母舰载机起飞仿真终端' in wxml
+    assert '航母舰载机起飞仿真终端' in wxml
     for tag in ('MODE', 'CARRIER', 'AIRCRAFT', 'INPUT', 'OUTPUT', 'TRAJECTORY'):
         assert tag in wxml
     assert '.card-tag' in wxss

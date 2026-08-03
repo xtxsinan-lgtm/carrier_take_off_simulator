@@ -7,7 +7,7 @@ from utils.paths import ROOT
 
 # 六段卡片英文 tag，须与 HTML / 小程序 / iOS 一致
 CARD_TAGS = ('MODE', 'CARRIER', 'AIRCRAFT', 'INPUT', 'OUTPUT', 'TRAJECTORY')
-TERMINAL_TITLE = '▲ 航母舰载机起飞仿真终端'
+TERMINAL_TITLE = '航母舰载机起飞仿真终端'
 # 起飞蓝青主题（不得改成饱和打击琥珀橙）
 TAKEOFF_ACCENT = '#38bdf8'
 TAKEOFF_BG = '#0f1419'

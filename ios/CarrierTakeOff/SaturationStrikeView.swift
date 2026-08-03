@@ -80,7 +80,7 @@ struct SaturationStrikeView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("▲ 饱和打击 / 反导拦截仿真终端")
+            Text("饱和打击 / 反导拦截仿真终端")
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .foregroundStyle(SaturationTheme.amber)
             Text("SATURATION ATTACK · LOCAL PYODIDE")
