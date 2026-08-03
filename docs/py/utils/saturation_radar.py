@@ -10,9 +10,9 @@ from typing import Any
 # 雷达体制灵敏度倍率（相对机械扫描）
 TECH_MULT: dict[str, float] = {
     'mechanical': 1.0,
-    'pesa': 1.12,
-    'aesa': 1.35,
-    'gan_aesa': 1.55,
+    'pesa': 1.43,
+    'aesa': 2.10,
+    'gan_aesa': 3.74,
 }
 
 # 假设高度（米）

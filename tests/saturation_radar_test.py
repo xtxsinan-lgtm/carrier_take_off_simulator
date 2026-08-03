@@ -28,12 +28,20 @@ def test_radar_horizon_km():
     assert h == 4.12 * (math.sqrt(9000) + math.sqrt(10))
 
 
+def test_tech_mult_values():
+    """雷达体制增益倍率：机械扫描 / PESA / AESA / 氮化镓 AESA。"""
+    assert TECH_MULT['mechanical'] == 1.0
+    assert TECH_MULT['pesa'] == 1.43
+    assert TECH_MULT['aesa'] == 2.10
+    assert TECH_MULT['gan_aesa'] == 3.74
+
+
 def test_power_range_km_scales_with_area_and_rcs():
     """探测距离随天线面积与 RCS 按雷达方程比例变化。"""
     base = power_range_km(400, 8, 8, 'aesa', 5, 5)
     bigger = power_range_km(400, 32, 8, 'aesa', 5, 5)
     assert bigger == base * 2
-    assert TECH_MULT['aesa'] == 1.35
+    assert TECH_MULT['aesa'] == 2.10
 
 
 def test_radar_gain_factor_bounded():
