@@ -49,7 +49,7 @@ def test_e2e_saturation_estimate_paths():
     params = {
         'rcs': 0.5, 'traj': 'high', 'awacs_area': 8, 'awacs_type': 'aesa',
         'standoff': 150, 'ship_area': 12, 'ship_type': 'aesa', 'sam_range': 40,
-        'vm': 2.6, 'vi': 3.8, 'ecm': 2, 'interceptor_dia': 0.35,
+        'vm': 2.6, 'vi': 3.8, 'interceptor_dia': 0.35,
         'seeker_type': 'active_aesa',
     }
     # 与三端 onEstimateDistanceAndPk / estimateDistanceAndPk 调用顺序一致
@@ -61,6 +61,13 @@ def test_e2e_saturation_estimate_paths():
     pk = run_saturation_json({'action': 'estimate_pk', 'params': params})
     assert pk['success'] is True
     assert 0.03 <= pk['pk'] <= 0.97
+    assert 'ecm_factor' not in pk
+    # 遗留抗干扰档数不得影响拦截率估算
+    pk_hi = run_saturation_json({
+        'action': 'estimate_pk',
+        'params': {**params, 'ecm': 5},
+    })
+    assert pk_hi['pk'] == pk['pk']
 
 
 @pytest.mark.e2e

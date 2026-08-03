@@ -3,7 +3,7 @@
  */
 const PYODIDE_VERSION = '0.26.4';
 /** 与 saturation-strike.html 中 ?v= 同步递增 */
-const APP_VERSION = 6;
+const APP_VERSION = 7;
 
 /** 仅加载饱和打击相关 Python 模块（无需 numpy） */
 const SATURATION_PY_FILES = [
@@ -186,7 +186,6 @@ function collectEstimateParams() {
     sam_range: +$('samRange').value,
     vm: +$('vm').value,
     vi: +$('vi').value,
-    ecm: +$('ecm').value,
     interceptor_dia: +$('interceptorDia').value,
     seeker_type: $('seekerType').value,
   };
@@ -374,7 +373,7 @@ async function onEstimateDistanceAndPk() {
     if (!pkR.success) throw new Error(pkR.error || '拦截率估算失败');
     $('pk').value = Number(pkR.pk).toFixed(2);
     $('pkEstBreakdown').textContent =
-      `估算拦截率（单发）= ${pkR.pk.toFixed(2)}（基线0.75 × 速度系数${pkR.speed_factor.toFixed(2)} × 舰载雷达增益${pkR.ship_radar_factor.toFixed(2)} × 导引头增益${pkR.seeker_factor.toFixed(2)} × RCS系数${pkR.rcs_factor.toFixed(2)} × 抗干扰系数${pkR.ecm_factor.toFixed(2)} × 弹道系数${pkR.traj_factor.toFixed(2)}）— 已填入下方「单发拦截成功概率」，可手动修改。`;
+      `估算拦截率（单发）= ${pkR.pk.toFixed(2)}（基线0.75 × 速度系数${pkR.speed_factor.toFixed(2)} × 舰载雷达增益${pkR.ship_radar_factor.toFixed(2)} × 导引头增益${pkR.seeker_factor.toFixed(2)} × RCS系数${pkR.rcs_factor.toFixed(2)} × 弹道系数${pkR.traj_factor.toFixed(2)}）— 已填入下方「单发拦截成功概率」，可手动修改。`;
   } catch (e) {
     const msg = String(e.message || e);
     $('distBreakdown').textContent = msg;

@@ -140,7 +140,6 @@ def run_estimate_pk_from_params(params: dict[str, Any]) -> dict[str, Any]:
         vm_ma=float(params.get('vm', 2.6)),
         vi_ma=float(params.get('vi', 3.8)),
         rcs=float(params.get('rcs', 0.5)),
-        ecm=int(params.get('ecm', 2)),
         traj=str(params.get('traj', 'high')),
         ship_area=float(params.get('ship_area', 12)),
         ship_type=str(params.get('ship_type', 'aesa')),

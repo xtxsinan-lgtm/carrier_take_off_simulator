@@ -21,7 +21,6 @@ struct SaturationStrikeView: View {
                     field("速度 (Ma)", text: $vm.vm)
                     field("RCS (m²)", text: $vm.rcs)
                     pickerRow("弹道", selection: $vm.traj, options: vm.trajOptions)
-                    field("抗干扰 1–5", text: $vm.ecm)
 
                     sectionLabel("▸ 预警机", color: SaturationTheme.cyan)
                     presetPicker("预警机预设", selection: $vm.selectedAewId, items: vm.aewPresets) {

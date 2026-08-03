@@ -69,7 +69,6 @@ struct SaturationResult: Codable {
     var ship_radar_factor: Double?
     var seeker_factor: Double?
     var rcs_factor: Double?
-    var ecm_factor: Double?
     var traj_factor: Double?
     var awacs_detect: Double?
     var awacs_power: Double?

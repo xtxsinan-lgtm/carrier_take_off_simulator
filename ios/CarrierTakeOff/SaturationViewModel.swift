@@ -12,7 +12,6 @@ final class SaturationViewModel: ObservableObject {
     @Published var vm = "2.6"
     @Published var rcs = "0.5"
     @Published var traj = "high"
-    @Published var ecm = "2"
     @Published var awacsArea = "8"
     @Published var awacsType = "aesa"
     @Published var standoff = "150"
@@ -114,7 +113,6 @@ final class SaturationViewModel: ObservableObject {
             "sam_range": Double(samRange) ?? 40,
             "vm": Double(vm) ?? 2.6,
             "vi": Double(vi) ?? 3.8,
-            "ecm": Int(Double(ecm) ?? 2),
             "interceptor_dia": Double(interceptorDia) ?? 0.35,
             "seeker_type": seekerType,
         ]

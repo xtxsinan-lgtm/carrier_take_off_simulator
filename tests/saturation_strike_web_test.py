@@ -24,14 +24,22 @@ def test_run_saturation_estimate_distance():
 
 
 def test_run_saturation_estimate_pk():
-    """estimate_pk action。"""
+    """estimate_pk action（忽略遗留 ecm 字段）。"""
     r = run_saturation('estimate_pk', {
-        'vm': 2.6, 'vi': 3.8, 'rcs': 0.5, 'ecm': 2, 'traj': 'high',
+        'vm': 2.6, 'vi': 3.8, 'rcs': 0.5, 'traj': 'high',
         'ship_area': 12, 'ship_type': 'aesa', 'interceptor_dia': 0.35,
         'seeker_type': 'active_aesa',
     })
     assert r['success'] is True
     assert 'pk' in r
+    assert 'ecm_factor' not in r
+    # 遗留 ecm 入参不得改变结果
+    r2 = run_saturation('estimate_pk', {
+        'vm': 2.6, 'vi': 3.8, 'rcs': 0.5, 'ecm': 5, 'traj': 'high',
+        'ship_area': 12, 'ship_type': 'aesa', 'interceptor_dia': 0.35,
+        'seeker_type': 'active_aesa',
+    })
+    assert r2['pk'] == r['pk']
 
 
 def test_run_saturation_simulate_flat_payload():

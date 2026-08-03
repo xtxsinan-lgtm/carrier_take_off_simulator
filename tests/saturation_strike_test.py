@@ -59,13 +59,14 @@ def test_run_estimate_distance_from_params():
 
 
 def test_run_estimate_pk_from_params():
-    """Pk 估算返回因子分解。"""
+    """Pk 估算返回因子分解（无抗干扰系数）。"""
     r = run_estimate_pk_from_params({
-        'vm': 2.6, 'vi': 3.8, 'rcs': 0.5, 'ecm': 2, 'traj': 'high',
+        'vm': 2.6, 'vi': 3.8, 'rcs': 0.5, 'traj': 'high',
         'ship_area': 12, 'ship_type': 'aesa', 'interceptor_dia': 0.35,
         'seeker_type': 'active_aesa',
     })
     assert 0.03 <= r['pk'] <= 0.97
+    assert 'ecm_factor' not in r
 
 
 def test_saturation_strike_script_runs_as_file():

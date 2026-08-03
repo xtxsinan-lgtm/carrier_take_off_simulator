@@ -23,7 +23,7 @@ H_TARGET: dict[str, float] = {'sea': 10.0, 'high': 15000.0}
 # 火控锁定距离占搜索探测距离的比例
 LOCK_FRACTION = 0.65
 
-# Pk 基线（相对中等 RCS、无机动、无干扰目标）
+# Pk 基线（相对中等 RCS、无机动目标）
 PK0 = 0.75
 
 
@@ -107,18 +107,16 @@ def estimate_pk(
     vm_ma: float,
     vi_ma: float,
     rcs: float,
-    ecm: int,
     traj: str,
     ship_area: float,
     ship_type: str,
     interceptor_dia_m: float,
     seeker_type: str,
 ) -> dict[str, Any]:
-    """估算单发拦截成功概率 Pk 及各因子分解。"""
+    """估算单发拦截成功概率 Pk 及各因子分解（不含抗干扰/干扰能力）。"""
     vm_ma = max(0.1, float(vm_ma))
     vi_ma = max(0.1, float(vi_ma))
     rcs = max(0.001, float(rcs))
-    ecm = int(clamp(round(float(ecm)), 1, 5))
     ship_area = max(0.1, float(ship_area))
     dia = max(0.05, float(interceptor_dia_m))
 
@@ -129,7 +127,7 @@ def estimate_pk(
     ship_radar_factor = radar_gain_factor(ship_area, ship_type, 10.0)
 
     if seeker_type == 'semi_active':
-        # 半主动依赖舰载照射，抗干扰/多目标通常弱于主动雷达
+        # 半主动依赖舰载照射，多目标能力通常弱于主动雷达
         seeker_factor = ship_radar_factor * 0.9
     else:
         seeker_area = math.pi * (dia / 2.0) ** 2
@@ -138,11 +136,10 @@ def estimate_pk(
         seeker_factor = radar_gain_factor(seeker_area, seeker_tech, 0.03)
 
     rcs_factor = clamp(1.0 + 0.15 * math.log10(rcs / 0.5), 0.55, 1.15)
-    ecm_factor = clamp(1.15 - 0.15 * (ecm - 1), 0.55, 1.15)
     traj_factor = 0.85 if traj == 'sea' else 1.0
 
     pk = clamp(
-        PK0 * speed_factor * ship_radar_factor * seeker_factor * rcs_factor * ecm_factor * traj_factor,
+        PK0 * speed_factor * ship_radar_factor * seeker_factor * rcs_factor * traj_factor,
         0.03,
         0.97,
     )
@@ -152,7 +149,6 @@ def estimate_pk(
         'ship_radar_factor': ship_radar_factor,
         'seeker_factor': seeker_factor,
         'rcs_factor': rcs_factor,
-        'ecm_factor': ecm_factor,
         'traj_factor': traj_factor,
     }
 

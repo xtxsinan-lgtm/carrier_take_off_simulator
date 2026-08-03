@@ -32,10 +32,6 @@
         <view class="picker-val">{{trajNames[trajIndex]}}</view>
       </picker>
     </view>
-    <view class="field">
-      <view class="field-label"><text>抗干扰</text><text class="unit">1–5</text></view>
-      <input class="input" type="number" value="{{ecm}}" data-key="ecm" bindinput="onField"/>
-    </view>
 
     <view class="section cyan">▸ 预警机</view>
     <view class="field">

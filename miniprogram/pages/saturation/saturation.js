@@ -26,7 +26,7 @@ Page({
     radarTypeNames: RADAR_TYPE_NAMES,
     awacsTypeIndex: 2, shipTypeIndex: 2, seekerIndex: 0,
     seekerNames: SEEKER_NAMES,
-    nm: '24', vm: '2.6', rcs: '0.5', ecm: '2',
+    nm: '24', vm: '2.6', rcs: '0.5',
     awacsArea: '8', standoff: '150',
     shipArea: '12', samRange: '40',
     discoveryKm: '120', ni: '16', vi: '3.8',
@@ -123,7 +123,6 @@ Page({
       sam_range: num(d.samRange, 40),
       vm: num(d.vm, 2.6),
       vi: num(d.vi, 3.8),
-      ecm: num(d.ecm, 2),
       interceptor_dia: num(d.interceptorDia, 0.35),
       seeker_type: SEEKERS[d.seekerIndex] || 'active_aesa',
     };

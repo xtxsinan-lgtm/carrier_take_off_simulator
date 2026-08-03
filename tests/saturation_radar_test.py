@@ -63,18 +63,29 @@ def test_estimate_engagement_distance_sam_limited():
 def test_estimate_pk_range():
     """Pk 估算落在 [0.03, 0.97]。"""
     r = estimate_pk(
-        vm_ma=2.6, vi_ma=3.8, rcs=0.5, ecm=2, traj='high',
+        vm_ma=2.6, vi_ma=3.8, rcs=0.5, traj='high',
         ship_area=12, ship_type='aesa', interceptor_dia_m=0.35,
         seeker_type='active_aesa',
     )
     assert 0.03 <= r['pk'] <= 0.97
     assert 'speed_factor' in r
+    assert 'ecm_factor' not in r
+
+
+def test_estimate_pk_ignores_legacy_ecm_concept():
+    """Pk 不再受抗干扰档数影响：相同其余参数时结果唯一。"""
+    a = estimate_pk(2.6, 3.8, 0.5, 'high', 12, 'aesa', 0.35, 'active_aesa')
+    b = estimate_pk(2.6, 3.8, 0.5, 'high', 12, 'aesa', 0.35, 'active_aesa')
+    assert a['pk'] == b['pk']
+    assert set(a.keys()) == {
+        'pk', 'speed_factor', 'ship_radar_factor', 'seeker_factor', 'rcs_factor', 'traj_factor',
+    }
 
 
 def test_estimate_pk_sea_skimming_harder():
     """掠海弹道 traj_factor 更低；在未顶满上限时 Pk 亦更低。"""
-    high = estimate_pk(3.0, 3.0, 0.05, 4, 'high', 6, 'mechanical', 0.2, 'active_mech')
-    sea = estimate_pk(3.0, 3.0, 0.05, 4, 'sea', 6, 'mechanical', 0.2, 'active_mech')
+    high = estimate_pk(3.0, 3.0, 0.05, 'high', 6, 'mechanical', 0.2, 'active_mech')
+    sea = estimate_pk(3.0, 3.0, 0.05, 'sea', 6, 'mechanical', 0.2, 'active_mech')
     assert sea['traj_factor'] < high['traj_factor']
     assert sea['pk'] <= high['pk']
     if high['pk'] < 0.97:

@@ -122,3 +122,29 @@ def test_catalog_saturation_subtitle_mentions_intercept_rate():
     sat = next(s for s in SIMULATORS if s['id'] == 'saturation')
     assert '拦截率' in sat['subtitle']
     assert 'Pk 估算' not in sat['subtitle']
+
+
+def test_saturation_ui_no_ecm_fields():
+    """三端 UI 与估算传参均不含抗干扰档数。"""
+    html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')
+    web_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.wxml').read_text(
+        encoding='utf-8'
+    )
+    mp_js = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.js').read_text(
+        encoding='utf-8'
+    )
+    view = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationStrikeView.swift').read_text(
+        encoding='utf-8'
+    )
+    vm = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationViewModel.swift').read_text(
+        encoding='utf-8'
+    )
+    assert 'id="ecm"' not in html
+    assert '抗干扰' not in html
+    assert 'ecm:' not in web_js
+    assert '抗干扰系数' not in web_js
+    assert '抗干扰' not in wxml
+    assert 'ecm:' not in mp_js
+    assert '抗干扰' not in view
+    assert '"ecm"' not in vm
