@@ -463,7 +463,6 @@ module.exports = {
       {
         "id": "exocet",
         "name": "飞鱼 Exocet MM40 Block3 (法国)",
-        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.15,
         "traj": "sea"
@@ -471,7 +470,6 @@ module.exports = {
       {
         "id": "harpoon",
         "name": "鱼叉 Harpoon (美国)",
-        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.85,
         "rcs": 0.3,
         "traj": "sea"
@@ -479,7 +477,6 @@ module.exports = {
       {
         "id": "yj12",
         "name": "鹰击-12 YJ-12 (中国)",
-        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.5,
         "rcs": 0.3,
         "traj": "high"
@@ -487,7 +484,6 @@ module.exports = {
       {
         "id": "yj18",
         "name": "鹰击-18 YJ-18 (中国, 末端超音速)",
-        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.2,
         "traj": "sea"
@@ -495,7 +491,6 @@ module.exports = {
       {
         "id": "kalibr",
         "name": "口径 3M-54 Kalibr (俄罗斯)",
-        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 2.9,
         "rcs": 0.2,
         "traj": "sea"
@@ -503,7 +498,6 @@ module.exports = {
       {
         "id": "brahmos",
         "name": "布拉莫斯 BrahMos (印度/俄罗斯)",
-        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.3,
         "traj": "sea"
@@ -511,7 +505,6 @@ module.exports = {
       {
         "id": "nsm",
         "name": "海军打击导弹 NSM (挪威, 隐身外形)",
-        "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.05,
         "traj": "sea"

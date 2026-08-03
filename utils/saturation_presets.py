@@ -1,6 +1,8 @@
 """饱和打击仿真的公开资料预设（反舰弹 / 预警机 / 舰载雷达 / 防空弹）。
 
-型号列表以 data/saturation_equipment_database.csv 为唯一数据源；
+型号列表以导弹库与雷达库 CSV 为数据源：
+  data/saturation_missile_database.csv（asm / sam）
+  data/saturation_radar_database.csv（aew / ship）
 前端经 build_all → data.json 的 saturation_presets 自动同步。
 """
 from __future__ import annotations
@@ -8,16 +10,20 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from utils.database_csv import load_saturation_equipment_csv
-from utils.paths import SATURATION_EQUIPMENT_CSV
+from utils.database_csv import load_saturation_presets_csv
+from utils.paths import SATURATION_MISSILE_CSV, SATURATION_RADAR_CSV
 
 
-def load_presets(path: str | Path | None = None) -> dict[str, list[dict[str, Any]]]:
-    """从 CSV 加载四类预设；文件不存在时返回空分组（如 Pyodide 环境）。"""
-    csv_path = Path(path) if path is not None else SATURATION_EQUIPMENT_CSV
-    if not csv_path.is_file():
+def load_presets(
+    missile_path: str | Path | None = None,
+    radar_path: str | Path | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """从导弹库 + 雷达库加载四类预设；任一文件不存在时返回空分组（如 Pyodide 环境）。"""
+    m_path = Path(missile_path) if missile_path is not None else SATURATION_MISSILE_CSV
+    r_path = Path(radar_path) if radar_path is not None else SATURATION_RADAR_CSV
+    if not m_path.is_file() or not r_path.is_file():
         return {'asm': [], 'aew': [], 'ship': [], 'sam': []}
-    return load_saturation_equipment_csv(csv_path)
+    return load_saturation_presets_csv(m_path, r_path)
 
 
 def get_preset_by_id(presets: list[dict[str, Any]], preset_id: str) -> dict[str, Any] | None:
@@ -28,9 +34,12 @@ def get_preset_by_id(presets: list[dict[str, Any]], preset_id: str) -> dict[str,
     return None
 
 
-def build_saturation_presets_payload(path: str | Path | None = None) -> dict[str, list[dict[str, Any]]]:
-    """构建前端/小程序/iOS 共用的饱和打击预设目录（源自 CSV）。"""
-    data = load_presets(path)
+def build_saturation_presets_payload(
+    missile_path: str | Path | None = None,
+    radar_path: str | Path | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """构建前端/小程序/iOS 共用的饱和打击预设目录（源自双 CSV）。"""
+    data = load_presets(missile_path, radar_path)
     return {
         'asm': list(data['asm']),
         'aew': list(data['aew']),

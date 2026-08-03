@@ -1,13 +1,20 @@
-"""舰载机 / 航母 / 饱和打击装备 CSV 导入导出单元测试。"""
+"""舰载机 / 航母 / 饱和打击导弹与雷达 CSV 导入导出单元测试。"""
 import pytest
 
 from utils.database_csv import (
     list_model_ids_from_saturation_csv,
     load_aircraft_csv,
     load_carriers_csv,
-    load_saturation_equipment_csv,
+    load_saturation_missile_csv,
+    load_saturation_presets_csv,
+    load_saturation_radar_csv,
 )
-from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV, SATURATION_EQUIPMENT_CSV
+from utils.paths import (
+    AIRCRAFT_CSV,
+    CARRIERS_CSV,
+    SATURATION_MISSILE_CSV,
+    SATURATION_RADAR_CSV,
+)
 
 
 def test_load_aircraft_csv_count():
@@ -47,21 +54,40 @@ def test_aircraft_a2a_mass_via_specs():
     assert hornet.t_max_sl_n == pytest.approx(156600)
 
 
-def test_load_saturation_equipment_csv_groups():
-    """饱和打击：四类装备均可从 CSV 识别。"""
-    data = load_saturation_equipment_csv(SATURATION_EQUIPMENT_CSV)
-    assert set(data) == {'asm', 'aew', 'ship', 'sam'}
+def test_load_saturation_missile_csv_groups():
+    """饱和打击：导弹库含反舰弹与防空弹。"""
+    data = load_saturation_missile_csv(SATURATION_MISSILE_CSV)
+    assert set(data) == {'asm', 'sam'}
     assert len(data['asm']) >= 7
     assert len(data['sam']) >= 8
     assert data['asm'][0]['id'] == 'exocet'
     assert 'vm' in data['asm'][0]
-    assert 'area' in data['aew'][0]
     assert 'guidance' in data['sam'][0]
 
 
+def test_load_saturation_radar_csv_groups():
+    """饱和打击：雷达库含预警机与舰载雷达。"""
+    data = load_saturation_radar_csv(SATURATION_RADAR_CSV)
+    assert set(data) == {'aew', 'ship'}
+    assert len(data['aew']) >= 4
+    assert len(data['ship']) >= 5
+    assert 'area' in data['aew'][0]
+    assert 'standoff' in data['aew'][0]
+    assert 'area' in data['ship'][0]
+    assert 'standoff' not in data['ship'][0]
+
+
+def test_load_saturation_presets_csv_merges():
+    """合并双库后应得到四类预设。"""
+    data = load_saturation_presets_csv()
+    assert set(data) == {'asm', 'aew', 'ship', 'sam'}
+    assert data['asm'][0]['id'] == 'exocet'
+    assert data['aew'][0]['id'] == 'e2d'
+
+
 def test_list_model_ids_from_saturation_csv():
-    """列出 CSV 型号 id，供前端自动同步断言。"""
-    ids = list_model_ids_from_saturation_csv(SATURATION_EQUIPMENT_CSV)
+    """列出双库型号 id，供前端自动同步断言。"""
+    ids = list_model_ids_from_saturation_csv()
     assert 'yj12' in ids['asm']
     assert 'e2d' in ids['aew']
     assert 'type055' in ids['ship']

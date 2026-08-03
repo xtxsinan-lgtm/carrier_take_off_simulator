@@ -10,9 +10,9 @@ from scripts.frontend_catalog import SIMULATORS, build_catalog_payload
 from utils.database_csv import (
     load_aircraft_csv,
     load_carriers_csv,
-    load_saturation_equipment_csv,
+    load_saturation_presets_csv,
 )
-from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV, ROOT, SATURATION_EQUIPMENT_CSV
+from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV, ROOT
 
 
 @pytest.mark.e2e
@@ -20,7 +20,7 @@ def test_e2e_catalog_auto_detects_csv_models():
     """起飞与饱和 CSV 中的型号须全部出现在 catalog / API data。"""
     aircraft = load_aircraft_csv(AIRCRAFT_CSV)
     carriers = load_carriers_csv(CARRIERS_CSV)
-    sat = load_saturation_equipment_csv(SATURATION_EQUIPMENT_CSV)
+    sat = load_saturation_presets_csv()
     payload = build_catalog_payload(aircraft, carriers)
 
     assert {a['id'] for a in payload['aircraft']} == set(aircraft)

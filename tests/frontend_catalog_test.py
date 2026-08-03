@@ -89,8 +89,7 @@ def test_pyodide_bundles_saturation_presets_csv_deps():
 
 def test_build_catalog_payload_includes_simulators_and_csv_presets():
     """catalog 须含启动页模拟器列表，且饱和预设与 CSV 一致。"""
-    from utils.database_csv import load_saturation_equipment_csv
-    from utils.paths import SATURATION_EQUIPMENT_CSV
+    from utils.database_csv import load_saturation_presets_csv
     from scripts.frontend_catalog import SIMULATORS
 
     payload = build_catalog_payload(
@@ -98,8 +97,9 @@ def test_build_catalog_payload_includes_simulators_and_csv_presets():
         load_carriers_csv(CARRIERS_CSV),
     )
     assert payload['simulators'] == SIMULATORS
-    csv_data = load_saturation_equipment_csv(SATURATION_EQUIPMENT_CSV)
+    csv_data = load_saturation_presets_csv()
     assert [x['id'] for x in payload['saturation_presets']['asm']] == [x['id'] for x in csv_data['asm']]
+    assert [x['id'] for x in payload['saturation_presets']['aew']] == [x['id'] for x in csv_data['aew']]
     assert len(payload['aircraft']) >= 1
     assert len(payload['carriers']) >= 1
 

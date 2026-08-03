@@ -10,7 +10,7 @@ from utils.saturation_presets import (
     get_preset_by_id,
     load_presets,
 )
-from utils.paths import SATURATION_EQUIPMENT_CSV
+from utils.paths import SATURATION_MISSILE_CSV, SATURATION_RADAR_CSV
 
 
 def test_get_preset_by_id_found():
@@ -38,13 +38,16 @@ def test_build_saturation_presets_payload_keys():
 
 
 def test_load_presets_from_csv_path():
-    """显式路径加载与默认路径一致。"""
-    a = load_presets(SATURATION_EQUIPMENT_CSV)
+    """显式双库路径加载与默认路径一致。"""
+    a = load_presets(SATURATION_MISSILE_CSV, SATURATION_RADAR_CSV)
     b = load_presets()
     assert [x['id'] for x in a['asm']] == [x['id'] for x in b['asm']]
+    assert [x['id'] for x in a['aew']] == [x['id'] for x in b['aew']]
 
 
 def test_load_presets_missing_file_returns_empty():
-    """CSV 不存在时返回空分组（Pyodide 等环境）。"""
-    empty = load_presets('/tmp/no-such-saturation-equipment.csv')
+    """任一 CSV 不存在时返回空分组（Pyodide 等环境）。"""
+    empty = load_presets('/tmp/no-such-missile.csv', '/tmp/no-such-radar.csv')
     assert empty == {'asm': [], 'aew': [], 'ship': [], 'sam': []}
+    half = load_presets('/tmp/no-such-missile.csv', SATURATION_RADAR_CSV)
+    assert half == {'asm': [], 'aew': [], 'ship': [], 'sam': []}
