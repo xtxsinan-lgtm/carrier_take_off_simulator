@@ -32,8 +32,8 @@ DATA_VERSION = 14
 SIMULATORS = [
     {
         'id': 'takeoff',
-        'name': '航母舰载机起飞仿真',
-        'subtitle': '滑跃 / 短距 / 短距滑跃 / 倾转短距',
+        'name': '航母舰载机起飞距离仿真',
+        'subtitle': 'CARRIER TAKEOFF · 滑跃 / 短距 / 短距滑跃 / 倾转短距',
         'html': 'takeoff.html',
         'miniprogram_page': '/pages/index/index',
         'ios_route': 'takeoff',

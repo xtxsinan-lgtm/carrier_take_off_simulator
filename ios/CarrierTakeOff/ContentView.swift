@@ -186,11 +186,11 @@ struct ContentView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("航母舰载机起飞仿真终端")
+            Text("航母舰载机起飞距离仿真终端")
                 .font(.system(size: 14, weight: .bold, design: .monospaced))
                 .foregroundStyle(AppTheme.accent)
                 .tracking(2)
-            Text("CARRIER TAKEOFF · LOCAL PYODIDE")
+            Text("CARRIER TAKEOFF")
                 .font(.system(size: 10, design: .monospaced))
                 .foregroundStyle(AppTheme.muted)
                 .tracking(1)

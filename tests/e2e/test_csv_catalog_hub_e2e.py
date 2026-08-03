@@ -52,7 +52,7 @@ def test_e2e_docs_hub_and_takeoff_pages():
 @pytest.mark.e2e
 def test_e2e_takeoff_terminal_gui_three_channels():
     """起飞战术终端观感须在 HTML / 小程序 / iOS 三端同时落地。"""
-    title = '航母舰载机起飞仿真终端'
+    title = '航母舰载机起飞距离仿真终端'
     tags = ('MODE', 'CARRIER', 'AIRCRAFT', 'INPUT', 'OUTPUT', 'TRAJECTORY')
 
     html = (ROOT / 'docs' / 'takeoff.html').read_text(encoding='utf-8')

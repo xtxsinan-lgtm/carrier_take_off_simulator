@@ -15,9 +15,6 @@ struct HubView: View {
                 Text("舰载作战仿真终端")
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundStyle(Color(hex: 0xE8EEF0))
-                Text("型号列表由 CSV → data.json 自动同步")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(hex: 0x8AA0A8))
 
                 ForEach(simulators) { sim in
                     NavigationLink {
