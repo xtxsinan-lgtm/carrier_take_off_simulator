@@ -23,7 +23,7 @@ CARRIERS_CSV_COLUMNS = (
 
 # 饱和打击导弹库（反舰弹 / 防空弹）
 SATURATION_MISSILE_CSV_COLUMNS = (
-    'category', 'id', 'name',
+    'category', 'id', 'name', 'nation',
     'vm_ma', 'rcs_m2', 'traj',
     'vi_ma', 'dia_m', 'guidance', 'range_km',
     'notes',
@@ -31,7 +31,7 @@ SATURATION_MISSILE_CSV_COLUMNS = (
 
 # 饱和打击雷达库（预警机 / 舰载雷达）
 SATURATION_RADAR_CSV_COLUMNS = (
-    'category', 'id', 'name',
+    'category', 'id', 'name', 'nation',
     'area_m2', 'radar_type', 'standoff_km',
     'notes',
 )
@@ -69,6 +69,14 @@ def _parse_float(raw: str, field: str) -> float:
     if not text:
         raise ValueError(f'缺少必填数值字段 {field}')
     return float(text)
+
+
+def _parse_nation(row: dict[str, str], path: Path, item_id: str) -> str:
+    """读取国别列；两级（国别 → 型号）选择器依赖该列，故要求非空。"""
+    nation = (row.get('nation') or '').strip()
+    if not nation:
+        raise ValueError(f'{path} 记录 {item_id} 缺少 nation（国别）')
+    return nation
 
 
 def export_aircraft_csv(path: str | Path, aircraft: dict[str, 'AircraftSpec']) -> None:
@@ -195,7 +203,9 @@ def load_saturation_missile_csv(path: str | Path) -> dict[str, list[dict[str, An
                 continue
             if cat not in grouped:
                 raise ValueError(f'{path} 未知 category={cat!r}（id={item_id}；导弹库仅允许 asm/sam）')
-            item: dict[str, Any] = {'id': item_id, 'name': name}
+            item: dict[str, Any] = {
+                'id': item_id, 'name': name, 'nation': _parse_nation(row, path, item_id),
+            }
             notes = (row.get('notes') or '').strip()
             if notes:
                 item['notes'] = notes
@@ -240,7 +250,9 @@ def load_saturation_radar_csv(path: str | Path) -> dict[str, list[dict[str, Any]
                 continue
             if cat not in grouped:
                 raise ValueError(f'{path} 未知 category={cat!r}（id={item_id}；雷达库仅允许 aew/ship）')
-            item: dict[str, Any] = {'id': item_id, 'name': name}
+            item: dict[str, Any] = {
+                'id': item_id, 'name': name, 'nation': _parse_nation(row, path, item_id),
+            }
             notes = (row.get('notes') or '').strip()
             if notes:
                 item['notes'] = notes

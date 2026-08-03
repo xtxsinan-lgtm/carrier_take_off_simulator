@@ -35,6 +35,10 @@ final class SaturationViewModel: ObservableObject {
     @Published var selectedAewId = ""
     @Published var selectedShipId = ""
     @Published var selectedSamId = ""
+    // 反舰 / 驱护 / 防空为两级选择：先国别再型号，空串表示不限国别
+    @Published var selectedAsmNation = ""
+    @Published var selectedShipNation = ""
+    @Published var selectedSamNation = ""
 
     @Published var distNote = ""
     @Published var pkNote = ""
@@ -80,6 +84,36 @@ final class SaturationViewModel: ObservableObject {
 
     /// 当前是否选择了预警机（未选择「无预警机」即视为有预警机，含自定义/空选项）
     var hasAwacs: Bool { selectedAewId != Self.noAewId }
+
+    /// 从预设列表提取去重国别（按首次出现顺序，与 Python nations_sorted 一致）
+    static func nationsSorted(_ items: [SaturationPresetItem]) -> [String] {
+        var seen: [String] = []
+        for item in items {
+            let nation = (item.nation ?? "").trimmingCharacters(in: .whitespaces)
+            if !nation.isEmpty, !seen.contains(nation) { seen.append(nation) }
+        }
+        return seen
+    }
+
+    /// 按国别过滤预设；国别为空时返回全部
+    static func filterPresets(_ items: [SaturationPresetItem], nation: String) -> [SaturationPresetItem] {
+        let key = nation.trimmingCharacters(in: .whitespaces)
+        if key.isEmpty { return items }
+        return items.filter { ($0.nation ?? "").trimmingCharacters(in: .whitespaces) == key }
+    }
+
+    var asmNations: [String] { Self.nationsSorted(asmPresets) }
+    var shipNations: [String] { Self.nationsSorted(shipPresets) }
+    var samNations: [String] { Self.nationsSorted(samPresets) }
+
+    var asmModels: [SaturationPresetItem] { Self.filterPresets(asmPresets, nation: selectedAsmNation) }
+    var shipModels: [SaturationPresetItem] { Self.filterPresets(shipPresets, nation: selectedShipNation) }
+    var samModels: [SaturationPresetItem] { Self.filterPresets(samPresets, nation: selectedSamNation) }
+
+    /// 切换国别后型号需复位为「— 自定义 —」，避免残留其他国别的选中项
+    func resetAsmModel() { selectedAsmId = "" }
+    func resetShipModel() { selectedShipId = "" }
+    func resetSamModel() { selectedSamId = "" }
 
     func applyAsmPreset() {
         guard let p = asmPresets.first(where: { $0.id == selectedAsmId }) else { return }

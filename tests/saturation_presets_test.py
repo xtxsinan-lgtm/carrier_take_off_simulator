@@ -7,8 +7,10 @@ from utils.saturation_presets import (
     SAM_PRESETS,
     SHIP_PRESETS,
     build_saturation_presets_payload,
+    filter_presets_by_nation,
     get_preset_by_id,
     load_presets,
+    nations_sorted,
 )
 from utils.paths import SATURATION_MISSILE_CSV, SATURATION_RADAR_CSV
 
@@ -51,3 +53,48 @@ def test_load_presets_missing_file_returns_empty():
     assert empty == {'asm': [], 'aew': [], 'ship': [], 'sam': []}
     half = load_presets('/tmp/no-such-missile.csv', SATURATION_RADAR_CSV)
     assert half == {'asm': [], 'aew': [], 'ship': [], 'sam': []}
+
+
+def test_nations_sorted_dedups_by_first_appearance():
+    """国别按首次出现顺序去重，忽略空白与缺失。"""
+    presets = [
+        {'id': 'a', 'nation': '中国'},
+        {'id': 'b', 'nation': '美国'},
+        {'id': 'c', 'nation': '中国'},
+        {'id': 'd', 'nation': ' '},
+        {'id': 'e'},
+    ]
+    assert nations_sorted(presets) == ['中国', '美国']
+
+
+def test_nations_sorted_on_real_presets():
+    """真实预设的国别列表非空且不含空串。"""
+    for presets in (ASM_PRESETS, SAM_PRESETS, SHIP_PRESETS, AEW_PRESETS):
+        nations = nations_sorted(presets)
+        assert nations
+        assert all(n.strip() for n in nations)
+    assert '中国' in nations_sorted(ASM_PRESETS)
+    assert '美国' in nations_sorted(SHIP_PRESETS)
+
+
+def test_filter_presets_by_nation():
+    """按国别过滤只返回该国别型号。"""
+    china = filter_presets_by_nation(ASM_PRESETS, '中国')
+    assert china
+    assert all(x['nation'] == '中国' for x in china)
+    assert 'yj12' in [x['id'] for x in china]
+    assert 'harpoon' not in [x['id'] for x in china]
+
+
+def test_filter_presets_by_nation_empty_returns_all():
+    """国别为空视为不限国别，返回全部型号。"""
+    assert len(filter_presets_by_nation(SAM_PRESETS, '')) == len(SAM_PRESETS)
+    assert filter_presets_by_nation(SAM_PRESETS, '  ') == list(SAM_PRESETS)
+    assert filter_presets_by_nation(SAM_PRESETS, '不存在的国别') == []
+
+
+def test_payload_presets_carry_nation():
+    """目录载荷四类预设均带国别，供前端两级选择。"""
+    payload = build_saturation_presets_payload()
+    for cat in ('asm', 'sam', 'ship', 'aew'):
+        assert all(x.get('nation') for x in payload[cat]), f'{cat} 存在无国别预设'

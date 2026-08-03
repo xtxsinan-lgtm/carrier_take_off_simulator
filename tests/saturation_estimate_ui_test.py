@@ -251,6 +251,55 @@ def test_no_awacs_option_present_in_all_channels():
     assert 'has_awacs' in vm, 'iOS 估算参数缺少 has_awacs'
 
 
+def test_two_level_nation_model_selectors_in_all_channels():
+    """三端反舰/防空/驱护均为两级选择：国别选择器在型号选择器上方。"""
+    html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')
+    web_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
+    wxml = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.wxml').read_text(
+        encoding='utf-8'
+    )
+    mp_js = (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.js').read_text(
+        encoding='utf-8'
+    )
+    view = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationStrikeView.swift').read_text(
+        encoding='utf-8'
+    )
+    vm = (ROOT / 'ios' / 'CarrierTakeOff' / 'SaturationViewModel.swift').read_text(
+        encoding='utf-8'
+    )
+
+    # 三类装备的「国别 / 型号」标签对（须按国别在前、型号在后的顺序出现）
+    pairs = (('反舰导弹国别', '反舰导弹型号'), ('防空导弹国别', '防空导弹型号'),
+             ('驱护舰艇国别', '驱护舰艇型号'))
+    for channel, text, labels in (
+        ('HTML', html, (('反舰导弹国别', '反舰导弹型号'), ('舰载防空导弹国别', '舰载防空导弹型号'),
+                        ('驱护舰艇国别', '驱护舰艇型号'))),
+        ('小程序', wxml, pairs),
+        ('iOS', view, pairs),
+    ):
+        for nation_label, model_label in labels:
+            assert nation_label in text, f'{channel} 缺少国别选择器: {nation_label}'
+            assert model_label in text, f'{channel} 缺少型号选择器: {model_label}'
+            assert text.index(nation_label) < text.index(model_label), (
+                f'{channel} 「{nation_label}」须在「{model_label}」上方'
+            )
+
+    assert 'id="asmNation"' in html and 'id="samNation"' in html and 'id="shipNation"' in html
+    assert 'filterPresetsByNation' in web_js and 'nationsSorted' in web_js
+    assert 'bindNationModelSelects' in web_js
+
+    assert 'bindchange="onAsmNation"' in wxml
+    assert 'bindchange="onSamNation"' in wxml
+    assert 'bindchange="onShipNation"' in wxml
+    assert 'filterPresetsByNation' in mp_js and 'nationsSorted' in mp_js
+    assert 'asmFiltered' in mp_js and 'samFiltered' in mp_js and 'shipFiltered' in mp_js
+
+    assert 'nationPicker(' in view
+    assert 'vm.asmModels' in view and 'vm.samModels' in view and 'vm.shipModels' in view
+    assert 'func nationsSorted' in vm and 'func filterPresets' in vm
+    assert 'selectedAsmNation' in vm and 'selectedSamNation' in vm and 'selectedShipNation' in vm
+
+
 def test_missile_counts_at_top_of_inputs():
     """三端：反舰/来袭数量与防空/拦截弹数量位于所有输入参数最上方。"""
     html = (ROOT / 'docs' / 'saturation-strike.html').read_text(encoding='utf-8')

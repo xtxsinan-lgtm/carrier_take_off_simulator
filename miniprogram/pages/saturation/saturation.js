@@ -7,9 +7,34 @@ const TRAJ_NAMES = ['高空 / 常规', '掠海'];
 const SEEKERS = ['active_aesa', 'active_mech', 'semi_active'];
 const SEEKER_NAMES = ['主动 AESA', '主动机械', '半主动'];
 
+/** 「国别」选择器首项：不限国别 */
+const ALL_NATIONS = '— 全部国别 —';
+
 function num(v, d) {
   const n = Number(v);
   return Number.isFinite(n) ? n : d;
+}
+
+/** 从预设列表提取去重国别（按首次出现顺序，与 Python nations_sorted 一致）。 */
+function nationsSorted(presets) {
+  const seen = [];
+  (presets || []).forEach((p) => {
+    const nation = (p.nation || '').trim();
+    if (nation && seen.indexOf(nation) < 0) seen.push(nation);
+  });
+  return seen;
+}
+
+/** 按国别过滤预设；国别为空时返回全部。 */
+function filterPresetsByNation(presets, nation) {
+  const key = (nation || '').trim();
+  if (!key) return (presets || []).slice();
+  return (presets || []).filter((p) => (p.nation || '').trim() === key);
+}
+
+/** 型号选择器名称列表：首项固定为「— 自定义 —」。 */
+function modelNames(presets) {
+  return ['— 自定义 —'].concat((presets || []).map((x) => x.name));
 }
 
 function fmt(n, d) {
@@ -19,6 +44,10 @@ function fmt(n, d) {
 Page({
   data: {
     asmList: [], aewList: [], shipList: [], samList: [],
+    // 反舰/防空/驱护为两级选择：先国别再型号，*Filtered 为当前国别下的型号列表
+    asmFiltered: [], shipFiltered: [], samFiltered: [],
+    asmNationNames: [ALL_NATIONS], shipNationNames: [ALL_NATIONS], samNationNames: [ALL_NATIONS],
+    asmNationIndex: 0, shipNationIndex: 0, samNationIndex: 0,
     // 预警机预设下标 0 固定为「无预警机」，1 为「— 自定义 —」，>=2 为 aewList 预设
     asmNames: ['— 自定义 —'], aewNames: ['无预警机', '— 自定义 —'],
     shipNames: ['— 自定义 —'], samNames: ['— 自定义 —'],
@@ -51,10 +80,14 @@ Page({
       const samList = p.sam || [];
       this.setData({
         asmList, aewList, shipList, samList,
-        asmNames: ['— 自定义 —'].concat(asmList.map((x) => x.name)),
+        asmFiltered: asmList, shipFiltered: shipList, samFiltered: samList,
+        asmNationNames: [ALL_NATIONS].concat(nationsSorted(asmList)),
+        shipNationNames: [ALL_NATIONS].concat(nationsSorted(shipList)),
+        samNationNames: [ALL_NATIONS].concat(nationsSorted(samList)),
+        asmNames: modelNames(asmList),
         aewNames: ['无预警机', '— 自定义 —'].concat(aewList.map((x) => x.name)),
-        shipNames: ['— 自定义 —'].concat(shipList.map((x) => x.name)),
-        samNames: ['— 自定义 —'].concat(samList.map((x) => x.name)),
+        shipNames: modelNames(shipList),
+        samNames: modelNames(samList),
         statusText: '预设已加载。请配置后端 apiBaseUrl 后运行仿真。',
       });
     }).catch((e) => {
@@ -72,11 +105,35 @@ Page({
   onShipType(e) { this.setData({ shipTypeIndex: Number(e.detail.value) }); },
   onSeeker(e) { this.setData({ seekerIndex: Number(e.detail.value) }); },
 
+  /** 切换国别：重建该国别下的型号列表并复位为「— 自定义 —」。 */
+  onNation(e, listKey, nationNamesKey, indexKey, filteredKey, namesKey, modelIndexKey) {
+    const idx = Number(e.detail.value);
+    const nation = idx <= 0 ? '' : this.data[nationNamesKey][idx];
+    const filtered = filterPresetsByNation(this.data[listKey], nation);
+    this.setData({
+      [indexKey]: idx,
+      [filteredKey]: filtered,
+      [namesKey]: modelNames(filtered),
+      [modelIndexKey]: 0,
+    });
+  },
+
+  onAsmNation(e) {
+    this.onNation(e, 'asmList', 'asmNationNames', 'asmNationIndex', 'asmFiltered', 'asmNames', 'asmIndex');
+  },
+  onShipNation(e) {
+    this.onNation(e, 'shipList', 'shipNationNames', 'shipNationIndex', 'shipFiltered', 'shipNames', 'shipIndex');
+  },
+  onSamNation(e) {
+    this.onNation(e, 'samList', 'samNationNames', 'samNationIndex', 'samFiltered', 'samNames', 'samIndex');
+  },
+
   onAsmPreset(e) {
     const idx = Number(e.detail.value);
     this.setData({ asmIndex: idx });
     if (idx <= 0) return;
-    const p = this.data.asmList[idx - 1];
+    const p = this.data.asmFiltered[idx - 1];
+    if (!p) return;
     this.setData({
       vm: String(p.vm), rcs: String(p.rcs),
       trajIndex: Math.max(0, TRAJ.indexOf(p.traj)),
@@ -97,7 +154,8 @@ Page({
     const idx = Number(e.detail.value);
     this.setData({ shipIndex: idx });
     if (idx <= 0) return;
-    const p = this.data.shipList[idx - 1];
+    const p = this.data.shipFiltered[idx - 1];
+    if (!p) return;
     this.setData({
       shipArea: String(p.area),
       shipTypeIndex: Math.max(0, RADAR_TYPES.indexOf(p.type)),
@@ -107,7 +165,8 @@ Page({
     const idx = Number(e.detail.value);
     this.setData({ samIndex: idx });
     if (idx <= 0) return;
-    const p = this.data.samList[idx - 1];
+    const p = this.data.samFiltered[idx - 1];
+    if (!p) return;
     this.setData({
       vi: String(p.vi), interceptorDia: String(p.dia), samRange: String(p.range),
       seekerIndex: Math.max(0, SEEKERS.indexOf(p.guidance)),

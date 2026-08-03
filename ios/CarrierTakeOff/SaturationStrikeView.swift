@@ -17,7 +17,10 @@ struct SaturationStrikeView: View {
                     field("拦截弹数量", text: $vm.ni)
 
                     sectionLabel("▸ 打击方", color: SaturationTheme.red)
-                    presetPicker("反舰导弹预设", selection: $vm.selectedAsmId, items: vm.asmPresets) {
+                    nationPicker("反舰导弹国别", selection: $vm.selectedAsmNation, nations: vm.asmNations) {
+                        vm.resetAsmModel()
+                    }
+                    presetPicker("反舰导弹型号", selection: $vm.selectedAsmId, items: vm.asmModels) {
                         vm.applyAsmPreset()
                     }
                     field("速度 (Ma)", text: $vm.vm)
@@ -33,10 +36,16 @@ struct SaturationStrikeView: View {
                     field("前出距离 (km)", text: $vm.standoff)
 
                     sectionLabel("▸ 舰载雷达 & 拦截弹", color: SaturationTheme.green)
-                    presetPicker("驱逐舰雷达", selection: $vm.selectedShipId, items: vm.shipPresets) {
+                    nationPicker("驱护舰艇国别", selection: $vm.selectedShipNation, nations: vm.shipNations) {
+                        vm.resetShipModel()
+                    }
+                    presetPicker("驱护舰艇型号", selection: $vm.selectedShipId, items: vm.shipModels) {
                         vm.applyShipPreset()
                     }
-                    presetPicker("防空导弹", selection: $vm.selectedSamId, items: vm.samPresets) {
+                    nationPicker("防空导弹国别", selection: $vm.selectedSamNation, nations: vm.samNations) {
+                        vm.resetSamModel()
+                    }
+                    presetPicker("防空导弹型号", selection: $vm.selectedSamId, items: vm.samModels) {
                         vm.applySamPreset()
                     }
                     field("舰载天线 (m²)", text: $vm.shipArea)
@@ -194,6 +203,29 @@ struct SaturationStrikeView: View {
             }
             .pickerStyle(.menu)
             .tint(SaturationTheme.cyan)
+        }
+    }
+
+    /// 两级选择的第一级：国别；切换后由 onChange 复位型号
+    private func nationPicker(
+        _ label: String,
+        selection: Binding<String>,
+        nations: [String],
+        onChange: @escaping () -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.system(size: 11, design: .monospaced))
+                .foregroundStyle(SaturationTheme.textDim)
+            Picker(label, selection: selection) {
+                Text("— 全部国别 —").tag("")
+                ForEach(nations, id: \.self) { nation in
+                    Text(nation).tag(nation)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(SaturationTheme.cyan)
+            .onChange(of: selection.wrappedValue) { _, _ in onChange() }
         }
     }
 

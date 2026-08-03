@@ -18,7 +18,13 @@
 
     <view class="section red">▸ 打击方</view>
     <view class="field">
-      <view class="field-label"><text>反舰导弹预设</text></view>
+      <view class="field-label"><text>反舰导弹国别</text></view>
+      <picker mode="selector" range="{{asmNationNames}}" value="{{asmNationIndex}}" bindchange="onAsmNation">
+        <view class="picker-val">{{asmNationNames[asmNationIndex]}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <view class="field-label"><text>反舰导弹型号</text></view>
       <picker mode="selector" range="{{asmNames}}" value="{{asmIndex}}" bindchange="onAsmPreset">
         <view class="picker-val">{{asmNames[asmIndex] || '自定义'}}</view>
       </picker>
@@ -63,13 +69,25 @@
 
     <view class="section green">▸ 舰载雷达 & 拦截弹</view>
     <view class="field">
-      <view class="field-label"><text>驱逐舰雷达预设</text></view>
+      <view class="field-label"><text>驱护舰艇国别</text></view>
+      <picker mode="selector" range="{{shipNationNames}}" value="{{shipNationIndex}}" bindchange="onShipNation">
+        <view class="picker-val">{{shipNationNames[shipNationIndex]}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <view class="field-label"><text>驱护舰艇型号</text></view>
       <picker mode="selector" range="{{shipNames}}" value="{{shipIndex}}" bindchange="onShipPreset">
         <view class="picker-val">{{shipNames[shipIndex] || '自定义'}}</view>
       </picker>
     </view>
     <view class="field">
-      <view class="field-label"><text>防空导弹预设</text></view>
+      <view class="field-label"><text>防空导弹国别</text></view>
+      <picker mode="selector" range="{{samNationNames}}" value="{{samNationIndex}}" bindchange="onSamNation">
+        <view class="picker-val">{{samNationNames[samNationIndex]}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <view class="field-label"><text>防空导弹型号</text></view>
       <picker mode="selector" range="{{samNames}}" value="{{samIndex}}" bindchange="onSamPreset">
         <view class="picker-val">{{samNames[samIndex] || '自定义'}}</view>
       </picker>

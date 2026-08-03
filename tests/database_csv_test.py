@@ -2,6 +2,8 @@
 import pytest
 
 from utils.database_csv import (
+    SATURATION_MISSILE_CSV_COLUMNS,
+    SATURATION_RADAR_CSV_COLUMNS,
     list_model_ids_from_saturation_csv,
     load_aircraft_csv,
     load_carriers_csv,
@@ -92,3 +94,60 @@ def test_list_model_ids_from_saturation_csv():
     assert 'e2d' in ids['aew']
     assert 'type055' in ids['ship']
     assert 'hhq9' in ids['sam']
+
+
+def test_saturation_csv_columns_include_nation():
+    """双库表头须含 nation 列，且位于 name 之后。"""
+    for columns in (SATURATION_MISSILE_CSV_COLUMNS, SATURATION_RADAR_CSV_COLUMNS):
+        assert 'nation' in columns
+        assert columns.index('nation') == columns.index('name') + 1
+
+
+def test_saturation_presets_all_have_nation():
+    """四类预设每条记录均带非空国别（两级选择器依赖）。"""
+    data = load_saturation_presets_csv()
+    for cat in ('asm', 'sam', 'ship', 'aew'):
+        assert data[cat], f'{cat} 无记录'
+        for item in data[cat]:
+            assert item.get('nation'), f"{cat} {item['id']} 缺少国别"
+
+
+@pytest.mark.parametrize(('cat', 'item_id', 'nation'), [
+    ('asm', 'yj12', '中国'),
+    ('asm', 'harpoon', '美国'),
+    ('sam', 'sm6', '美国'),
+    ('sam', 'hhq9', '中国'),
+    ('ship', 'type055', '中国'),
+    ('ship', 'burke3', '美国'),
+    ('aew', 'kj600', '中国'),
+    ('aew', 'e2d', '美国'),
+])
+def test_saturation_preset_nation_samples(cat: str, item_id: str, nation: str):
+    """抽样校验各类装备国别取值。"""
+    data = load_saturation_presets_csv()
+    item = next(x for x in data[cat] if x['id'] == item_id)
+    assert item['nation'] == nation
+
+
+def test_saturation_missile_csv_missing_nation_raises(tmp_path):
+    """国别为空时导弹库加载须报错，避免出现无国别型号。"""
+    path = tmp_path / 'missile.csv'
+    path.write_text(
+        ','.join(SATURATION_MISSILE_CSV_COLUMNS) + '\n'
+        'asm,x1,测试弹,,2.0,0.2,sea,,,,,\n',
+        encoding='utf-8',
+    )
+    with pytest.raises(ValueError, match='nation'):
+        load_saturation_missile_csv(path)
+
+
+def test_saturation_radar_csv_missing_nation_raises(tmp_path):
+    """国别为空时雷达库加载须报错。"""
+    path = tmp_path / 'radar.csv'
+    path.write_text(
+        ','.join(SATURATION_RADAR_CSV_COLUMNS) + '\n'
+        'ship,x1,测试舰,,12,aesa,,\n',
+        encoding='utf-8',
+    )
+    with pytest.raises(ValueError, match='nation'):
+        load_saturation_radar_csv(path)

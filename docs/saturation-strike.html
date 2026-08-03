@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>饱和打击 / 拦截仿真终端</title>
-<link rel="stylesheet" href="css/saturation.css?v=6">
+<link rel="stylesheet" href="css/saturation.css?v=7">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
@@ -36,7 +36,11 @@
 
     <div class="section-label red">▸ 打击方 / ATTACKER</div>
     <div class="field">
-      <label>反舰导弹型号预设 <span class="unit">可选</span></label>
+      <label>反舰导弹国别 <span class="unit">可选</span></label>
+      <select id="asmNation"></select>
+    </div>
+    <div class="field">
+      <label>反舰导弹型号 <span class="unit">可选</span></label>
       <select id="asmPreset"></select>
     </div>
     <div class="field">
@@ -80,11 +84,19 @@
 
     <div class="section-label green">▸ 舰载雷达 &amp; 拦截弹</div>
     <div class="field">
-      <label>驱逐舰型号预设（雷达） <span class="unit">可选</span></label>
+      <label>驱护舰艇国别 <span class="unit">可选</span></label>
+      <select id="shipNation"></select>
+    </div>
+    <div class="field">
+      <label>驱护舰艇型号（雷达） <span class="unit">可选</span></label>
       <select id="shipPreset"></select>
     </div>
     <div class="field">
-      <label>舰载防空导弹型号预设 <span class="unit">可选</span></label>
+      <label>舰载防空导弹国别 <span class="unit">可选</span></label>
+      <select id="samNation"></select>
+    </div>
+    <div class="field">
+      <label>舰载防空导弹型号 <span class="unit">可选</span></label>
       <select id="samPreset"></select>
     </div>
     <div class="field">
@@ -205,6 +217,6 @@
 
 <div class="footer">MONTE CARLO N=<span id="mcN">–</span> · Python 同源仿真 · 仅用于战术资源分配算法演示</div>
 
-<script type="module" src="js/saturation.js?v=10"></script>
+<script type="module" src="js/saturation.js?v=11"></script>
 </body>
 </html>

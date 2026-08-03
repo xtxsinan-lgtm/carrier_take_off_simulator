@@ -3,7 +3,7 @@
  */
 const PYODIDE_VERSION = '0.26.4';
 /** 与 saturation-strike.html 中 ?v= 同步递增 */
-const APP_VERSION = 10;
+const APP_VERSION = 11;
 
 /** 预警机预设中「无预警机」的特殊 value */
 const AEW_NONE_VALUE = '__none__';
@@ -56,6 +56,42 @@ function fillSelect(selectEl, presets) {
     presets.map((p) => `<option value="${p.id}">${p.name}</option>`).join('');
 }
 
+/** 从预设列表提取去重国别（按首次出现顺序，与 Python nations_sorted 一致）。 */
+function nationsSorted(presets) {
+  const seen = [];
+  (presets || []).forEach((p) => {
+    const nation = (p.nation || '').trim();
+    if (nation && !seen.includes(nation)) seen.push(nation);
+  });
+  return seen;
+}
+
+/** 按国别过滤预设；国别为空时返回全部。 */
+function filterPresetsByNation(presets, nation) {
+  const key = (nation || '').trim();
+  if (!key) return (presets || []).slice();
+  return (presets || []).filter((p) => (p.nation || '').trim() === key);
+}
+
+/**
+ * 绑定「国别 → 型号」两级选择器：选国别后重建型号列表并复位为自定义，
+ * 选型号后调用 apply 回填参数。
+ */
+function bindNationModelSelects(nationEl, modelEl, presets, apply) {
+  nationEl.innerHTML =
+    '<option value="">— 全部国别 —</option>' +
+    nationsSorted(presets).map((n) => `<option value="${n}">${n}</option>`).join('');
+  fillSelect(modelEl, presets);
+  nationEl.addEventListener('change', () => {
+    fillSelect(modelEl, filterPresetsByNation(presets, nationEl.value));
+    modelEl.value = '';
+  });
+  modelEl.addEventListener('change', () => {
+    const p = (presets || []).find((x) => x.id === modelEl.value);
+    if (p) apply(p);
+  });
+}
+
 /** 在预警机预设下拉框中插入「无预警机」选项（紧跟自定义选项之后）。 */
 function insertNoAewOption(selectEl) {
   const noneOpt = document.createElement('option');
@@ -74,19 +110,24 @@ function setAwacsFieldsDisabled(disabled) {
 
 function applyPresetsFromData() {
   const presets = data.saturation_presets || {};
-  fillSelect($('asmPreset'), presets.asm || []);
-  fillSelect($('aewPreset'), presets.aew || []);
-  insertNoAewOption($('aewPreset'));
-  fillSelect($('shipPreset'), presets.ship || []);
-  fillSelect($('samPreset'), presets.sam || []);
-
-  $('asmPreset').addEventListener('change', (e) => {
-    const p = (presets.asm || []).find((x) => x.id === e.target.value);
-    if (!p) return;
+  bindNationModelSelects($('asmNation'), $('asmPreset'), presets.asm || [], (p) => {
     $('vm').value = p.vm;
     $('rcs').value = p.rcs;
     $('traj').value = p.traj;
   });
+  bindNationModelSelects($('shipNation'), $('shipPreset'), presets.ship || [], (p) => {
+    $('shipArea').value = p.area;
+    $('shipType').value = p.type;
+  });
+  bindNationModelSelects($('samNation'), $('samPreset'), presets.sam || [], (p) => {
+    $('vi').value = p.vi;
+    $('interceptorDia').value = p.dia;
+    $('seekerType').value = p.guidance;
+    $('samRange').value = p.range;
+  });
+
+  fillSelect($('aewPreset'), presets.aew || []);
+  insertNoAewOption($('aewPreset'));
   $('aewPreset').addEventListener('change', (e) => {
     const isNone = e.target.value === AEW_NONE_VALUE;
     setAwacsFieldsDisabled(isNone);
@@ -96,20 +137,6 @@ function applyPresetsFromData() {
     $('awacsArea').value = p.area;
     $('awacsType').value = p.type;
     $('standoff').value = p.standoff;
-  });
-  $('shipPreset').addEventListener('change', (e) => {
-    const p = (presets.ship || []).find((x) => x.id === e.target.value);
-    if (!p) return;
-    $('shipArea').value = p.area;
-    $('shipType').value = p.type;
-  });
-  $('samPreset').addEventListener('change', (e) => {
-    const p = (presets.sam || []).find((x) => x.id === e.target.value);
-    if (!p) return;
-    $('vi').value = p.vi;
-    $('interceptorDia').value = p.dia;
-    $('seekerType').value = p.guidance;
-    $('samRange').value = p.range;
   });
 }
 

@@ -34,6 +34,26 @@ def get_preset_by_id(presets: list[dict[str, Any]], preset_id: str) -> dict[str,
     return None
 
 
+def nations_sorted(presets: list[dict[str, Any]]) -> list[str]:
+    """从预设列表提取去重国别并稳定排序（按首次出现顺序）。"""
+    seen: list[str] = []
+    for item in presets:
+        nation = (item.get('nation') or '').strip()
+        if nation and nation not in seen:
+            seen.append(nation)
+    return seen
+
+
+def filter_presets_by_nation(
+    presets: list[dict[str, Any]], nation: str
+) -> list[dict[str, Any]]:
+    """按国别过滤预设；国别为空时返回全部。"""
+    key = (nation or '').strip()
+    if not key:
+        return list(presets)
+    return [x for x in presets if (x.get('nation') or '').strip() == key]
+
+
 def build_saturation_presets_payload(
     missile_path: str | Path | None = None,
     radar_path: str | Path | None = None,

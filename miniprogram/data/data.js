@@ -3,7 +3,7 @@
  * 请勿手改；修改 CSV 后运行 python3 scripts/build_all.py。
  */
 module.exports = {
-  "version": 14,
+  "version": 15,
   "pilot_load_kg": 100.0,
   "a2a_missile_count": 4,
   "pitch_max_deg": 20.0,
@@ -465,6 +465,7 @@ module.exports = {
       {
         "id": "exocet",
         "name": "飞鱼 Exocet MM40 Block3 (法国)",
+        "nation": "法国",
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.15,
@@ -473,6 +474,7 @@ module.exports = {
       {
         "id": "harpoon",
         "name": "鱼叉 Harpoon (美国)",
+        "nation": "美国",
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.85,
         "rcs": 0.3,
@@ -481,6 +483,7 @@ module.exports = {
       {
         "id": "yj12",
         "name": "鹰击-12 YJ-12 (中国)",
+        "nation": "中国",
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.5,
         "rcs": 0.3,
@@ -489,6 +492,7 @@ module.exports = {
       {
         "id": "yj18",
         "name": "鹰击-18 YJ-18 (中国, 末端超音速)",
+        "nation": "中国",
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.2,
@@ -497,6 +501,7 @@ module.exports = {
       {
         "id": "kalibr",
         "name": "口径 3M-54 Kalibr (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 2.9,
         "rcs": 0.2,
@@ -505,6 +510,7 @@ module.exports = {
       {
         "id": "brahmos",
         "name": "布拉莫斯 BrahMos (印度/俄罗斯)",
+        "nation": "印度",
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.3,
@@ -513,6 +519,7 @@ module.exports = {
       {
         "id": "nsm",
         "name": "海军打击导弹 NSM (挪威, 隐身外形)",
+        "nation": "挪威",
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 0.93,
         "rcs": 0.05,
@@ -521,6 +528,7 @@ module.exports = {
       {
         "id": "yj83",
         "name": "鹰击-83/C-802 YJ-83 (中国)",
+        "nation": "中国",
         "notes": "公开资料亚音速掠海反舰弹·射程约180km；部分资料称末端可加速至1.2-1.4Ma；RCS为量级估计",
         "vm": 0.9,
         "rcs": 0.2,
@@ -529,6 +537,7 @@ module.exports = {
       {
         "id": "yj62",
         "name": "鹰击-62 YJ-62 (中国)",
+        "nation": "中国",
         "notes": "公开资料亚音速掠海反舰弹·巡航高度30m/末段7-10m·射程约280-400km；RCS为量级估计",
         "vm": 0.8,
         "rcs": 0.25,
@@ -537,6 +546,7 @@ module.exports = {
       {
         "id": "yj91",
         "name": "鹰击-91 YJ-91 (中国·改自Kh-31P)",
+        "nation": "中国",
         "notes": "反辐射弹改型反舰弹·末端掠海约1.2m·射程约110km；RCS为量级估计",
         "vm": 3.5,
         "rcs": 0.15,
@@ -545,6 +555,7 @@ module.exports = {
       {
         "id": "yj17",
         "name": "鹰击-17 YJ-17 (中国·高超声速滑翔)",
+        "nation": "中国",
         "notes": "2025年阅兵公开的乘波体高超声速滑翔反舰弹·射程约1200km；RCS为滑翔体量级估计",
         "vm": 8.0,
         "rcs": 0.1,
@@ -553,6 +564,7 @@ module.exports = {
       {
         "id": "yj19",
         "name": "鹰击-19 YJ-19 (中国·超燃冲压)",
+        "nation": "中国",
         "notes": "超燃冲压发动机高超声速反舰弹·2025年阅兵公开·部分资料称可达10Ma以上；RCS为量级估计",
         "vm": 8.5,
         "rcs": 0.15,
@@ -561,6 +573,7 @@ module.exports = {
       {
         "id": "yj20",
         "name": "鹰击-20 YJ-20 (中国·高超声速弹道)",
+        "nation": "中国",
         "notes": "双锥体高超声速反舰弹道弹·射程约1500-2000km·由055型垂发冷发射；RCS为量级估计",
         "vm": 10.0,
         "rcs": 0.1,
@@ -569,6 +582,7 @@ module.exports = {
       {
         "id": "yj21",
         "name": "鹰击-21 YJ-21 (中国·高超声速弹道)",
+        "nation": "中国",
         "notes": "准弹道式反舰弹·巡航6Ma/末端10Ma·055型/H-6发射·射程约1500km；RCS为量级估计",
         "vm": 10.0,
         "rcs": 0.12,
@@ -577,6 +591,7 @@ module.exports = {
       {
         "id": "lrasm",
         "name": "LRASM AGM-158C (美国)",
+        "nation": "美国",
         "notes": "JASSM衍生低RCS隐身反舰弹·多模复合导引头(GPS/INS+成像红外+无源ESM)含自主目标识别；RCS为量级估计",
         "vm": 0.9,
         "rcs": 0.04,
@@ -585,6 +600,7 @@ module.exports = {
       {
         "id": "jsm",
         "name": "JSM联合打击导弹 (挪威)",
+        "nation": "挪威",
         "notes": "F-35内埋弹舱适配隐身反舰弹·可高-高-低/低-低-低多剖面飞行；RCS为量级估计",
         "vm": 0.9,
         "rcs": 0.05,
@@ -593,6 +609,7 @@ module.exports = {
       {
         "id": "zircon",
         "name": "3M22锆石 Zircon (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "超燃冲压高超声速反舰/对陆巡航弹·2023年服役·射程超1000km；RCS为量级估计",
         "vm": 8.0,
         "rcs": 0.2,
@@ -601,6 +618,7 @@ module.exports = {
       {
         "id": "p500",
         "name": "P-500玄武岩 Bazalt (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "大型冲压反舰弹·巡航高度50-5000m·末端2.0Ma掠海俯冲·射程550km；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.35,
@@ -609,6 +627,7 @@ module.exports = {
       {
         "id": "p700",
         "name": "P-700花岗岩 Granit (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "大型冲压反舰弹·高空巡航2.5Ma以上·射程约550-625km；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.35,
@@ -617,6 +636,7 @@ module.exports = {
       {
         "id": "p270",
         "name": "P-270白蛉 Moskit/SS-N-22 (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "超低空掠海反舰弹(10-20m/末段小于7m)·高空模式可达3Ma·射程120-250km；RCS为量级估计",
         "vm": 2.2,
         "rcs": 0.3,
@@ -625,6 +645,7 @@ module.exports = {
       {
         "id": "kh22",
         "name": "Kh-22/AS-4厨房 (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "大型高空超音速反舰/对陆弹·高空模式爬升27000m后俯冲·射程约600km；RCS为量级估计",
         "vm": 4.6,
         "rcs": 0.4,
@@ -633,6 +654,7 @@ module.exports = {
       {
         "id": "kh32",
         "name": "Kh-32 (俄罗斯·Kh-22改进型)",
+        "nation": "俄罗斯",
         "notes": "Kh-22升级型·升限达40000m·射程约600-1000km；RCS为量级估计",
         "vm": 4.6,
         "rcs": 0.4,
@@ -641,6 +663,7 @@ module.exports = {
       {
         "id": "kh31",
         "name": "Kh-31/AS-17小妖精 (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "Kh-31A反舰型末端掠海·射程7.5-70km·衍生型号含鹰击-91；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.15,
@@ -649,6 +672,7 @@ module.exports = {
       {
         "id": "kh15",
         "name": "Kh-15/AS-16厨刀 (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "空射弹道式导弹·爬升至40000m后俯冲末端5Ma·射程300km；RCS为量级估计",
         "vm": 5.0,
         "rcs": 0.15,
@@ -657,6 +681,7 @@ module.exports = {
       {
         "id": "hf2",
         "name": "雄风二型 Hsiung Feng II (台湾地区)",
+        "nation": "台湾地区",
         "notes": "亚音速掠海反舰弹·射程约80km·弹径0.34m；RCS为量级估计",
         "vm": 0.75,
         "rcs": 0.2,
@@ -665,6 +690,7 @@ module.exports = {
       {
         "id": "hf3",
         "name": "雄风三型 Hsiung Feng III (台湾地区)",
+        "nation": "台湾地区",
         "notes": "固体助推加液体冲压超音速掠海反舰弹·射程150-300km(增程型更远)；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.25,
@@ -673,6 +699,7 @@ module.exports = {
       {
         "id": "rbs15",
         "name": "RBS-15 Mk4 Gungnir (瑞典)",
+        "nation": "瑞典",
         "notes": "亚音速掠海反舰弹·惯性/抗干扰GPS/J波段主动雷达制导·射程超300km；RCS为量级估计",
         "vm": 0.9,
         "rcs": 0.2,
@@ -681,6 +708,7 @@ module.exports = {
       {
         "id": "taurus350",
         "name": "Taurus KEPD 350 (德国/瑞典)",
+        "nation": "德国",
         "notes": "隐身外形亚音速巡航弹·地形跟踪低空突防(30-40m)·主要用于对陆/大型舰船·射程超500km；RCS为量级估计",
         "vm": 0.9,
         "rcs": 0.1,
@@ -689,6 +717,7 @@ module.exports = {
       {
         "id": "quicksink",
         "name": "Quicksink制导炸弹 (美国)",
+        "nation": "美国",
         "notes": "GBU-31/GBU-38 JDAM改装反舰套件(加装雷达+成像红外导引头)·由高空投放滑翔·滑翔射程约74km；RCS为量级估计",
         "vm": 0.9,
         "rcs": 0.15,
@@ -697,6 +726,7 @@ module.exports = {
       {
         "id": "tasm",
         "name": "战斧反舰型 Maritime Strike Tomahawk (美国)",
+        "nation": "美国",
         "notes": "战斧Block Va海上打击型·GPS/INS加改进导引头可打击海上机动目标·射程约1600km；RCS为量级估计",
         "vm": 0.75,
         "rcs": 0.2,
@@ -705,6 +735,7 @@ module.exports = {
       {
         "id": "aargmer",
         "name": "AGM-88G AARGM-ER (美国)",
+        "nation": "美国",
         "notes": "反辐射弹用于压制/摧毁舰载雷达等辐射源·射程约130km；RCS为量级估计",
         "vm": 2.0,
         "rcs": 0.07,
@@ -715,6 +746,7 @@ module.exports = {
       {
         "id": "e2d",
         "name": "E-2D 先进鹰眼 (美国, 固定翼舰载)",
+        "nation": "美国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 40.0,
         "type": "aesa",
@@ -723,6 +755,7 @@ module.exports = {
       {
         "id": "e2c",
         "name": "E-2C 鹰眼 (美国, 固定翼舰载, 早期型)",
+        "nation": "美国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 40.0,
         "type": "mechanical",
@@ -731,6 +764,7 @@ module.exports = {
       {
         "id": "kj600",
         "name": "空警-600 KJ-600 (中国, 固定翼舰载)",
+        "nation": "中国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 40.0,
         "type": "aesa",
@@ -739,6 +773,7 @@ module.exports = {
       {
         "id": "ka31",
         "name": "卡-31 Ka-31 预警直升机 (俄/中/印)",
+        "nation": "俄罗斯",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 6.0,
         "type": "pesa",
@@ -747,6 +782,7 @@ module.exports = {
       {
         "id": "z18j",
         "name": "直-18J Z-18J预警直升机 (中国)",
+        "nation": "中国",
         "notes": "二维X波段有源相控阵可收放雷达天线·公开资料探测距离约200-320km·天线面积由公开外形尺寸推估",
         "area": 7.0,
         "type": "aesa",
@@ -755,6 +791,7 @@ module.exports = {
       {
         "id": "aw101crowsnest",
         "name": "AW101 Crowsnest预警直升机 (英国)",
+        "nation": "英国",
         "notes": "搜水2000(Searchwater 2000)机械扫描雷达加Cerberus任务系统·充气整流罩侧挂收放·取代海王ASaC7·天线面积由公开外形尺寸推估",
         "area": 4.0,
         "type": "mechanical",
@@ -765,6 +802,7 @@ module.exports = {
       {
         "id": "burke3",
         "name": "阿利·伯克 Flight III (美国, SPY-6)",
+        "nation": "美国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 13.5,
         "type": "gan_aesa"
@@ -772,6 +810,7 @@ module.exports = {
       {
         "id": "burke2a",
         "name": "阿利·伯克 Flight IIA (美国, SPY-1D)",
+        "nation": "美国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 12.0,
         "type": "pesa"
@@ -779,6 +818,7 @@ module.exports = {
       {
         "id": "type052d",
         "name": "052D (中国, Type 346A)",
+        "nation": "中国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 14.0,
         "type": "aesa"
@@ -786,6 +826,7 @@ module.exports = {
       {
         "id": "type055",
         "name": "055 (中国, Type 346B)",
+        "nation": "中国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 21.0,
         "type": "aesa"
@@ -793,6 +834,7 @@ module.exports = {
       {
         "id": "type45",
         "name": "45型 Type 45 (英国, SAMPSON)",
+        "nation": "英国",
         "notes": "天线面积由公开外形尺寸推估",
         "area": 6.0,
         "type": "aesa"
@@ -800,6 +842,7 @@ module.exports = {
       {
         "id": "type054a",
         "name": "054A护卫舰 (中国·Type 382)",
+        "nation": "中国",
         "notes": "Type 382三坐标对海对空雷达·双背靠背平面阵列旋转扫描·天线面积由公开外形尺寸推估",
         "area": 8.0,
         "type": "pesa"
@@ -807,6 +850,7 @@ module.exports = {
       {
         "id": "type054b",
         "name": "054B护卫舰 (中国)",
+        "nation": "中国",
         "notes": "新一代旋转双面S波段AESA加独立X波段AESA·公开资料有限·天线面积为量级推估",
         "area": 7.0,
         "type": "aesa"
@@ -814,6 +858,7 @@ module.exports = {
       {
         "id": "type052c",
         "name": "052C驱逐舰 (中国·Type 346)",
+        "nation": "中国",
         "notes": "「中华神盾」346雷达四面固定阵列·引用3.9x4.6m结构尺寸·早期型多归类为PESA",
         "area": 18.0,
         "type": "pesa"
@@ -821,6 +866,7 @@ module.exports = {
       {
         "id": "type051c",
         "name": "051C驱逐舰 (中国)",
+        "nation": "中国",
         "notes": "引进俄制Fregat-MAE-5三坐标警戒雷达(顶板)配合独立照射雷达制导S-300FM·天线面积由公开外形尺寸推估",
         "area": 14.0,
         "type": "pesa"
@@ -828,6 +874,7 @@ module.exports = {
       {
         "id": "ticonderoga",
         "name": "提康德罗加级巡洋舰 (美国·SPY-1A/B)",
+        "nation": "美国",
         "notes": "SPY-1A/B四面无源相控阵·天线面尺寸3.5x3.5m",
         "area": 12.0,
         "type": "pesa"
@@ -835,6 +882,7 @@ module.exports = {
       {
         "id": "perry",
         "name": "佩里级护卫舰 (美国·SPS-49)",
+        "nation": "美国",
         "notes": "SPS-49二维搜索雷达机械扫描无三坐标测高功能·天线面积为量级推估",
         "area": 5.0,
         "type": "mechanical"
@@ -842,6 +890,7 @@ module.exports = {
       {
         "id": "constellation",
         "name": "星座级护卫舰 (美国·SPY-6V3)",
+        "nation": "美国",
         "notes": "SPY-6(V)3增强型护卫舰型AESA(EASR)收发组件数少于伯克III型(V)1·天线面积为量级推估",
         "area": 4.0,
         "type": "gan_aesa"
@@ -849,6 +898,7 @@ module.exports = {
       {
         "id": "burke1",
         "name": "阿利·伯克 Flight I伯克I型 (美国·SPY-1D)",
+        "nation": "美国",
         "notes": "与Flight IIA同为SPY-1D雷达阵面尺寸相同",
         "area": 12.0,
         "type": "pesa"
@@ -856,6 +906,7 @@ module.exports = {
       {
         "id": "burke2",
         "name": "阿利·伯克 Flight II伯克II型 (美国·SPY-1D)",
+        "nation": "美国",
         "notes": "与Flight I/IIA同为SPY-1D雷达阵面尺寸相同",
         "area": 12.0,
         "type": "pesa"
@@ -863,6 +914,7 @@ module.exports = {
       {
         "id": "sovremenny",
         "name": "现代级驱逐舰 (俄罗斯·MR-750)",
+        "nation": "俄罗斯",
         "notes": "MR-750「顶板」三坐标警戒雷达双背靠背频扫阵列·天线面积为量级推估",
         "area": 16.0,
         "type": "pesa"
@@ -870,6 +922,7 @@ module.exports = {
       {
         "id": "udaloy",
         "name": "无畏级驱逐舰 (俄罗斯·MR-760MA)",
+        "nation": "俄罗斯",
         "notes": "MR-760MA「顶板」三坐标警戒雷达与现代级同族",
         "area": 16.0,
         "type": "pesa"
@@ -877,6 +930,7 @@ module.exports = {
       {
         "id": "kirov",
         "name": "基洛夫级巡洋舰 (俄罗斯·MR-800)",
+        "nation": "俄罗斯",
         "notes": "MR-800「顶对」远程三坐标雷达反射面7.5x8.5m·核动力巡洋舰级超大型天线",
         "area": 64.0,
         "type": "pesa"
@@ -884,6 +938,7 @@ module.exports = {
       {
         "id": "gorshkov",
         "name": "22350型护卫舰 (俄罗斯·Poliment)",
+        "nation": "俄罗斯",
         "notes": "5P-20K「波利缅特」四面固定S波段AESA配Redut垂发·天线面积为量级推估",
         "area": 6.0,
         "type": "aesa"
@@ -891,6 +946,7 @@ module.exports = {
       {
         "id": "grigorovich",
         "name": "11356R型护卫舰 (俄罗斯·Fregat M2EM)",
+        "nation": "俄罗斯",
         "notes": "Fregat-M2EM三坐标警戒雷达探测战斗机型目标230km/掠海导弹50km",
         "area": 16.0,
         "type": "pesa"
@@ -898,6 +954,7 @@ module.exports = {
       {
         "id": "kolkata",
         "name": "加尔各答级驱逐舰 (印度·MF-STAR)",
+        "nation": "印度",
         "notes": "以色列IAI EL/M-2248 MF-STAR四面固定S波段AESA·天线口径约3m",
         "area": 7.0,
         "type": "aesa"
@@ -905,6 +962,7 @@ module.exports = {
       {
         "id": "delhi",
         "name": "德里级驱逐舰 (印度·Half Plate)",
+        "nation": "印度",
         "notes": "Half Plate(Fregat MR-755M2)三坐标警戒雷达为顶板简化型",
         "area": 12.0,
         "type": "pesa"
@@ -912,6 +970,7 @@ module.exports = {
       {
         "id": "visakhapatnam",
         "name": "维沙卡帕特南级驱逐舰 (印度·MF-STAR)",
+        "nation": "印度",
         "notes": "沿用MF-STAR为加尔各答级改进型",
         "area": 7.0,
         "type": "aesa"
@@ -919,6 +978,7 @@ module.exports = {
       {
         "id": "nilgiri",
         "name": "尼尔吉里级护卫舰 (印度·Project 17A)",
+        "nation": "印度",
         "notes": "17A型护卫舰采用MF-STAR与加尔各答/维沙卡帕特南级同源",
         "area": 7.0,
         "type": "aesa"
@@ -926,6 +986,7 @@ module.exports = {
       {
         "id": "kongo",
         "name": "金刚级驱逐舰 (日本·SPY-1D)",
+        "nation": "日本",
         "notes": "日本首型宙斯盾舰·SPY-1D四面阵",
         "area": 12.0,
         "type": "pesa"
@@ -933,6 +994,7 @@ module.exports = {
       {
         "id": "atago",
         "name": "爱宕级驱逐舰 (日本·SPY-1D V)",
+        "nation": "日本",
         "notes": "SPY-1D(V)改进型·阵面尺寸与金刚级相同",
         "area": 12.0,
         "type": "pesa"
@@ -940,6 +1002,7 @@ module.exports = {
       {
         "id": "maya",
         "name": "摩耶级驱逐舰 (日本·SPY-1D V)",
+        "nation": "日本",
         "notes": "与爱宕级同为SPY-1D(V)·具备协同作战能力(CEC)",
         "area": 12.0,
         "type": "pesa"
@@ -947,6 +1010,7 @@ module.exports = {
       {
         "id": "akizuki",
         "name": "秋月级驱逐舰 (日本·FCS-3A)",
+        "nation": "日本",
         "notes": "FCS-3A双波段(C加X)有源相控阵·全球首型实用化氮化镓GaN AESA",
         "area": 5.0,
         "type": "gan_aesa"
@@ -954,6 +1018,7 @@ module.exports = {
       {
         "id": "asahi",
         "name": "朝日级驱逐舰 (日本·OPY-1)",
+        "nation": "日本",
         "notes": "OPY-1为FCS-3A双波段配置优化反潜整合·与秋月级同族",
         "area": 5.0,
         "type": "gan_aesa"
@@ -961,6 +1026,7 @@ module.exports = {
       {
         "id": "mogami",
         "name": "最上级护卫舰 (日本·OPY-2)",
+        "nation": "日本",
         "notes": "OPY-2 X波段一体化AESA·由OPY-1衍生的独立强化版·隐身桅杆整合",
         "area": 4.0,
         "type": "gan_aesa"
@@ -968,6 +1034,7 @@ module.exports = {
       {
         "id": "sejong",
         "name": "世宗大王级驱逐舰 (韩国·SPY-1D V)",
+        "nation": "韩国",
         "notes": "Batch I搭载宙斯盾基线7第一阶段加SPY-1D(V)",
         "area": 12.0,
         "type": "pesa"
@@ -975,6 +1042,7 @@ module.exports = {
       {
         "id": "jeongjo",
         "name": "正祖大王级驱逐舰 (韩国·SPY-1D V)",
+        "nation": "韩国",
         "notes": "Batch II搭载宙斯盾基线9.C2·雷达仍为SPY-1D(V)非AESA",
         "area": 12.0,
         "type": "pesa"
@@ -982,6 +1050,7 @@ module.exports = {
       {
         "id": "chungnam",
         "name": "忠南级护卫舰 (韩国·FFX Batch III)",
+        "nation": "韩国",
         "notes": "韩华FFX Batch III国产四面固定数字AESA多功能雷达·天线面积为量级推估",
         "area": 6.0,
         "type": "aesa"
@@ -989,6 +1058,7 @@ module.exports = {
       {
         "id": "daegu",
         "name": "大邱级护卫舰 (韩国·SPS-550K)",
+        "nation": "韩国",
         "notes": "SPS-550K旋转式线阵AESA(LIG Nex1)·天线尺寸为量级推估",
         "area": 3.0,
         "type": "aesa"
@@ -996,6 +1066,7 @@ module.exports = {
       {
         "id": "incheon",
         "name": "仁川级护卫舰 (韩国·SPS-550K)",
+        "nation": "韩国",
         "notes": "与大邱级同为SPS-550K旋转式线阵AESA",
         "area": 3.0,
         "type": "aesa"
@@ -1003,6 +1074,7 @@ module.exports = {
       {
         "id": "horizon",
         "name": "地平线级驱逐舰 (法国/意大利·EMPAR)",
+        "nation": "法国/意大利",
         "notes": "EMPAR单面旋转无源相控阵·天线口径约1.5x1.5m·球形整流罩直径5m",
         "area": 2.25,
         "type": "pesa"
@@ -1010,6 +1082,7 @@ module.exports = {
       {
         "id": "f127",
         "name": "F127型护卫舰 (德国·在研)",
+        "nation": "德国",
         "notes": "采用与伯克III型相同的SPY-6(V)1四面RMA模块化GaN AESA·尚在设计建造阶段预计2033-34年服役",
         "area": 13.5,
         "type": "gan_aesa"
@@ -1017,6 +1090,7 @@ module.exports = {
       {
         "id": "type26",
         "name": "26型护卫舰 (英国·Artisan 997)",
+        "nation": "英国",
         "notes": "997「工匠」三坐标对空对海雷达·中程搜索用途·天线重约700kg·面积为量级推估",
         "area": 3.0,
         "type": "aesa"
@@ -1024,6 +1098,7 @@ module.exports = {
       {
         "id": "type31",
         "name": "31型护卫舰 (英国·NS110)",
+        "nation": "英国",
         "notes": "泰雷兹NS110(NS100家族小型号)旋转AESA·天线面积为量级推估",
         "area": 3.0,
         "type": "aesa"
@@ -1031,6 +1106,7 @@ module.exports = {
       {
         "id": "nansen",
         "name": "南森级护卫舰 (挪威·SPY-1F)",
+        "nation": "挪威",
         "notes": "SPY-1F为SPY-1家族小型化版本·适配4000吨级护卫舰·天线面积为量级推估",
         "area": 4.0,
         "type": "pesa"
@@ -1038,6 +1114,7 @@ module.exports = {
       {
         "id": "fremmit",
         "name": "FREMM护卫舰意大利型 (意大利·Kronos)",
+        "nation": "意大利",
         "notes": "徕昂纳多「克罗诺斯」Grand Naval C波段AESA·搜索加火控一体·天线面积为量级推估",
         "area": 6.0,
         "type": "aesa"
@@ -1045,6 +1122,7 @@ module.exports = {
       {
         "id": "fremmfr",
         "name": "FREMM护卫舰法国型 (法国·Herakles)",
+        "nation": "法国",
         "notes": "泰雷兹「武仙座」Herakles无源相控阵·E/F波段探测距离250-300km·天线面积为量级推估",
         "area": 5.0,
         "type": "pesa"
@@ -1052,6 +1130,7 @@ module.exports = {
       {
         "id": "bazan",
         "name": "阿尔瓦罗·巴赞级护卫舰 (西班牙·SPY-1D)",
+        "nation": "西班牙",
         "notes": "F100型护卫舰采用SPY-1D·与提康德罗加/伯克同型阵面尺寸",
         "area": 12.0,
         "type": "pesa"
@@ -1061,6 +1140,7 @@ module.exports = {
       {
         "id": "sm2",
         "name": "SM-2MR 标准-2 (美国)",
+        "nation": "美国",
         "notes": "公开资料速度/直径/射程",
         "vi": 3.5,
         "dia": 0.343,
@@ -1070,6 +1150,7 @@ module.exports = {
       {
         "id": "sm6",
         "name": "SM-6 标准-6 (美国)",
+        "nation": "美国",
         "notes": "公开资料速度/直径/射程",
         "vi": 3.5,
         "dia": 0.343,
@@ -1079,6 +1160,7 @@ module.exports = {
       {
         "id": "aster30",
         "name": "Aster 30 (法国/欧洲)",
+        "nation": "欧洲",
         "notes": "公开资料速度/直径/射程",
         "vi": 4.5,
         "dia": 0.18,
@@ -1088,6 +1170,7 @@ module.exports = {
       {
         "id": "essm",
         "name": "ESSM Block2 (北约通用)",
+        "nation": "北约",
         "notes": "公开资料速度/直径/射程",
         "vi": 4.0,
         "dia": 0.254,
@@ -1097,6 +1180,7 @@ module.exports = {
       {
         "id": "hhq9",
         "name": "海红旗-9 HHQ-9 (中国)",
+        "nation": "中国",
         "notes": "公开资料速度/直径/射程",
         "vi": 4.2,
         "dia": 0.56,
@@ -1106,6 +1190,7 @@ module.exports = {
       {
         "id": "barak8",
         "name": "巴拉克-8 Barak 8 (以色列/印度)",
+        "nation": "以色列",
         "notes": "公开资料速度/直径/射程",
         "vi": 2.0,
         "dia": 0.225,
@@ -1115,6 +1200,7 @@ module.exports = {
       {
         "id": "seaceptor",
         "name": "海上拦截者 Sea Ceptor/CAMM (英国)",
+        "nation": "英国",
         "notes": "公开资料速度/直径/射程",
         "vi": 3.0,
         "dia": 0.166,
@@ -1124,6 +1210,7 @@ module.exports = {
       {
         "id": "s300f",
         "name": "里夫/48N6 S-300F (俄罗斯)",
+        "nation": "俄罗斯",
         "notes": "公开资料速度/直径/射程",
         "vi": 6.0,
         "dia": 0.52,
@@ -1133,6 +1220,7 @@ module.exports = {
       {
         "id": "sm2er",
         "name": "SM-2ER RIM-156标准-2增程型 (美国)",
+        "nation": "美国",
         "notes": "公开资料速度/直径/射程；与SM-6共用助推器与弹体",
         "vi": 3.5,
         "dia": 0.343,
@@ -1142,6 +1230,7 @@ module.exports = {
       {
         "id": "hhq9b",
         "name": "海红旗-9B HHQ-9B (中国)",
+        "nation": "中国",
         "notes": "公开资料速度/直径/射程；主动雷达加被动红外双模末制导增强抗干扰",
         "vi": 4.4,
         "dia": 0.56,
@@ -1151,6 +1240,7 @@ module.exports = {
       {
         "id": "hhq16f",
         "name": "海红旗-16F HQ-16FE参考型 (中国)",
+        "nation": "中国",
         "notes": "参考出口型HQ-16FE公开参数；射高15m-27km配相控阵雷达跟踪",
         "vi": 3.0,
         "dia": 0.34,
@@ -1160,6 +1250,7 @@ module.exports = {
       {
         "id": "hq10",
         "name": "红旗-10 HQ-10舰载型 (中国)",
+        "nation": "中国",
         "notes": "红外成像末制导舰载近程点防御弹·自主末制导不依赖照射(按active_mech归类)·射高低至1.5m",
         "vi": 2.5,
         "dia": 0.12,
@@ -1169,6 +1260,7 @@ module.exports = {
       {
         "id": "rim116",
         "name": "RIM-116 RAM滚转弹体导弹 (美国)",
+        "nation": "美国",
         "notes": "被动射频/红外复合导引自主末制导(按active_mech归类)·Block2性能",
         "vi": 2.0,
         "dia": 0.159,
@@ -1178,6 +1270,7 @@ module.exports = {
       {
         "id": "hhq16b",
         "name": "海红旗-16B HHQ-16B (中国)",
+        "nation": "中国",
         "notes": "公开资料速度/直径/射程；较HQ-16A增程并改进发动机与弹翼",
         "vi": 3.0,
         "dia": 0.34,
@@ -1187,6 +1280,7 @@ module.exports = {
       {
         "id": "kmsam",
         "name": "KM-SAM/天弓 Cheolmae-2 (韩国)",
+        "nation": "韩国",
         "notes": "与俄罗斯金刚石-安泰协研·主要为陆基中程防空弹·公开资料速度/直径/射程",
         "vi": 4.5,
         "dia": 0.275,
@@ -1196,6 +1290,7 @@ module.exports = {
       {
         "id": "ksaam",
         "name": "K-SAAM/海龙 Haeryong (韩国)",
+        "nation": "韩国",
         "notes": "双模微波/红外复合导引头自主末制导(按active_mech归类)·用于取代RIM-116",
         "vi": 2.0,
         "dia": 0.13,
@@ -1205,6 +1300,7 @@ module.exports = {
       {
         "id": "aster15",
         "name": "Aster 15 (法国/欧洲)",
+        "nation": "欧洲",
         "notes": "与Aster 30共用0.18m弹体仅助推器较小·公开资料速度/直径/射程",
         "vi": 3.5,
         "dia": 0.18,
@@ -1214,6 +1310,7 @@ module.exports = {
       {
         "id": "vlmica",
         "name": "VL MICA垂直发射型 (法国)",
+        "nation": "欧洲",
         "notes": "MICA陆射垂直发射型·射频型(MICA-RF/EM)加红外型(MICA-IR)并存此处按主动雷达型归类",
         "vi": 4.0,
         "dia": 0.16,

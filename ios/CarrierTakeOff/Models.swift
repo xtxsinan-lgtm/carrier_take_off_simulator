@@ -35,6 +35,7 @@ struct SaturationPresets: Codable {
 struct SaturationPresetItem: Codable, Identifiable, Hashable {
     var id: String
     var name: String
+    var nation: String?
     var vm: Double?
     var rcs: Double?
     var traj: String?
