@@ -45,6 +45,7 @@ from utils.search_utils import fine_range_deck, fine_range_symmetric, grid_step
 from utils.sim_config import apply_wind_knots_globals
 from utils.ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s, deck_height_at_s
 from utils.trajectory import TrajectoryRecorder
+from utils.takeoff_config import cfg_range, mode_config, shared_config
 from utils.takeoff_physics import (
     G,
     KT_TO_MPS,
@@ -63,53 +64,43 @@ from utils.takeoff_physics import (
     taxi_alpha_deg,
 )
 
-# ---------------------------------------------------------------------------
-# 仿真模式开关
-# ---------------------------------------------------------------------------
-ALLOW_AIR_NOZZLE_VECTORING = False
-# True：离甲板后主喷口可继续偏转；此时 NOZZLE_AIR_DEG_LIST 参与参数搜索
-# False：离甲板后喷口固定为滑跑结束角；NOZZLE_AIR_DEG_LIST 被忽略
+_SHARED = shared_config()
+_MODE = mode_config('short_ski_jump')
+_REF = _MODE['reference_aircraft']
+_SEARCH = _MODE['search']
 
-# ---------------------------------------------------------------------------
-# 大气与温度（推力在 T_THRUST_REF_C 海平面标定）
-# ---------------------------------------------------------------------------
-AMBIENT_TEMP_C = 15.0           # 环境温度，°C
+ALLOW_AIR_NOZZLE_VECTORING = bool(_SHARED['allow_air_nozzle_vectoring'])
 
+AMBIENT_TEMP_C = float(_MODE['ambient_temp_c'])
 RHO = calc_sea_level_density_kg_m3(AMBIENT_TEMP_C)
 THRUST_TEMP_FACTOR = calc_thrust_temp_factor(AMBIENT_TEMP_C)
 
-# ---------------------------------------------------------------------------
-# 飞机与推力参数（F-35B）
-# ---------------------------------------------------------------------------
-MASS_KG_MTOW = 27200            # 最大起飞重量 MTOW，kg
-MASS_KG_A2A = 21620             # 满内油 + 4 枚中距弹，kg
+MASS_KG_MTOW = float(_REF['mass_kg_mtow'])
+MASS_KG_A2A = float(_REF['mass_kg_a2a'])
 MASS_KG = MASS_KG_A2A
-WEIGHT_N = MASS_KG * G          # 重力，N
+WEIGHT_N = MASS_KG * G
 
-S_REF_M2 = 42.7                 # 机翼参考面积，m²
-WINGSPAN_M = 10.7               # 翼展，m
-WING_HEIGHT_M = 1.96            # 机翼平均离地高度，m
-ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2  # 展弦比 AR = b²/S
+S_REF_M2 = float(_REF['s_ref_m2'])
+WINGSPAN_M = float(_REF['wingspan_m'])
+WING_HEIGHT_M = float(_REF['wing_height_m'])
+ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2
 
-NOZZLE_RATE_DEG_S = 95 / 2.5    # 3BSM 主喷管偏转速率，°/s（95° 需 2.5 s）
-T_MAIN_STOVL_SL_N = 83260       # STOVL 模式主喷管推力（T_THRUST_REF_C 标定），N
-ROLLPOST_EFFICIENCY = 0.9       # 滚转喷管效率（关闭时功率回收给主喷管）
-T_LIFTFAN_SL_N = 83260          # 升力风扇推力（T_THRUST_REF_C 标定），N
-T_ROLLPOSTS_SL_N = 14600        # 滚转喷管总推力（T_THRUST_REF_C 标定），N
+NOZZLE_RATE_DEG_S = float(_SHARED['nozzle_rate_deg_s'])
+T_MAIN_STOVL_SL_N = float(_REF['t_main_stovl_sl_n'])
+ROLLPOST_EFFICIENCY = float(_SHARED['rollpost_efficiency'])
+T_LIFTFAN_SL_N = float(_REF['t_liftfan_sl_n'])
+T_ROLLPOSTS_SL_N = float(_REF['t_rollposts_sl_n'])
 T_MAIN_STOVL_N = T_MAIN_STOVL_SL_N * THRUST_TEMP_FACTOR
 T_LIFTFAN_N = T_LIFTFAN_SL_N * THRUST_TEMP_FACTOR
 T_ROLLPOSTS_N = T_ROLLPOSTS_SL_N * THRUST_TEMP_FACTOR
 T_MAIN_GROUND_N = T_MAIN_STOVL_N + T_ROLLPOSTS_N / ROLLPOST_EFFICIENCY
 
-CD0 = 0.039                     # 零升阻力系数（襟翼放下、起落架未收）
+CD0 = float(_REF['cd0'])
+SWEEP_LE_DEG = float(_REF['sweep_le_deg'])
 
-SWEEP_LE_DEG = 35  # F-35B 35°，歼-35 38°，歼-15 42°
-
-# ---------------------------------------------------------------------------
-# 航母甲板参数（滑跃段为圆弧：入口切线水平，出口切线 = SKI_JUMP_ANGLE_DEG）
-# ---------------------------------------------------------------------------
-SKI_JUMP_ANGLE_DEG = 13.0
-SKI_JUMP_ARC: SkiJumpArc = compute_ski_jump_arc(SKI_JUMP_ANGLE_DEG, lip_height_m=6.0)
+SKI_JUMP_ANGLE_DEG = float(_MODE['ski_jump_angle_deg'])
+SKI_JUMP_ARC: SkiJumpArc = compute_ski_jump_arc(
+    SKI_JUMP_ANGLE_DEG, lip_height_m=float(_MODE['ski_jump_lip_height_m']))
 SKI_JUMP_ANGLE_RAD = SKI_JUMP_ARC.angle_rad
 SKI_JUMP_RADIUS_M = SKI_JUMP_ARC.radius_m
 SKI_JUMP_ARC_LENGTH_M = SKI_JUMP_ARC.arc_length_m
@@ -117,40 +108,29 @@ SKI_JUMP_HORIZONTAL_M = SKI_JUMP_ARC.horizontal_m
 SKI_JUMP_LIP_HEIGHT_M = SKI_JUMP_ARC.lip_height_m
 SKI_JUMP_COS = SKI_JUMP_ARC.cos_exit
 SKI_JUMP_SIN = SKI_JUMP_ARC.sin_exit
-# 兼容旧名
 SKI_JUMP_LENGTH_M = SKI_JUMP_ARC_LENGTH_M
-MU = 0.03
-WIND_KT = 22
+MU = float(_MODE['mu'])
+WIND_KT = float(_MODE['wind_kt'])
 V_WIND_MPS = WIND_KT * KT_TO_MPS
 
-# 策略 C：尾流约束（必须为负，表示该 x 以左的甲板须全程安全）
-MIN_SAFE_DISTANCE_M = -70.0
+MIN_SAFE_DISTANCE_M = float(_MODE['min_safe_distance_m'])
 
-# 策略 C 搜索范围
-FLAT_LENGTH_M_LIST_C = range(0, 501, 10) if not ALLOW_AIR_NOZZLE_VECTORING else range(0, 501, 20)
-PITCH_DEG_LIST_C = range(20, PITCH_MAX_DEG + 1, 1) if not ALLOW_AIR_NOZZLE_VECTORING else range(10, PITCH_MAX_DEG + 1, 2)
+_SRCH_KEY = 'with_air_nozzle' if ALLOW_AIR_NOZZLE_VECTORING else 'without_air_nozzle'
+_SRCH = _SEARCH[_SRCH_KEY]
+_SC = _SEARCH['strategy_c']
 
-# ---------------------------------------------------------------------------
-# 参数搜索范围（随 ALLOW_AIR_NOZZLE_VECTORING 切换，保持与原两文件一致）
-# ---------------------------------------------------------------------------
-if ALLOW_AIR_NOZZLE_VECTORING:
-    NOZZLE_TAKEOFF_DEG_LIST_A = range(5, 71, 5)
-    FLAT_LENGTH_M_LIST_A = range(30, 201, 20)
-    V_TRANS_MPS_LIST_A = range(5, 76, 10)
-    NOZZLE_TAKEOFF_DEG_LIST_B = range(5, 31, 5)
-    FLAT_LENGTH_M_LIST_B = range(50, 501, 20)
-    PITCH_DEG_LIST = range(10, PITCH_MAX_DEG + 1, 2)
-    NOZZLE_AIR_DEG_LIST = range(0, 31, 5)  # 仅 ALLOW_AIR_NOZZLE_VECTORING=True 时参与搜索
-else:
-    NOZZLE_TAKEOFF_DEG_LIST_A = range(5, 86, 5)
-    FLAT_LENGTH_M_LIST_A = range(10, 161, 10)
-    V_TRANS_MPS_LIST_A = range(0, 41, 5)
-    NOZZLE_TAKEOFF_DEG_LIST_B = range(0, 31, 10)
-    FLAT_LENGTH_M_LIST_B = range(100, 501, 10)
-    PITCH_DEG_LIST = range(20, PITCH_MAX_DEG + 1, 1)
-    NOZZLE_AIR_DEG_LIST = range(0, 31, 5)  # 开关关闭时被忽略，保留定义便于切换模式
+FLAT_LENGTH_M_LIST_C = cfg_range(_SC['flat_length_m'])
+PITCH_DEG_LIST_C = cfg_range(_SC['pitch_deg'])
 
-FINE_SEARCH_STEP = 1
+NOZZLE_TAKEOFF_DEG_LIST_A = cfg_range(_SRCH['nozzle_takeoff_deg_a'])
+FLAT_LENGTH_M_LIST_A = cfg_range(_SRCH['flat_length_m_a'])
+V_TRANS_MPS_LIST_A = cfg_range(_SRCH['v_trans_mps_a'])
+NOZZLE_TAKEOFF_DEG_LIST_B = cfg_range(_SRCH['nozzle_takeoff_deg_b'])
+FLAT_LENGTH_M_LIST_B = cfg_range(_SRCH['flat_length_m_b'])
+PITCH_DEG_LIST = cfg_range(_SRCH['pitch_deg'])
+NOZZLE_AIR_DEG_LIST = cfg_range(_SRCH['nozzle_air_deg'])
+
+FINE_SEARCH_STEP = int(_SHARED['fine_search_step'])
 
 PLUME_PARAMS: ExhaustPlumeParams = default_exhaust_plume_params()
 
@@ -244,10 +224,10 @@ def apply_ski_jump_deck(angle_deg, lip_height_m=None):
 
 recompute_aero_parameters()
 
-DT_DEFAULT = 0.02
-MAX_GROUND_TIME_S = 30.0
-MAX_AIR_TIME_S = 3.0
-ALPHA_LIMIT_RAD = np.radians(20)
+DT_DEFAULT = float(_MODE['dt_default'])
+MAX_GROUND_TIME_S = float(_MODE['max_ground_time_s'])
+MAX_AIR_TIME_S = float(_MODE['max_air_time_s'])
+ALPHA_LIMIT_RAD = np.radians(float(_MODE['alpha_limit_deg']))
 CL_MIN, CL_MAX = 0.2, 1.8
 
 

@@ -8,7 +8,7 @@ from apps.web_simulator import (
     normalize_stovl_strategy,
     run_stovl_strategy_search,
 )
-import simulators.short_take_off as flat
+import simulators.takeoff.short_take_off as flat
 
 
 def test_normalize_stovl_strategy_default_and_case():

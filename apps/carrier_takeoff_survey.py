@@ -10,9 +10,9 @@ from typing import Any
 
 import numpy as np
 
-import simulators.short_ski_jump_take_off as ski_stovl
-import simulators.short_take_off as flat_stovl
-import simulators.ski_jump_take_off as ski_conv
+import simulators.takeoff.short_ski_jump_take_off as ski_stovl
+import simulators.takeoff.short_take_off as flat_stovl
+import simulators.takeoff.ski_jump_take_off as ski_conv
 from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV, SURVEY_RESULTS_TXT
 from utils.specs import A2A_MISSILE_COUNT, AircraftSpec, CarrierSpec, PILOT_LOAD_KG
 

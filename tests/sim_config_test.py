@@ -1,6 +1,6 @@
 """Unit tests for sim_config.py."""
-from utils.sim_config import apply_wind_knots_globals
-from utils.takeoff_physics import KT_TO_MPS
+from utils.takeoff.sim_config import apply_wind_knots_globals
+from utils.takeoff.takeoff_physics import KT_TO_MPS
 
 
 def test_apply_wind_knots_globals():

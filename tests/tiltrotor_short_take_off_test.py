@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-import simulators.tiltrotor_short_take_off as tilt
+import simulators.takeoff.tiltrotor_short_take_off as tilt
 
 
 def test_nacelle_rate_from_wikipedia_12s_for_90deg():

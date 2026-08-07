@@ -5,7 +5,7 @@ import math
 
 import pytest
 
-from utils.propeller_thrust import (
+from utils.takeoff.propeller_thrust import (
     calc_effective_disk_area_m2,
     calc_ideal_static_thrust_n,
     calc_ideal_thrust_with_axial_speed_n,

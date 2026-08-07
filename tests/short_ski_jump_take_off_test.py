@@ -1,7 +1,7 @@
 """Unit tests for short_ski_jump_take_off.py core simulation."""
 import pytest
 
-import simulators.short_ski_jump_take_off as ski_stovl
+import simulators.takeoff.short_ski_jump_take_off as ski_stovl
 
 
 def test_total_takeoff_distance_includes_arc(baseline):

@@ -10,6 +10,7 @@ final class SimulatorViewModel: ObservableObject {
     @Published var currentStrategy: String = "A"
     @Published var showStrategy: Bool = false
     @Published var strategyTitle: String = "喷口策略"
+    @Published var strategyDescription: String = ""
 
     @Published var carriers: [Carrier] = []
     @Published var aircraft: [Aircraft] = []
@@ -69,7 +70,12 @@ final class SimulatorViewModel: ObservableObject {
             ]
             modeList = modesToList(resolved.modes)
             strategyList = modesToList(stovlStrategies)
-            applyMode("ski_jump")
+            let ui = resolved.takeoff_config?.ui
+            tempC = ui?.default_temp_c.map { String(format: "%.0f", $0) } ?? "30"
+            applyMode(ui?.default_mode ?? "ski_jump")
+            if let strategy = ui?.default_strategy {
+                currentStrategy = strategy
+            }
             setStatus("目录已加载，正在初始化本地 Python 引擎（首次可能较慢）…", .loading)
             try await LocalSimulatorEngine.shared.prepare()
             engineReady = true
@@ -101,6 +107,7 @@ final class SimulatorViewModel: ObservableObject {
         currentMode = mode
         strategyTitle = isTilt ? "短舱倾转策略" : "喷口策略"
         strategyList = modesToList(strategyMap)
+        updateStrategyDescription()
         selectedCarrierId = carriers.first?.id
         selectedAircraftId = aircraft.first?.id
         showTrajectory = false
@@ -111,6 +118,19 @@ final class SimulatorViewModel: ObservableObject {
     func refreshSelections() {
         updateCarrierInfo()
         updateAircraftInfo()
+    }
+
+    func updateStrategyDescription() {
+        guard showStrategy else {
+            strategyDescription = ""
+            return
+        }
+        let cfg = catalog?.takeoff_config
+        let descs =
+            currentMode == "tiltrotor_short_takeoff"
+            ? cfg?.tiltrotor_strategy_descriptions
+            : cfg?.stovl_strategy_descriptions
+        strategyDescription = descs?[currentStrategy] ?? ""
     }
 
     func updateSkiJumpFromInputs() {

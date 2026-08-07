@@ -1,32 +1,36 @@
 """Shared atmosphere, aero, units, and flight-limit helpers for carrier takeoff simulators."""
 import numpy as np
 
+from utils.takeoff_config import physics_config
+
+_PHYS = physics_config()
+
 # ---------------------------------------------------------------------------
 # Atmosphere / thrust temperature reference
 # ---------------------------------------------------------------------------
-T_THRUST_REF_C = 15.0
-RHO_ISA_KG_M3 = 1.225
-THRUST_TEMP_EXPONENT = 0.85
+T_THRUST_REF_C = float(_PHYS['t_thrust_ref_c'])
+RHO_ISA_KG_M3 = float(_PHYS['rho_isa_kg_m3'])
+THRUST_TEMP_EXPONENT = float(_PHYS['thrust_temp_exponent'])
 
 # ---------------------------------------------------------------------------
 # Physical units
 # ---------------------------------------------------------------------------
-G = 9.81
-KT_TO_MPS = 0.514444
-M_TO_FT = 3.28084
-MPS_TO_KT = 1.94384
+G = float(_PHYS['g'])
+KT_TO_MPS = float(_PHYS['kt_to_mps'])
+M_TO_FT = float(_PHYS['m_to_ft'])
+MPS_TO_KT = float(_PHYS['mps_to_kt'])
 
 # ---------------------------------------------------------------------------
 # Flap / incidence defaults (STOVL & conventional)
 # ---------------------------------------------------------------------------
-FLAP_DEFLECTION_DEG = 20
-FLAP_EFFICIENCY = 0.5
-WING_INCIDENCE_DEG = 2
+FLAP_DEFLECTION_DEG = float(_PHYS['flap_deflection_deg'])
+FLAP_EFFICIENCY = float(_PHYS['flap_efficiency'])
+WING_INCIDENCE_DEG = float(_PHYS['wing_incidence_deg'])
 
 # ---------------------------------------------------------------------------
 # Flight limits
 # ---------------------------------------------------------------------------
-PITCH_MAX_DEG = 20
+PITCH_MAX_DEG = int(_PHYS['pitch_max_deg'])
 
 
 def calc_sea_level_density_kg_m3(ambient_temp_c, reference_temp_c=T_THRUST_REF_C):

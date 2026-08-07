@@ -2,7 +2,7 @@
 import pytest
 
 from utils.database_csv import load_aircraft_csv
-from utils.exhaust_plume import (
+from utils.takeoff.exhaust_plume import (
     PEGASUS_AIRFLOW_LB_S,
     calc_exhaust_d0_from_engine_diameter,
     calc_exhaust_u0_from_thrust_mdot,

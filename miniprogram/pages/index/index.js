@@ -38,6 +38,7 @@ Page({
     currentStrategy: 'A',
     showStrategy: false,
     strategyTitle: '喷口策略',
+    strategyDescription: '',
     carriers: [],
     aircraft: [],
     carrierNames: [],
@@ -90,6 +91,7 @@ Page({
         throw new Error('数据格式无效：缺少 carriers / aircraft');
       }
       this._data = data;
+      const ui = data.takeoff_config?.ui || {};
       this._stovlStrategies = data.stovl_strategies || {
         A: '策略 A — 延迟偏转喷口',
         B: '策略 B — 全程固定喷口',
@@ -99,11 +101,15 @@ Page({
         A: '策略 A — 延迟倾转短舱',
         B: '策略 B — 全程固定短舱角',
       };
+      const takeoffCfg = data.takeoff_config || {};
+      this._stovlStrategyDesc = takeoffCfg.stovl_strategy_descriptions || {};
+      this._tiltrotorStrategyDesc = takeoffCfg.tiltrotor_strategy_descriptions || {};
       this.setData({
         modeList: modesToList(data.modes),
         strategyList: modesToList(this._stovlStrategies),
+        tempC: ui.default_temp_c != null ? String(ui.default_temp_c) : '30',
       });
-      this.applyMode('ski_jump');
+      this.applyMode(ui.default_mode || 'ski_jump');
       const hint = config.apiBaseUrl
         ? '本地数据已加载。仿真将请求后端 API。'
         : '数据已加载。仿真需配置 config.js 中的 apiBaseUrl 并启动 python3 apps/miniprogram_api.py';
@@ -115,6 +121,14 @@ Page({
 
   setStatus(text, cls = '') {
     this.setData({ statusText: text, statusClass: cls });
+  },
+
+  resolveStrategyDescription(mode, strategy) {
+    const descs =
+      mode === 'tiltrotor_short_takeoff'
+        ? this._tiltrotorStrategyDesc
+        : this._stovlStrategyDesc;
+    return (descs && descs[strategy]) || '';
   },
 
   applyMode(mode) {
@@ -137,6 +151,7 @@ Page({
       strategyTitle: isTilt ? '短舱倾转策略' : '喷口策略',
       strategyList: modesToList(strategyMap || {}),
       currentStrategy,
+      strategyDescription: this.resolveStrategyDescription(mode, currentStrategy),
       carriers,
       aircraft,
       carrierNames: carriers.map((c) => `${c.name}（${c.nation}）`),
@@ -314,7 +329,11 @@ Page({
 
   onStrategyChange(e) {
     const strategy = e.detail.mode;
-    if (strategy) this.setData({ currentStrategy: strategy });
+    if (!strategy) return;
+    this.setData({
+      currentStrategy: strategy,
+      strategyDescription: this.resolveStrategyDescription(this.data.currentMode, strategy),
+    });
   },
 
   onCarrierChange(e) {

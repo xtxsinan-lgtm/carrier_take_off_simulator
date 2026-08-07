@@ -1,11 +1,11 @@
 """轨迹采样与甲板折线的单元测试。"""
 import pytest
 
-import simulators.short_ski_jump_take_off as ski_stovl
-import simulators.ski_jump_take_off as ski_conv
+import simulators.takeoff.short_ski_jump_take_off as ski_stovl
+import simulators.takeoff.ski_jump_take_off as ski_conv
 from apps.web_simulator import _capture_trajectory, _configure_ski_conv, resolve_ski_jump_geom
-from utils.ski_jump_geometry import compute_ski_jump_arc
-from utils.trajectory import TrajectoryRecorder, build_deck_profile
+from utils.takeoff.ski_jump_geometry import compute_ski_jump_arc
+from utils.takeoff.trajectory import TrajectoryRecorder, build_deck_profile
 
 
 def test_trajectory_recorder_none_trajectory():
@@ -102,7 +102,7 @@ def carriers():
 
 @pytest.fixture
 def f35b_ski_config():
-    import simulators.short_ski_jump_take_off as mod
+    import simulators.takeoff.short_ski_jump_take_off as mod
     from utils.database_csv import load_aircraft_csv
     from utils.paths import AIRCRAFT_CSV
     ac = load_aircraft_csv(AIRCRAFT_CSV)['F-35B']

@@ -1,7 +1,7 @@
 """Unit tests for short_take_off.py core simulation."""
 import pytest
 
-import simulators.short_take_off as flat
+import simulators.takeoff.short_take_off as flat
 
 
 def test_module_defaults_rho_and_thrust(baseline):

@@ -1,5 +1,5 @@
 """Unit tests for search_utils.py."""
-from utils.search_utils import fine_range_deck, fine_range_symmetric, grid_step
+from utils.takeoff.search_utils import fine_range_deck, fine_range_symmetric, grid_step
 
 
 def test_grid_step_from_range():

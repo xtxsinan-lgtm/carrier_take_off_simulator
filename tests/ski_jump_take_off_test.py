@@ -1,7 +1,7 @@
 """ski_jump_take_off.py 核心仿真单元测试。"""
 import pytest
 
-import simulators.ski_jump_take_off as ski_conv
+import simulators.takeoff.ski_jump_take_off as ski_conv
 
 
 def _restore_ski_conv_defaults():

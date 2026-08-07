@@ -67,7 +67,7 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
     }
 
     /// 在本地 Pyodide 中运行饱和打击仿真 / 估算
-    func runSaturation(payload: [String: Any]) async throws -> SaturationResult {
+    func runMissileInterception(payload: [String: Any]) async throws -> MissileInterceptionResult {
         try await prepare()
         guard let webView else {
             throw NSError(
@@ -77,7 +77,7 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
             )
         }
         let result = try await webView.callAsyncJavaScript(
-            "return await window.__saturationSim.run(payload);",
+            "return await window.__missileInterceptionSim.run(payload);",
             arguments: ["payload": payload],
             contentWorld: .page
         )
@@ -89,7 +89,7 @@ final class LocalSimulatorEngine: NSObject, WKScriptMessageHandler {
             )
         }
         let data = try JSONSerialization.data(withJSONObject: obj)
-        return try JSONDecoder().decode(SaturationResult.self, from: data)
+        return try JSONDecoder().decode(MissileInterceptionResult.self, from: data)
     }
 
     nonisolated func userContentController(

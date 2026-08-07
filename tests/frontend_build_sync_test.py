@@ -23,9 +23,9 @@ from scripts.generate_frontend_physics import (
 )
 from utils.database_csv import load_aircraft_csv, load_carriers_csv
 from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV, ROOT
-from utils.ski_jump_geometry import compute_ski_jump_arc
+from utils.takeoff.ski_jump_geometry import compute_ski_jump_arc
 from utils.specs import A2A_MISSILE_COUNT, PILOT_LOAD_KG
-from utils.takeoff_physics import (
+from utils.takeoff.takeoff_physics import (
     PITCH_MAX_DEG,
     calc_cl_alpha,
     calc_cl_from_alpha_deg,

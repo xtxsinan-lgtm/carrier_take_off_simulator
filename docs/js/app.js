@@ -13,7 +13,7 @@ import {
 
 const PYODIDE_VERSION = '0.26.4';
 /** 与 takeoff.html 中 app.js?v= 及 data.json?v= 同步递增，避免 CDN/浏览器缓存旧资源 */
-const APP_VERSION = 21;
+const APP_VERSION = 22;
 let data = null;
 let pyodide = null;
 let pyReady = false;
@@ -65,6 +65,16 @@ if '/py' not in sys.path:
     pyodide.FS.writeFile(`/py/${name}`, code);
   }
 
+  pyodide.globals.set('_takeoff_cfg', JSON.stringify(data.takeoff_config || {}));
+  pyodide.globals.set('_missile_interception_cfg', JSON.stringify(data.missile_interception_config || {}));
+  await pyodide.runPythonAsync(`
+import json
+from utils.takeoff.takeoff_config import inject_takeoff_config
+from utils.missile_interception.missile_interception_config import inject_missile_interception_config
+inject_takeoff_config(json.loads(_takeoff_cfg))
+inject_missile_interception_config(json.loads(_missile_interception_cfg))
+`);
+
   const importOrder = data.py_import_order || data.py_load_order.map((n) => n.replace(/\.py$/, '').replace(/\//g, '.'));
   pyodide.globals.set('_py_import_order', importOrder);
   await pyodide.runPythonAsync(`
@@ -114,7 +124,46 @@ function modeAllowsStrategyC(mode) {
   return mode === 'short_takeoff' || mode === 'short_ski_jump';
 }
 
-function populateModeButtons() {
+function strategyDescriptionMap(mode) {
+  const cfg = data?.takeoff_config;
+  if (!cfg) return {};
+  return mode === 'tiltrotor_short_takeoff'
+    ? cfg.tiltrotor_strategy_descriptions || {}
+    : cfg.stovl_strategy_descriptions || {};
+}
+
+function currentStrategyDescription() {
+  const descs = strategyDescriptionMap(currentMode);
+  return descs[currentStrategy] || '';
+}
+
+function refreshStrategySection() {
+  const show = modeNeedsStovlStrategy(currentMode);
+  els.strategySection.classList.toggle('hidden', !show);
+  const allowC = modeAllowsStrategyC(currentMode);
+  if (els.strategyBtnC) {
+    els.strategyBtnC.classList.toggle('hidden', !allowC);
+  }
+  if (els.strategyTitle) {
+    els.strategyTitle.textContent =
+      currentMode === 'tiltrotor_short_takeoff' ? '短舱倾转策略' : '喷口策略';
+  }
+  if (!allowC && currentStrategy === 'C') {
+    currentStrategy = 'A';
+  }
+  els.strategyBtns.forEach((btn) => {
+    if (btn.dataset.strategy === 'C' && !allowC) {
+      btn.classList.remove('active');
+      return;
+    }
+    btn.classList.toggle('active', btn.dataset.strategy === currentStrategy);
+  });
+  if (els.strategyDesc) {
+    const text = show ? currentStrategyDescription() : '';
+    els.strategyDesc.textContent = text;
+    els.strategyDesc.classList.toggle('hidden', !text);
+  }
+}
   /** 模式按钮由 data.modes 生成，与小程序 / catalog 同源，避免硬编码漏同步。 */
   const modes = data.modes || {};
   const ids = Object.keys(modes);
@@ -141,32 +190,7 @@ function refreshModeButtons() {
   refreshStrategySection();
 }
 
-function refreshStrategySection() {
-  const show = modeNeedsStovlStrategy(currentMode);
-  els.strategySection.classList.toggle('hidden', !show);
-  const allowC = modeAllowsStrategyC(currentMode);
-  if (els.strategyBtnC) {
-    els.strategyBtnC.classList.toggle('hidden', !allowC);
-  }
-  if (els.strategyTitle) {
-    els.strategyTitle.textContent =
-      currentMode === 'tiltrotor_short_takeoff'
-        ? '短舱倾转策略（倾转短距，无策略 C）'
-        : '喷口策略（短距 / 短距滑跃）';
-  }
-  if (!allowC && currentStrategy === 'C') {
-    currentStrategy = 'A';
-  }
-  els.strategyBtns.forEach((btn) => {
-    if (btn.dataset.strategy === 'C' && !allowC) {
-      btn.classList.remove('active');
-      return;
-    }
-    btn.classList.toggle('active', btn.dataset.strategy === currentStrategy);
-  });
-}
-
-function populateCarriers() {
+function populateModeButtons() {
   const list = filterCarriersForMode(currentMode, data.carriers);
   els.carrierSelect.innerHTML =
     list.length === 0
@@ -649,12 +673,23 @@ function bindEvents() {
   els.preloadBtn.addEventListener('click', () => initPyodide().catch((e) => setStatus(e.message, 'error')));
 }
 
+function applyTakeoffUiDefaults() {
+  const ui = data?.takeoff_config?.ui;
+  if (!ui) return;
+  if (ui.default_temp_c != null && els.tempInput) {
+    els.tempInput.value = ui.default_temp_c;
+  }
+  if (ui.default_mode) currentMode = ui.default_mode;
+  if (ui.default_strategy) currentStrategy = ui.default_strategy;
+}
+
 async function main() {
   els.modeGroup = $('modeGroup');
   els.headerSubtitle = $('headerSubtitle');
   els.modeBtns = [];
   els.strategyBtns = [...document.querySelectorAll('.strategy-btn')];
   els.strategySection = $('strategySection');
+  els.strategyDesc = $('strategyDesc');
   els.strategyBtnC = $('strategyBtnC');
   els.strategyTitle = $('strategyTitle');
   els.carrierSelect = $('carrierSelect');
@@ -680,6 +715,7 @@ async function main() {
 
   try {
     await loadData();
+    applyTakeoffUiDefaults();
     populateModeButtons();
   } catch (e) {
     setStatus(e.message, 'error');
@@ -691,7 +727,7 @@ async function main() {
   populateAircraft();
   bindEvents();
 
-  els.tempInput.value = 30;
+  applyTakeoffUiDefaults();
   setStatus('页面已加载。点击「预加载引擎」或「开始仿真」时将加载 Python 引擎。', '');
 
   const clockEl = $('takeoffClock');

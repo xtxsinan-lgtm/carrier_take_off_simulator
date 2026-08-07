@@ -7,9 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-import simulators.short_ski_jump_take_off as ski_stovl
-import simulators.short_take_off as flat
-import simulators.ski_jump_take_off as ski_conv
+import simulators.takeoff.short_ski_jump_take_off as ski_stovl
+import simulators.takeoff.short_take_off as flat
+import simulators.takeoff.ski_jump_take_off as ski_conv
 from utils.paths import BASELINE_JSON
 
 BASELINE_PATH = BASELINE_JSON

@@ -29,7 +29,7 @@
   border: 1px solid #243540;
 }
 .card.takeoff { border-top: 6rpx solid #38bdf8; }
-.card.saturation { border-top: 6rpx solid #ffb020; }
+.card.missile_interception { border-top: 6rpx solid #ffb020; }
 .card-id {
   font-size: 20rpx;
   color: #8aa0a8;

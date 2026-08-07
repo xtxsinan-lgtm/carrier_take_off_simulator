@@ -2,7 +2,7 @@
   "pages": [
     "pages/home/home",
     "pages/index/index",
-    "pages/saturation/saturation"
+    "pages/missile_interception/missile_interception"
   ],
   "window": {
     "navigationBarTitleText": "舰载作战仿真",
@@ -31,10 +31,10 @@
         "selectedIconPath": "assets/tab-takeoff-active.png"
       },
       {
-        "pagePath": "pages/saturation/saturation",
+        "pagePath": "pages/missile_interception/missile_interception",
         "text": "饱和打击",
-        "iconPath": "assets/tab-saturation.png",
-        "selectedIconPath": "assets/tab-saturation-active.png"
+        "iconPath": "assets/tab-missile-interception.png",
+        "selectedIconPath": "assets/tab-missile-interception-active.png"
       }
     ]
   },

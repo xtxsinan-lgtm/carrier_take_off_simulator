@@ -21,13 +21,12 @@ from __future__ import annotations
 import numpy as np
 
 from utils.propeller_thrust import (
-    DEFAULT_FIGURE_OF_MERIT,
-    DEFAULT_NACELLE_BLOCKAGE_FRAC,
     calc_prop_disk_area_m2,
     calc_propeller_thrust_n,
 )
 from utils.search_utils import fine_range_symmetric
 from utils.sim_config import apply_wind_knots_globals
+from utils.takeoff_config import mode_config, shared_config
 from utils.takeoff_physics import (
     G,
     KT_TO_MPS,
@@ -44,58 +43,54 @@ from utils.takeoff_physics import (
     taxi_alpha_deg,
 )
 
-# ---------------------------------------------------------------------------
-# 大气与温度（功率按与喷气推力相同的温度系数折减，近似）
-# ---------------------------------------------------------------------------
-AMBIENT_TEMP_C = 15.0
+_SHARED = shared_config()
+_MODE = mode_config('tiltrotor_short_takeoff')
+_REF = _MODE['reference_aircraft']
+_SEARCH = _MODE['search']
+
+AMBIENT_TEMP_C = float(_MODE['ambient_temp_c'])
 RHO = calc_sea_level_density_kg_m3(AMBIENT_TEMP_C)
 THRUST_TEMP_FACTOR = calc_thrust_temp_factor(AMBIENT_TEMP_C)
 
-# ---------------------------------------------------------------------------
-# MV-22 参考默认值（Wikipedia / 公开规格；气动系数为合理估计）
-# ---------------------------------------------------------------------------
-MASS_KG = 20827.0               # 空重 + 内油 + 机组近似
+MASS_KG = float(_REF['mass_kg'])
 WEIGHT_N = MASS_KG * G
-S_REF_M2 = 28.0                 # 机翼面积 301.4 ft²
-WINGSPAN_M = 13.97              # 翼展（不含旋翼）
-WING_HEIGHT_M = 2.6             # 机翼平均离地高度估计，m
+S_REF_M2 = float(_REF['s_ref_m2'])
+WINGSPAN_M = float(_REF['wingspan_m'])
+WING_HEIGHT_M = float(_REF['wing_height_m'])
 ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2
-SWEEP_LE_DEG = 0.0              # 近似平直上单翼
-CD0 = 0.062                     # 起落架放下、短距构型零升阻力估计
-MU = 0.02
-ROTATION_AOA_DEG = 10.0         # 倾转旋翼短距拉杆攻角估计
+SWEEP_LE_DEG = float(_REF['sweep_le_deg'])
+CD0 = float(_REF['cd0'])
+MU = float(_MODE['mu'])
+ROTATION_AOA_DEG = float(_MODE['rotation_aoa_deg'])
 
-# 双发 Rolls-Royce T406：各 6150 hp ≈ 4590 kW（海平面 15°C）
-SHAFT_POWER_SL_W = 2 * 4590e3
-PROP_DIAMETER_M = 11.61         # 单桨盘直径 38 ft 1 in
-N_ROTORS = 2
-NACELLE_BLOCKAGE_FRAC = DEFAULT_NACELLE_BLOCKAGE_FRAC
-FIGURE_OF_MERIT = DEFAULT_FIGURE_OF_MERIT
+SHAFT_POWER_SL_W = float(_REF['shaft_power_sl_w'])
+PROP_DIAMETER_M = float(_REF['prop_diameter_m'])
+N_ROTORS = int(_REF['n_rotors'])
+NACELLE_BLOCKAGE_FRAC = float(_MODE['nacelle_blockage_frac'])
+FIGURE_OF_MERIT = float(_MODE['figure_of_merit'])
 PROP_DISK_AREA_M2 = calc_prop_disk_area_m2(PROP_DIAMETER_M, N_ROTORS)
 
-# Wikipedia：短舱可在少至 12 s 内前倾 90°
-NACELLE_RATE_DEG_S = 90.0 / 12.0
+NACELLE_RATE_DEG_S = float(_SHARED['nacelle_rate_deg_s'])
 
 SHAFT_POWER_W = SHAFT_POWER_SL_W * THRUST_TEMP_FACTOR
 
-WIND_KT = 22
+WIND_KT = float(_MODE['wind_kt'])
 V_WIND_MPS = WIND_KT * KT_TO_MPS
 
-# 搜索范围（短舱角 0°=水平推力，90°=垂直升力）
-NACELLE_FINAL_DEG_START = 20
-NACELLE_FINAL_DEG_END = 75
-NACELLE_FINAL_DEG_STEP = 5
-V_TRANS_START_MPS = 0
-V_TRANS_END_MPS = 45
-V_TRANS_STEP_MPS = 5
-NACELLE_B_DEG_START = 25
-NACELLE_B_DEG_END = 70
-NACELLE_B_DEG_STEP = 1
-FINE_SEARCH_STEP = 1
+NACELLE_FINAL_DEG_START = _SEARCH['nacelle_final_deg']['start']
+NACELLE_FINAL_DEG_END = _SEARCH['nacelle_final_deg']['end']
+NACELLE_FINAL_DEG_STEP = _SEARCH['nacelle_final_deg']['step']
+V_TRANS_START_MPS = _SEARCH['v_trans_mps']['start']
+V_TRANS_END_MPS = _SEARCH['v_trans_mps']['end']
+V_TRANS_STEP_MPS = _SEARCH['v_trans_mps']['step']
+NACELLE_B_DEG_START = _SEARCH['nacelle_b_deg']['start']
+NACELLE_B_DEG_END = _SEARCH['nacelle_b_deg']['end']
+NACELLE_B_DEG_STEP = _SEARCH['nacelle_b_deg']['step']
+FINE_SEARCH_STEP = int(_SHARED['fine_search_step'])
 
-DT_DEFAULT = 0.01
-MAX_SIM_TIME_S = 60.0
-MAX_RUNWAY_M = 3000.0
+DT_DEFAULT = float(_MODE['dt_default'])
+MAX_SIM_TIME_S = float(_MODE['max_sim_time_s'])
+MAX_RUNWAY_M = float(_MODE['max_runway_m'])
 
 TAXI_ALPHA_DEG = taxi_alpha_deg()
 

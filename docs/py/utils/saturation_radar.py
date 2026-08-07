@@ -7,27 +7,24 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from utils.saturation_config import physics_config
+
+_PHYS = physics_config()
+
 # 雷达体制灵敏度倍率（相对机械扫描）
-TECH_MULT: dict[str, float] = {
-    'mechanical': 1.0,
-    'pesa': 1.43,
-    'aesa': 2.10,
-    'gan_aesa': 3.74,
-}
+TECH_MULT: dict[str, float] = dict(_PHYS['tech_mult'])
 
 # 假设高度（米）
-H_AWACS = 9000.0  # 预警机/预警直升机典型巡航高度
-H_SHIP_RADAR = 25.0  # 舰载对空搜索雷达天线典型高度
-H_TARGET: dict[str, float] = {
-    'sea': 10.0,       # 掠海反舰导弹合理估计掠海高度
-    'high': 12000.0,   # 高空巡航反舰导弹合理估计高度（原 15000 调整为更贴近实际的 12000）
-}
+H_AWACS = float(_PHYS['h_awacs_m'])
+H_SHIP_RADAR = float(_PHYS['h_ship_radar_m'])
+H_TARGET: dict[str, float] = dict(_PHYS['h_target_m'])
+PK_TRAJ_FACTOR: dict[str, float] = dict(_PHYS.get('pk_traj_factor', {'sea': 0.85, 'high': 1.0}))
 
 # 火控锁定距离占搜索探测距离的比例
-LOCK_FRACTION = 0.65
+LOCK_FRACTION = float(_PHYS['lock_fraction'])
 
 # Pk 基线（相对中等 RCS、无机动目标）
-PK0 = 0.75
+PK0 = float(_PHYS['pk0'])
 
 
 def clamp(x: float, lo: float, hi: float) -> float:
@@ -184,7 +181,7 @@ def estimate_pk(
         seeker_factor = radar_gain_factor(seeker_area, seeker_tech, 0.03)
 
     rcs_factor = clamp(1.0 + 0.15 * math.log10(rcs / 0.5), 0.55, 1.15)
-    traj_factor = 0.85 if traj == 'sea' else 1.0
+    traj_factor = float(PK_TRAJ_FACTOR.get(traj, PK_TRAJ_FACTOR.get('high', 1.0)))
 
     pk = clamp(
         PK0 * speed_factor * ship_radar_factor * seeker_factor * rcs_factor * traj_factor,

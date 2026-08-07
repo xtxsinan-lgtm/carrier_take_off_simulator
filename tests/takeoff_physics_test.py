@@ -1,7 +1,7 @@
 """Unit tests for takeoff_physics.py."""
 import pytest
 
-from utils.takeoff_physics import (
+from utils.takeoff.takeoff_physics import (
     FLAP_DEFLECTION_DEG,
     FLAP_EFFICIENCY,
     PITCH_MAX_DEG,

@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "physics": {
+    "mach_mps": 340.0,
+    "tech_mult": {
+      "mechanical": 1.0,
+      "pesa": 1.43,
+      "aesa": 2.10,
+      "gan_aesa": 3.74
+    },
+    "h_awacs_m": 9000.0,
+    "h_ship_radar_m": 25.0,
+    "h_target_m": {
+      "sea": 10.0,
+      "high": 12000.0,
+      "glide": 45000.0,
+      "ballistic": 80000.0
+    },
+    "dive_angle_deg": {
+      "sea": 15.0,
+      "high": 30.0,
+      "glide": 25.0,
+      "ballistic": 45.0
+    },
+    "default_sam_max_alt_km": 33.0,
+    "maneuver_pk_factor": {
+      "cruise": 1.0,
+      "scramjet": 1.06,
+      "glide": 0.88,
+      "dual_cone": 0.94
+    },
+    "pk_traj_factor": {
+      "sea": 0.85,
+      "high": 1.0,
+      "glide": 0.78,
+      "ballistic": 0.72
+    },
+    "lock_fraction": 0.65,
+    "pk0": 0.75
+  },
+  "traj_types": {
+    "high": "高空 / 常规弹道",
+    "sea": "掠海 / 海面杂波环境",
+    "glide": "滑翔体弹道（鹰击-17 等）",
+    "ballistic": "弹道导弹弹道（鹰击-20/21 等）"
+  },
+  "ui": {
+    "nm": 24,
+    "ni": 16,
+    "vm": 2.6,
+    "rcs": 0.5,
+    "traj": "high",
+    "awacs_area": 8,
+    "awacs_type": "aesa",
+    "standoff": 150,
+    "ship_area": 12,
+    "ship_type": "aesa",
+    "sam_range": 40,
+    "sam_max_alt": 33,
+    "vi": 3.8,
+    "interceptor_dia": 0.35,
+    "seeker_type": "active_aesa",
+    "tlock": 6,
+    "minr": 3,
+    "discovery_km": 120,
+    "pk": 0.7,
+    "has_awacs": false,
+    "aew_preset": "__none__"
+  },
+  "simulation": {
+    "search_trials": 900,
+    "final_trials": 6000,
+    "fast_search_trials": 200,
+    "fast_final_trials": 800
+  },
+  "estimate_defaults": {
+    "rcs": 0.5,
+    "traj": "high",
+    "awacs_area": 8,
+    "awacs_type": "aesa",
+    "standoff": 150,
+    "ship_area": 12,
+    "ship_type": "aesa",
+    "sam_range": 40,
+    "sam_max_alt": 33,
+    "vm": 2.6,
+    "vi": 3.8,
+    "interceptor_dia": 0.35,
+    "seeker_type": "active_aesa"
+  }
+}

@@ -9,7 +9,48 @@ struct CatalogPayload: Codable {
     var simulators: [SimulatorEntry]?
     var carriers: [Carrier]
     var aircraft: [Aircraft]
-    var saturation_presets: SaturationPresets?
+    var missile_interception_presets: MissileInterceptionPresets?
+    var takeoff_config: TakeoffConfigPayload?
+    var missile_interception_config: MissileInterceptionConfigPayload?
+}
+
+struct TakeoffConfigPayload: Codable {
+    var ui: TakeoffUiDefaults?
+    var stovl_strategy_descriptions: [String: String]?
+    var tiltrotor_strategy_descriptions: [String: String]?
+}
+
+struct TakeoffUiDefaults: Codable {
+    var default_mode: String?
+    var default_strategy: String?
+    var default_temp_c: Double?
+}
+
+struct MissileInterceptionConfigPayload: Codable {
+    var ui: MissileInterceptionUiDefaults?
+    var traj_types: [String: String]?
+}
+
+struct MissileInterceptionUiDefaults: Codable {
+    var nm: Int?
+    var ni: Int?
+    var vm: Double?
+    var rcs: Double?
+    var traj: String?
+    var awacs_area: Double?
+    var awacs_type: String?
+    var standoff: Double?
+    var ship_area: Double?
+    var ship_type: String?
+    var sam_range: Double?
+    var vi: Double?
+    var interceptor_dia: Double?
+    var seeker_type: String?
+    var tlock: Double?
+    var minr: Double?
+    var discovery_km: Double?
+    var pk: Double?
+    var has_awacs: Bool?
 }
 
 /// 启动页模拟器条目
@@ -24,15 +65,15 @@ struct SimulatorEntry: Codable, Identifiable, Hashable {
 }
 
 /// 饱和打击四类预设
-struct SaturationPresets: Codable {
-    var asm: [SaturationPresetItem]?
-    var aew: [SaturationPresetItem]?
-    var ship: [SaturationPresetItem]?
-    var sam: [SaturationPresetItem]?
+struct MissileInterceptionPresets: Codable {
+    var asm: [MissileInterceptionPresetItem]?
+    var aew: [MissileInterceptionPresetItem]?
+    var ship: [MissileInterceptionPresetItem]?
+    var sam: [MissileInterceptionPresetItem]?
 }
 
 /// 饱和打击单项预设（字段按类型可选）
-struct SaturationPresetItem: Codable, Identifiable, Hashable {
+struct MissileInterceptionPresetItem: Codable, Identifiable, Hashable {
     var id: String
     var name: String
     var nation: String?
@@ -46,10 +87,12 @@ struct SaturationPresetItem: Codable, Identifiable, Hashable {
     var dia: Double?
     var guidance: String?
     var range: Double?
+    var max_alt: Double?
+    var maneuver_class: String?
 }
 
 /// 饱和打击仿真结果
-struct SaturationResult: Codable {
+struct MissileInterceptionResult: Codable {
     var success: Bool
     var error: String?
     var nm: Int?
@@ -61,10 +104,10 @@ struct SaturationResult: Codable {
     var intercept_rate: Double?
     var final_trials: Int?
     var note: String?
-    var windows: [SaturationWindow]?
-    var best: SaturationPlan?
+    var windows: [MissileInterceptionWindow]?
+    var best: MissileInterceptionPlan?
     var avg_survivors: [Double]?
-    var all_candidates: [SaturationCandidate]?
+    var all_candidates: [MissileInterceptionCandidate]?
     var engage_dist: Double?
     var binding: String?
     var speed_factor: Double?
@@ -72,7 +115,12 @@ struct SaturationResult: Codable {
     var seeker_factor: Double?
     var rcs_factor: Double?
     var traj_factor: Double?
-    var awacs_detect: Double?
+    var maneuver_factor: Double?
+    var maneuver_class: String?
+    var dive_entry_km: Double?
+    var dive_angle_deg: Double?
+    var sam_max_alt_km: Double?
+    var h_engage_m: Double?
     var awacs_power: Double?
     var awacs_horizon: Double?
     var awacs_total: Double?
@@ -87,7 +135,7 @@ struct SaturationResult: Codable {
     var h_target_m: Double?
 }
 
-struct SaturationWindow: Codable, Identifiable, Hashable {
+struct MissileInterceptionWindow: Codable, Identifiable, Hashable {
     var round: Int
     var dist_start_km: Double
     var t_fly_s: Double
@@ -96,12 +144,12 @@ struct SaturationWindow: Codable, Identifiable, Hashable {
     var id: Int { round }
 }
 
-struct SaturationPlan: Codable, Hashable {
+struct MissileInterceptionPlan: Codable, Hashable {
     var name: String
     var plan: [Int]
 }
 
-struct SaturationCandidate: Codable, Identifiable, Hashable {
+struct MissileInterceptionCandidate: Codable, Identifiable, Hashable {
     var name: String
     var plan: [Int]
     var expected_leak: Double

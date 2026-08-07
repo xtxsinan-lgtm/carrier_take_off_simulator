@@ -3,7 +3,7 @@ import math
 
 import pytest
 
-from utils.ski_jump_geometry import (
+from utils.takeoff.ski_jump_geometry import (
     SKI_JUMP_REF_RADIUS_M,
     compute_ski_jump_arc,
     deck_angle_deg_at_s,

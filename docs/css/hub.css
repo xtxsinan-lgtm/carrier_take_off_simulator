@@ -76,7 +76,7 @@ html, body {
 }
 
 .sim-card.takeoff { border-top: 3px solid var(--blue); }
-.sim-card.saturation { border-top: 3px solid var(--amber); }
+.sim-card.missile_interception { border-top: 3px solid var(--amber); }
 
 .sim-id {
   font-family: var(--mono);

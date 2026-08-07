@@ -14,11 +14,11 @@ def test_get_api_data_returns_aircraft_and_carriers():
     assert 'aircraft' in data and len(data['aircraft']) >= 1
     assert 'carriers' in data and len(data['carriers']) >= 1
     assert data['modes']['ski_jump'] == '滑跃起飞'
-    assert 'saturation_presets' in data
-    assert 'asm' in data['saturation_presets']
+    assert 'missile_interception_presets' in data
+    assert 'asm' in data['missile_interception_presets']
 
 
-def test_post_saturation_simulate_success():
+def test_post_missile_interception_simulate_success():
     """饱和打击 API 返回窗口与最优方案。"""
     payload = {
         'action': 'simulate',
@@ -28,7 +28,7 @@ def test_post_saturation_simulate_success():
         },
     }
     status, _, body = handle_request(
-        'POST', '/api/saturation/simulate', json.dumps(payload).encode(),
+        'POST', '/api/missile_interception/simulate', json.dumps(payload).encode(),
     )
     assert status == 200
     result = json.loads(body.decode())

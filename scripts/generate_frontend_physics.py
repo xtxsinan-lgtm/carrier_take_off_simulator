@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """从 Python 物理常量生成前端 physics.js（Web ESM + 小程序 CommonJS）与 iOS Physics.swift。
 
-算法与 utils/takeoff_physics.py、utils/ski_jump_geometry.py、utils/specs.py 对齐；
+算法与 utils/takeoff/takeoff_physics.py、utils/takeoff/ski_jump_geometry.py、utils/specs.py 对齐；
 常量在生成时注入。请勿手改 docs/js/physics.js、miniprogram/utils/physics.js 或
 ios/CarrierTakeOff/Physics.swift。
 """
@@ -36,26 +36,17 @@ _EXPORT_NAMES = (
 
 
 def _load_constants() -> dict:
-    """从 Python 源读取前端预览所需常量。"""
-    import sys
-    if str(ROOT) not in sys.path:
-        sys.path.insert(0, str(ROOT))
-    from utils.ski_jump_geometry import SKI_JUMP_REF_RADIUS_M
-    from utils.specs import A2A_MISSILE_COUNT, PILOT_LOAD_KG
-    from utils.takeoff_physics import (
-        FLAP_DEFLECTION_DEG,
-        FLAP_EFFICIENCY,
-        PITCH_MAX_DEG,
-        WING_INCIDENCE_DEG,
-    )
+    """从 data/takeoff_config.json 读取前端预览所需常量。"""
+    from utils.takeoff.takeoff_config import physics_config
+    phys = physics_config()
     return {
-        'SKI_JUMP_REF_RADIUS_M': float(SKI_JUMP_REF_RADIUS_M),
-        'FLAP_DEFLECTION_DEG': float(FLAP_DEFLECTION_DEG),
-        'FLAP_EFFICIENCY': float(FLAP_EFFICIENCY),
-        'WING_INCIDENCE_DEG': float(WING_INCIDENCE_DEG),
-        'PILOT_LOAD_KG': float(PILOT_LOAD_KG),
-        'A2A_MISSILE_COUNT': int(A2A_MISSILE_COUNT),
-        'PITCH_MAX_DEG': float(PITCH_MAX_DEG),
+        'SKI_JUMP_REF_RADIUS_M': float(phys['ski_jump_ref_radius_m']),
+        'FLAP_DEFLECTION_DEG': float(phys['flap_deflection_deg']),
+        'FLAP_EFFICIENCY': float(phys['flap_efficiency']),
+        'WING_INCIDENCE_DEG': float(phys['wing_incidence_deg']),
+        'PILOT_LOAD_KG': float(phys['pilot_load_kg']),
+        'A2A_MISSILE_COUNT': int(phys['a2a_missile_count']),
+        'PITCH_MAX_DEG': float(phys['pitch_max_deg']),
     }
 
 

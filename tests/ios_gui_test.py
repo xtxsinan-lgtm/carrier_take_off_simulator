@@ -12,9 +12,9 @@ def test_ios_swift_sources_exist():
         'CarrierTakeOffApp.swift',
         'ContentView.swift',
         'SimulatorViewModel.swift',
-        'SaturationStrikeView.swift',
-        'SaturationViewModel.swift',
-        'SaturationTheme.swift',
+        'MissileInterceptionStrikeView.swift',
+        'MissileInterceptionViewModel.swift',
+        'MissileInterceptionTheme.swift',
         'HubView.swift',
         'CatalogStore.swift',
         'LocalSimulatorEngine.swift',
@@ -40,7 +40,7 @@ def test_ios_app_has_hub_then_simulators():
     hub = (IOS_ROOT / 'HubView.swift').read_text(encoding='utf-8')
     assert 'HubView' in app
     assert 'NavigationStack' in app
-    assert 'SaturationStrikeView' in hub
+    assert 'MissileInterceptionStrikeView' in hub
     assert 'ContentView' in hub
     assert (IOS_ROOT / 'HubView.swift').is_file()
 
@@ -70,17 +70,17 @@ def test_ios_uses_local_engine_not_http_api():
     assert 'APIClient' not in vm
     engine_js = (IOS_ROOT / 'Resources' / 'engine.js').read_text(encoding='utf-8')
     assert 'run_simulation_json' in engine_js
-    assert 'run_saturation_json' in engine_js
-    assert '__saturationSim' in engine_js
+    assert 'run_missile_interception_json' in engine_js
+    assert '__missileInterceptionSim' in engine_js
     assert 'loadPyodide' in engine_js
     assert '__BUNDLED_CATALOG__' in engine_js
     engine_swift = (IOS_ROOT / 'LocalSimulatorEngine.swift').read_text(encoding='utf-8')
     assert '__BUNDLED_CATALOG__' in engine_swift
-    assert 'runSaturation' in engine_swift
-    assert 'func runSaturation(payload:' in engine_swift
-    sat_vm = (IOS_ROOT / 'SaturationViewModel.swift').read_text(encoding='utf-8')
-    assert 'runSaturation(payload:' in sat_vm
-    assert 'runSaturation([' not in sat_vm
+    assert 'runMissileInterception' in engine_swift
+    assert 'func runMissileInterception(payload:' in engine_swift
+    sat_vm = (IOS_ROOT / 'MissileInterceptionViewModel.swift').read_text(encoding='utf-8')
+    assert 'runMissileInterception(payload:' in sat_vm
+    assert 'runMissileInterception([' not in sat_vm
 
 
 def test_ios_project_yml_exists():

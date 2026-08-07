@@ -102,15 +102,15 @@ json.dumps(run_simulation_json(_payload_json), ensure_ascii=False)
 /**
  * 运行饱和打击仿真 / 估算：payload 含 action 与 params。
  */
-async function runSaturation(payload) {
+async function runMissileInterception(payload) {
   if (!ready || !pyodide) {
     throw new Error('仿真引擎尚未就绪');
   }
-  pyodide.globals.set('_sat_payload_json', JSON.stringify(payload));
+  pyodide.globals.set('_missile_interception_payload_json', JSON.stringify(payload));
   const raw = pyodide.runPython(`
 import json
-from apps.saturation_strike_web import run_saturation_json
-json.dumps(run_saturation_json(_sat_payload_json), ensure_ascii=False)
+from apps.missile_interception_strike_web import run_missile_interception_json
+json.dumps(run_missile_interception_json(_missile_interception_payload_json), ensure_ascii=False)
 `);
   return JSON.parse(raw);
 }
@@ -121,8 +121,8 @@ window.__carrierSim = {
   isReady: () => ready,
 };
 
-window.__saturationSim = {
-  run: runSaturation,
+window.__missileInterceptionSim = {
+  run: runMissileInterception,
   isReady: () => ready,
 };
 

@@ -9,7 +9,11 @@ from simulators.saturation_strike import (
     run_estimate_pk_from_params,
     run_saturation_strike,
 )
+from utils.saturation_config import simulation_config, ui_config
 from utils.saturation_presets import build_saturation_presets_payload
+
+_UI = ui_config()
+_SIM = simulation_config()
 
 
 def _opt_float(v: Any, default: float) -> float:
@@ -51,17 +55,23 @@ def run_saturation(
 
     try:
         fast = bool(params.get('fast', False))
-        search_trials = _opt_int(params.get('search_trials'), 200 if fast else 900)
-        final_trials = _opt_int(params.get('final_trials'), 800 if fast else 6000)
+        search_trials = _opt_int(
+            params.get('search_trials'),
+            int(_SIM['fast_search_trials']) if fast else int(_SIM['search_trials']),
+        )
+        final_trials = _opt_int(
+            params.get('final_trials'),
+            int(_SIM['fast_final_trials']) if fast else int(_SIM['final_trials']),
+        )
         result = run_saturation_strike(
-            nm=_opt_int(params.get('nm'), 24),
-            vm_ma=_opt_float(params.get('vm'), 2.6),
-            discovery_km=_opt_float(params.get('D', params.get('discovery_km')), 120.0),
-            ni=_opt_int(params.get('ni'), 16),
-            vi_ma=_opt_float(params.get('vi'), 3.8),
-            pk=_opt_float(params.get('pk'), 0.7),
-            t_lock_s=_opt_float(params.get('tlock', params.get('t_lock_s')), 6.0),
-            min_range_km=_opt_float(params.get('minr', params.get('min_range_km')), 3.0),
+            nm=_opt_int(params.get('nm'), int(_UI['nm'])),
+            vm_ma=_opt_float(params.get('vm'), float(_UI['vm'])),
+            discovery_km=_opt_float(params.get('D', params.get('discovery_km')), float(_UI['discovery_km'])),
+            ni=_opt_int(params.get('ni'), int(_UI['ni'])),
+            vi_ma=_opt_float(params.get('vi'), float(_UI['vi'])),
+            pk=_opt_float(params.get('pk'), float(_UI['pk'])),
+            t_lock_s=_opt_float(params.get('tlock', params.get('t_lock_s')), float(_UI['tlock'])),
+            min_range_km=_opt_float(params.get('minr', params.get('min_range_km')), float(_UI['minr'])),
             search_trials=search_trials,
             final_trials=final_trials,
         )

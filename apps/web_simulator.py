@@ -6,12 +6,12 @@ import sys
 from contextlib import redirect_stdout
 from typing import Any
 
-import simulators.short_ski_jump_take_off as ski_stovl
-import simulators.short_take_off as flat_stovl
-import simulators.ski_jump_take_off as ski_conv
-import simulators.tiltrotor_short_take_off as tilt_stovl
-from utils.ski_jump_geometry import SKI_JUMP_REF_RADIUS_M, compute_ski_jump_arc
-from utils.trajectory import build_deck_profile
+import simulators.takeoff.short_ski_jump_take_off as ski_stovl
+import simulators.takeoff.short_take_off as flat_stovl
+import simulators.takeoff.ski_jump_take_off as ski_conv
+import simulators.takeoff.tiltrotor_short_take_off as tilt_stovl
+from utils.takeoff.ski_jump_geometry import SKI_JUMP_REF_RADIUS_M, compute_ski_jump_arc
+from utils.takeoff.trajectory import build_deck_profile
 from utils.specs import (
     AircraftSpec,
     CarrierSpec,
@@ -20,7 +20,7 @@ from utils.specs import (
     VTOL_TYPE_LABEL,
     simulation_uses_plume_model,
 )
-from utils.takeoff_physics import (
+from utils.takeoff.takeoff_physics import (
     FLAP_DEFLECTION_DEG,
     FLAP_EFFICIENCY,
     PITCH_MAX_DEG,

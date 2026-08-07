@@ -80,7 +80,7 @@ function runSimulation(payload) {
 }
 
 /** 调用后端饱和打击仿真 API */
-function runSaturationSimulation(payload) {
+function runMissileInterceptionSimulation(payload) {
   const base = config.apiBaseUrl;
   if (!base) {
     return Promise.reject(
@@ -89,7 +89,7 @@ function runSaturationSimulation(payload) {
   }
   return new Promise((resolve, reject) => {
     wx.request({
-      url: `${base}/api/saturation/simulate`,
+      url: `${base}/api/missile_interception/simulate`,
       method: 'POST',
       header: { 'content-type': 'application/json' },
       data: payload,
@@ -119,6 +119,6 @@ module.exports = {
   loadLocalData,
   loadSimulatorData,
   runSimulation,
-  runSaturationSimulation,
+  runMissileInterceptionSimulation,
   modesToList,
 };

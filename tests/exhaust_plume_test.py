@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from utils.exhaust_plume import (
+from utils.takeoff.exhaust_plume import (
     calc_exhaust_safe_distance_m,
     calc_exhaust_theta_deg_for_safe_distance_m,
     calc_min_nozzle_deg_for_plume,

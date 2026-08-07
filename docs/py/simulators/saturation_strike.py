@@ -15,6 +15,7 @@ _ROOT = Path(__file__).resolve().parent.parent
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+from utils.saturation_config import estimate_defaults, physics_config, simulation_config, ui_config
 from utils.saturation_monte_carlo import optimize_plan
 from utils.saturation_radar import (
     binding_limit_label,
@@ -23,8 +24,12 @@ from utils.saturation_radar import (
 )
 from utils.saturation_windows import compute_windows
 
-# 海平面标准声速（m/s），与原 HTML 一致
-MACH_MPS = 340.0
+# 海平面标准声速（m/s）
+MACH_MPS = float(physics_config()['mach_mps'])
+
+_UI = ui_config()
+_EST = estimate_defaults()
+_SIM = simulation_config()
 
 
 def run_saturation_strike(
@@ -136,7 +141,7 @@ def _opt_bool(v: Any, default: bool = True) -> bool:
 
 def run_estimate_distance_from_params(params: dict[str, Any]) -> dict[str, Any]:
     """从参数字典估算交战距离（供 Web/API）。"""
-    awacs_type = str(params.get('awacs_type', 'aesa'))
+    awacs_type = str(params.get('awacs_type', _EST['awacs_type']))
     has_awacs_raw = params.get('has_awacs')
     if has_awacs_raw is None or has_awacs_raw == '':
         # 未显式传 has_awacs 时，预警机体制/预设为 none 也视为「无预警机」
@@ -146,14 +151,14 @@ def run_estimate_distance_from_params(params: dict[str, Any]) -> dict[str, Any]:
         has_awacs = _opt_bool(has_awacs_raw, True)
 
     result = estimate_engagement_distance(
-        rcs=float(params.get('rcs', 0.5)),
-        traj=str(params.get('traj', 'high')),
-        awacs_area=float(params.get('awacs_area', 8)),
+        rcs=float(params.get('rcs', _EST['rcs'])),
+        traj=str(params.get('traj', _EST['traj'])),
+        awacs_area=float(params.get('awacs_area', _EST['awacs_area'])),
         awacs_type=awacs_type,
-        standoff_km=float(params.get('standoff', 150)),
-        ship_area=float(params.get('ship_area', 12)),
-        ship_type=str(params.get('ship_type', 'aesa')),
-        sam_range_km=float(params.get('sam_range', 40)),
+        standoff_km=float(params.get('standoff', _EST['standoff'])),
+        ship_area=float(params.get('ship_area', _EST['ship_area'])),
+        ship_type=str(params.get('ship_type', _EST['ship_type'])),
+        sam_range_km=float(params.get('sam_range', _EST['sam_range'])),
         has_awacs=has_awacs,
     )
     result['binding'] = binding_limit_label(result)
@@ -163,33 +168,33 @@ def run_estimate_distance_from_params(params: dict[str, Any]) -> dict[str, Any]:
 def run_estimate_pk_from_params(params: dict[str, Any]) -> dict[str, Any]:
     """从参数字典估算 Pk（供 Web/API）。"""
     return estimate_pk(
-        vm_ma=float(params.get('vm', 2.6)),
-        vi_ma=float(params.get('vi', 3.8)),
-        rcs=float(params.get('rcs', 0.5)),
-        traj=str(params.get('traj', 'high')),
-        ship_area=float(params.get('ship_area', 12)),
-        ship_type=str(params.get('ship_type', 'aesa')),
-        interceptor_dia_m=float(params.get('interceptor_dia', 0.35)),
-        seeker_type=str(params.get('seeker_type', 'active_aesa')),
+        vm_ma=float(params.get('vm', _EST['vm'])),
+        vi_ma=float(params.get('vi', _EST['vi'])),
+        rcs=float(params.get('rcs', _EST['rcs'])),
+        traj=str(params.get('traj', _EST['traj'])),
+        ship_area=float(params.get('ship_area', _EST['ship_area'])),
+        ship_type=str(params.get('ship_type', _EST['ship_type'])),
+        interceptor_dia_m=float(params.get('interceptor_dia', _EST['interceptor_dia'])),
+        seeker_type=str(params.get('seeker_type', _EST['seeker_type'])),
     )
 
 
 def main() -> None:
     """命令行入口：默认参数运行一次仿真并打印摘要。"""
     parser = argparse.ArgumentParser(description='饱和打击 / 反导拦截仿真')
-    parser.add_argument('--nm', type=int, default=24, help='来袭导弹数量')
-    parser.add_argument('--vm', type=float, default=2.6, help='来袭速度（马赫）')
-    parser.add_argument('--D', type=float, default=120.0, dest='discovery_km', help='发现距离（km）')
-    parser.add_argument('--ni', type=int, default=16, help='拦截弹数量')
-    parser.add_argument('--vi', type=float, default=3.8, help='拦截弹速度（马赫）')
-    parser.add_argument('--pk', type=float, default=0.7, help='单发拦截成功概率')
-    parser.add_argument('--tlock', type=float, default=6.0, help='火控锁定时间（s）')
-    parser.add_argument('--minr', type=float, default=3.0, help='最小交战距离（km）')
+    parser.add_argument('--nm', type=int, default=int(_UI['nm']), help='来袭导弹数量')
+    parser.add_argument('--vm', type=float, default=float(_UI['vm']), help='来袭速度（马赫）')
+    parser.add_argument('--D', type=float, default=float(_UI['discovery_km']), dest='discovery_km', help='发现距离（km）')
+    parser.add_argument('--ni', type=int, default=int(_UI['ni']), help='拦截弹数量')
+    parser.add_argument('--vi', type=float, default=float(_UI['vi']), help='拦截弹速度（马赫）')
+    parser.add_argument('--pk', type=float, default=float(_UI['pk']), help='单发拦截成功概率')
+    parser.add_argument('--tlock', type=float, default=float(_UI['tlock']), help='火控锁定时间（s）')
+    parser.add_argument('--minr', type=float, default=float(_UI['minr']), help='最小交战距离（km）')
     parser.add_argument('--fast', action='store_true', help='减少蒙特卡洛试验次数（调试用）')
     args = parser.parse_args()
 
-    search_trials = 200 if args.fast else 900
-    final_trials = 800 if args.fast else 6000
+    search_trials = int(_SIM['fast_search_trials']) if args.fast else int(_SIM['search_trials'])
+    final_trials = int(_SIM['fast_final_trials']) if args.fast else int(_SIM['final_trials'])
     result = run_saturation_strike(
         nm=args.nm,
         vm_ma=args.vm,

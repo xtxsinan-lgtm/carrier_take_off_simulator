@@ -12,6 +12,7 @@ from utils.search_utils import fine_range_deck, fine_range_symmetric
 from utils.sim_config import apply_wind_knots_globals
 from utils.ski_jump_geometry import SkiJumpArc, compute_ski_jump_arc, deck_angle_deg_at_s, deck_cos_sin_at_s, deck_height_at_s
 from utils.trajectory import TrajectoryRecorder
+from utils.takeoff_config import cfg_range, mode_config, shared_config
 from utils.takeoff_physics import (
     FLAP_DEFLECTION_DEG,
     FLAP_EFFICIENCY,
@@ -34,33 +35,35 @@ from utils.takeoff_physics import (
     taxi_alpha_deg,
 )
 
+_SHARED = shared_config()
+_MODE = mode_config('ski_jump')
+_REF = _MODE['reference_aircraft']
+_SEARCH = _MODE['search']
+
 # ---------------------------------------------------------------------------
 # 大气与温度（推力在 T_THRUST_REF_C 海平面标定）
 # ---------------------------------------------------------------------------
-AMBIENT_TEMP_C = 30.0           # 环境温度，°C
+AMBIENT_TEMP_C = float(_MODE['ambient_temp_c'])
 
 RHO = calc_sea_level_density_kg_m3(AMBIENT_TEMP_C)
 THRUST_TEMP_FACTOR = calc_thrust_temp_factor(AMBIENT_TEMP_C)
 
 # ---------------------------------------------------------------------------
-# 飞机参数（当前几何仍取 F-35B 量级，Λ 取歼-15）
+# 飞机参数（参考默认值，Web 仿真前由 apply_aircraft_geometry 覆盖）
 # ---------------------------------------------------------------------------
-MASS_KG = 29500                 # 典型舰基起飞重量，kg
-WEIGHT_N = MASS_KG * G          # 重力，N
-S_REF_M2 = 68.9              # 机翼参考面积，m² ；歼-15/15T 68.84m2,歼-35 68.9m2 
-WINGSPAN_M = 13.6               # 翼展，m；歼-15/15T 14.7m,歼-35 13.6m
-WING_HEIGHT_M = 1.96            # 机翼平均离地高度，m，歼-15/15T 2.55m,歼-35 1.96m
-ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2  # 展弦比 AR = b²/S
-T_MAX_SL_N = 186000             # 最大加力推力（T_THRUST_REF_C 标定），N；歼-15 ~251 kN，歼-15T 264kN,歼-35 ~186 kN
+MASS_KG = float(_REF['mass_kg'])
+WEIGHT_N = MASS_KG * G
+S_REF_M2 = float(_REF['s_ref_m2'])
+WINGSPAN_M = float(_REF['wingspan_m'])
+WING_HEIGHT_M = float(_REF['wing_height_m'])
+ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2
+T_MAX_SL_N = float(_REF['t_max_sl_n'])
 T_MAX_N = T_MAX_SL_N * THRUST_TEMP_FACTOR
-CD0 = 0.039                     # 零升阻力系数（襟翼放下、起落架未收） 歼35为0.039， 歼15为0.0475
+CD0 = float(_REF['cd0'])
 
-SWEEP_LE_DEG = 38  # F-35B 35°，歼-35 38°，歼-15 42°
+SWEEP_LE_DEG = float(_REF['sweep_le_deg'])
 
-# ---------------------------------------------------------------------------
-# 航母甲板参数（滑跃段为圆弧：入口切线水平，出口切线 = SKI_JUMP_ANGLE_DEG）
-# ---------------------------------------------------------------------------
-SKI_JUMP_ANGLE_DEG = 14.0
+SKI_JUMP_ANGLE_DEG = float(_MODE['ski_jump_angle_deg'])
 SKI_JUMP_ARC: SkiJumpArc = compute_ski_jump_arc(SKI_JUMP_ANGLE_DEG)
 SKI_JUMP_ANGLE_RAD = SKI_JUMP_ARC.angle_rad
 SKI_JUMP_RADIUS_M = SKI_JUMP_ARC.radius_m
@@ -69,17 +72,19 @@ SKI_JUMP_HORIZONTAL_M = SKI_JUMP_ARC.horizontal_m
 SKI_JUMP_LIP_HEIGHT_M = SKI_JUMP_ARC.lip_height_m
 SKI_JUMP_COS = SKI_JUMP_ARC.cos_exit
 SKI_JUMP_SIN = SKI_JUMP_ARC.sin_exit
-SKI_JUMP_LENGTH_M = SKI_JUMP_ARC_LENGTH_M  # 兼容旧名
-MU = 0.03                       # 甲板滚动摩擦系数
-WIND_KT = 30
-V_WIND_MPS = WIND_KT * KT_TO_MPS  # 甲板逆风，m/s
+SKI_JUMP_LENGTH_M = SKI_JUMP_ARC_LENGTH_M
+MU = float(_MODE['mu'])
+WIND_KT = float(_MODE['wind_kt'])
+V_WIND_MPS = WIND_KT * KT_TO_MPS
 
-PITCH_SEARCH_MIN = 10
-PITCH_SEARCH_MAX = PITCH_MAX_DEG
-PITCH_SEARCH_STEP = 1
-FLAT_SEARCH_MAX_M = 280   # 粗搜平直段上限，m
-FLAT_SEARCH_STEP_M = 20
-FINE_SEARCH_STEP = 1
+_PITCH = _SEARCH['pitch_deg']
+PITCH_SEARCH_MIN = _PITCH['start']
+PITCH_SEARCH_MAX = _PITCH['end'] - 1
+PITCH_SEARCH_STEP = _PITCH['step']
+_FLAT = _SEARCH['flat_length_m']
+FLAT_SEARCH_MAX_M = _FLAT['end'] - 1
+FLAT_SEARCH_STEP_M = _FLAT['step']
+FINE_SEARCH_STEP = int(_SHARED['fine_search_step'])
 # ---------------------------------------------------------------------------
 # 气动参数（计算值）
 # ---------------------------------------------------------------------------
@@ -129,10 +134,10 @@ def apply_ski_jump_deck(angle_deg, lip_height_m=None):
 
 recompute_aero_parameters()
 
-DT_DEFAULT = 0.02
-MAX_GROUND_TIME_S = 30.0
-MAX_AIR_TIME_S = 5.0
-CL_MAX = 1.8
+DT_DEFAULT = float(_MODE['dt_default'])
+MAX_GROUND_TIME_S = float(_MODE['max_ground_time_s'])
+MAX_AIR_TIME_S = float(_MODE['max_air_time_s'])
+CL_MAX = float(_MODE['cl_max'])
 
 
 def print_config_summary():

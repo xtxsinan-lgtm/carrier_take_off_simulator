@@ -3,7 +3,7 @@
  * 请勿手改；修改 CSV 后运行 python3 scripts/build_all.py。
  */
 module.exports = {
-  "version": 15,
+  "version": 22,
   "pilot_load_kg": 100.0,
   "a2a_missile_count": 4,
   "pitch_max_deg": 20.0,
@@ -33,13 +33,13 @@ module.exports = {
       "ios_route": "takeoff"
     },
     {
-      "id": "saturation",
+      "id": "missile_interception",
       "name": "饱和打击 / 反导拦截仿真",
       "eyebrow": "SHIPBORNE MISSILE INTERCEPTION",
       "subtitle": "蒙特卡洛弹药分配 · 交战距离与拦截率估算",
-      "html": "saturation-strike.html",
-      "miniprogram_page": "/pages/saturation/saturation",
-      "ios_route": "saturation"
+      "html": "missile-interception-strike.html",
+      "miniprogram_page": "/pages/missile_interception/missile_interception",
+      "ios_route": "missile_interception"
     }
   ],
   "aircraft": [
@@ -460,7 +460,7 @@ module.exports = {
       "notes": "国产 STOBAR；28 kn，14°"
     }
   ],
-  "saturation_presets": {
+  "missile_interception_presets": {
     "asm": [
       {
         "id": "exocet",
@@ -487,7 +487,8 @@ module.exports = {
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.5,
         "rcs": 0.3,
-        "traj": "high"
+        "traj": "high",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "yj18",
@@ -514,7 +515,8 @@ module.exports = {
         "notes": "公开资料速度/弹道；RCS 为量级估计",
         "vm": 3.0,
         "rcs": 0.3,
-        "traj": "sea"
+        "traj": "sea",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "nsm",
@@ -559,7 +561,8 @@ module.exports = {
         "notes": "2025年阅兵公开的乘波体高超声速滑翔反舰弹·射程约1200km；RCS为滑翔体量级估计",
         "vm": 8.0,
         "rcs": 0.1,
-        "traj": "high"
+        "traj": "glide",
+        "maneuver_class": "glide"
       },
       {
         "id": "yj19",
@@ -568,7 +571,8 @@ module.exports = {
         "notes": "超燃冲压发动机高超声速反舰弹·2025年阅兵公开·部分资料称可达10Ma以上；RCS为量级估计",
         "vm": 8.5,
         "rcs": 0.15,
-        "traj": "high"
+        "traj": "high",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "yj20",
@@ -577,7 +581,8 @@ module.exports = {
         "notes": "双锥体高超声速反舰弹道弹·射程约1500-2000km·由055型垂发冷发射；RCS为量级估计",
         "vm": 10.0,
         "rcs": 0.1,
-        "traj": "high"
+        "traj": "ballistic",
+        "maneuver_class": "dual_cone"
       },
       {
         "id": "yj21",
@@ -586,7 +591,8 @@ module.exports = {
         "notes": "准弹道式反舰弹·巡航6Ma/末端10Ma·055型/H-6发射·射程约1500km；RCS为量级估计",
         "vm": 10.0,
         "rcs": 0.12,
-        "traj": "high"
+        "traj": "ballistic",
+        "maneuver_class": "dual_cone"
       },
       {
         "id": "lrasm",
@@ -613,7 +619,8 @@ module.exports = {
         "notes": "超燃冲压高超声速反舰/对陆巡航弹·2023年服役·射程超1000km；RCS为量级估计",
         "vm": 8.0,
         "rcs": 0.2,
-        "traj": "high"
+        "traj": "high",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "p500",
@@ -622,7 +629,8 @@ module.exports = {
         "notes": "大型冲压反舰弹·巡航高度50-5000m·末端2.0Ma掠海俯冲·射程550km；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.35,
-        "traj": "high"
+        "traj": "high",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "p700",
@@ -631,7 +639,8 @@ module.exports = {
         "notes": "大型冲压反舰弹·高空巡航2.5Ma以上·射程约550-625km；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.35,
-        "traj": "high"
+        "traj": "high",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "p270",
@@ -640,7 +649,8 @@ module.exports = {
         "notes": "超低空掠海反舰弹(10-20m/末段小于7m)·高空模式可达3Ma·射程120-250km；RCS为量级估计",
         "vm": 2.2,
         "rcs": 0.3,
-        "traj": "sea"
+        "traj": "sea",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "kh22",
@@ -667,7 +677,8 @@ module.exports = {
         "notes": "Kh-31A反舰型末端掠海·射程7.5-70km·衍生型号含鹰击-91；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.15,
-        "traj": "sea"
+        "traj": "sea",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "kh15",
@@ -676,7 +687,8 @@ module.exports = {
         "notes": "空射弹道式导弹·爬升至40000m后俯冲末端5Ma·射程300km；RCS为量级估计",
         "vm": 5.0,
         "rcs": 0.15,
-        "traj": "high"
+        "traj": "high",
+        "maneuver_class": "dual_cone"
       },
       {
         "id": "hf2",
@@ -694,7 +706,8 @@ module.exports = {
         "notes": "固体助推加液体冲压超音速掠海反舰弹·射程150-300km(增程型更远)；RCS为量级估计",
         "vm": 2.5,
         "rcs": 0.25,
-        "traj": "sea"
+        "traj": "sea",
+        "maneuver_class": "scramjet"
       },
       {
         "id": "rbs15",
@@ -1145,7 +1158,8 @@ module.exports = {
         "vi": 3.5,
         "dia": 0.343,
         "guidance": "semi_active",
-        "range": 167.0
+        "range": 167.0,
+        "max_alt": 24.4
       },
       {
         "id": "sm6",
@@ -1155,7 +1169,8 @@ module.exports = {
         "vi": 3.5,
         "dia": 0.343,
         "guidance": "active_mech",
-        "range": 240.0
+        "range": 240.0,
+        "max_alt": 33.0
       },
       {
         "id": "aster30",
@@ -1165,7 +1180,8 @@ module.exports = {
         "vi": 4.5,
         "dia": 0.18,
         "guidance": "active_mech",
-        "range": 120.0
+        "range": 120.0,
+        "max_alt": 20.0
       },
       {
         "id": "essm",
@@ -1175,7 +1191,8 @@ module.exports = {
         "vi": 4.0,
         "dia": 0.254,
         "guidance": "active_mech",
-        "range": 50.0
+        "range": 50.0,
+        "max_alt": 15.0
       },
       {
         "id": "hhq9",
@@ -1185,7 +1202,8 @@ module.exports = {
         "vi": 4.2,
         "dia": 0.56,
         "guidance": "active_mech",
-        "range": 200.0
+        "range": 200.0,
+        "max_alt": 30.0
       },
       {
         "id": "barak8",
@@ -1195,7 +1213,8 @@ module.exports = {
         "vi": 2.0,
         "dia": 0.225,
         "guidance": "active_mech",
-        "range": 100.0
+        "range": 100.0,
+        "max_alt": 16.0
       },
       {
         "id": "seaceptor",
@@ -1205,7 +1224,8 @@ module.exports = {
         "vi": 3.0,
         "dia": 0.166,
         "guidance": "active_aesa",
-        "range": 25.0
+        "range": 25.0,
+        "max_alt": 10.0
       },
       {
         "id": "s300f",
@@ -1215,7 +1235,8 @@ module.exports = {
         "vi": 6.0,
         "dia": 0.52,
         "guidance": "semi_active",
-        "range": 150.0
+        "range": 150.0,
+        "max_alt": 27.0
       },
       {
         "id": "sm2er",
@@ -1225,7 +1246,8 @@ module.exports = {
         "vi": 3.5,
         "dia": 0.343,
         "guidance": "semi_active",
-        "range": 240.0
+        "range": 240.0,
+        "max_alt": 24.4
       },
       {
         "id": "hhq9b",
@@ -1235,7 +1257,8 @@ module.exports = {
         "vi": 4.4,
         "dia": 0.56,
         "guidance": "active_mech",
-        "range": 260.0
+        "range": 260.0,
+        "max_alt": 30.0
       },
       {
         "id": "hhq16f",
@@ -1245,7 +1268,8 @@ module.exports = {
         "vi": 3.0,
         "dia": 0.34,
         "guidance": "semi_active",
-        "range": 160.0
+        "range": 160.0,
+        "max_alt": 27.0
       },
       {
         "id": "hq10",
@@ -1255,7 +1279,8 @@ module.exports = {
         "vi": 2.5,
         "dia": 0.12,
         "guidance": "active_mech",
-        "range": 9.0
+        "range": 9.0,
+        "max_alt": 6.0
       },
       {
         "id": "rim116",
@@ -1265,7 +1290,8 @@ module.exports = {
         "vi": 2.0,
         "dia": 0.159,
         "guidance": "active_mech",
-        "range": 15.0
+        "range": 15.0,
+        "max_alt": 5.0
       },
       {
         "id": "hhq16b",
@@ -1275,7 +1301,8 @@ module.exports = {
         "vi": 3.0,
         "dia": 0.34,
         "guidance": "semi_active",
-        "range": 70.0
+        "range": 70.0,
+        "max_alt": 25.0
       },
       {
         "id": "kmsam",
@@ -1285,7 +1312,8 @@ module.exports = {
         "vi": 4.5,
         "dia": 0.275,
         "guidance": "semi_active",
-        "range": 40.0
+        "range": 40.0,
+        "max_alt": 15.0
       },
       {
         "id": "ksaam",
@@ -1295,7 +1323,8 @@ module.exports = {
         "vi": 2.0,
         "dia": 0.13,
         "guidance": "active_mech",
-        "range": 20.0
+        "range": 20.0,
+        "max_alt": 10.0
       },
       {
         "id": "aster15",
@@ -1305,7 +1334,8 @@ module.exports = {
         "vi": 3.5,
         "dia": 0.18,
         "guidance": "active_mech",
-        "range": 30.0
+        "range": 30.0,
+        "max_alt": 13.0
       },
       {
         "id": "vlmica",
@@ -1315,8 +1345,141 @@ module.exports = {
         "vi": 4.0,
         "dia": 0.16,
         "guidance": "active_mech",
-        "range": 20.0
+        "range": 20.0,
+        "max_alt": 9.0
       }
     ]
+  },
+  "takeoff_config": {
+    "version": 1,
+    "shared": {
+      "mu": 0.025,
+      "rollpost_efficiency": 0.9,
+      "nozzle_rate_deg_s": 38.0,
+      "nacelle_rate_deg_s": 7.5,
+      "fine_search_step": 1,
+      "allow_air_nozzle_vectoring": false
+    },
+    "physics": {
+      "t_thrust_ref_c": 15.0,
+      "rho_isa_kg_m3": 1.225,
+      "thrust_temp_exponent": 0.85,
+      "g": 9.81,
+      "kt_to_mps": 0.514444,
+      "m_to_ft": 3.28084,
+      "mps_to_kt": 1.94384,
+      "flap_deflection_deg": 20,
+      "flap_efficiency": 0.5,
+      "wing_incidence_deg": 2,
+      "pitch_max_deg": 20,
+      "pilot_load_kg": 100,
+      "a2a_missile_count": 4,
+      "ski_jump_ref_radius_m": 200
+    },
+    "ui": {
+      "default_mode": "ski_jump",
+      "default_strategy": "A",
+      "default_temp_c": 30
+    },
+    "stovl_strategy_descriptions": {
+      "A": "滑跑初期主喷口保持水平（0°），升力主要由升力风扇提供；当地速达到转换阈值后，主喷口以固定速率向后偏转。仿真搜索最优目标喷口角与开始偏转的地速。",
+      "B": "自滑跑起点起主喷口即固定在某一角度，全程不再变化。仿真搜索使起飞距离最短的固定喷口角。",
+      "C": "给定尾流安全距离约束（甲板后方指定区域不得被主喷管尾流侵入），在每个时间步动态调整喷口偏转，求满足约束的最短起飞距离。"
+    },
+    "tiltrotor_strategy_descriptions": {
+      "A": "滑跑初期短舱保持水平、推力向前；当地速达到转换阈值后，短舱以固定速率向后倾转。仿真搜索最优目标短舱角与开始倾转的地速。",
+      "B": "自滑跑起点起短舱固定在某一倾转角，全程不再变化。仿真搜索使起飞距离最短的固定短舱角。"
+    }
+  },
+  "missile_interception_config": {
+    "version": 1,
+    "physics": {
+      "mach_mps": 340.0,
+      "tech_mult": {
+        "mechanical": 1.0,
+        "pesa": 1.43,
+        "aesa": 2.1,
+        "gan_aesa": 3.74
+      },
+      "h_awacs_m": 9000.0,
+      "h_ship_radar_m": 25.0,
+      "h_target_m": {
+        "sea": 10.0,
+        "high": 12000.0,
+        "glide": 45000.0,
+        "ballistic": 80000.0
+      },
+      "dive_angle_deg": {
+        "sea": 15.0,
+        "high": 30.0,
+        "glide": 25.0,
+        "ballistic": 45.0
+      },
+      "default_sam_max_alt_km": 33.0,
+      "maneuver_pk_factor": {
+        "cruise": 1.0,
+        "scramjet": 1.06,
+        "glide": 0.88,
+        "dual_cone": 0.94
+      },
+      "pk_traj_factor": {
+        "sea": 0.85,
+        "high": 1.0,
+        "glide": 0.78,
+        "ballistic": 0.72
+      },
+      "lock_fraction": 0.65,
+      "pk0": 0.75
+    },
+    "traj_types": {
+      "high": "高空 / 常规弹道",
+      "sea": "掠海 / 海面杂波环境",
+      "glide": "滑翔体弹道（鹰击-17 等）",
+      "ballistic": "弹道导弹弹道（鹰击-20/21 等）"
+    },
+    "ui": {
+      "nm": 24,
+      "ni": 16,
+      "vm": 2.6,
+      "rcs": 0.5,
+      "traj": "high",
+      "awacs_area": 8,
+      "awacs_type": "aesa",
+      "standoff": 150,
+      "ship_area": 12,
+      "ship_type": "aesa",
+      "sam_range": 40,
+      "sam_max_alt": 33,
+      "vi": 3.8,
+      "interceptor_dia": 0.35,
+      "seeker_type": "active_aesa",
+      "tlock": 6,
+      "minr": 3,
+      "discovery_km": 120,
+      "pk": 0.7,
+      "has_awacs": false,
+      "aew_preset": "__none__"
+    },
+    "simulation": {
+      "search_trials": 900,
+      "final_trials": 6000,
+      "fast_search_trials": 200,
+      "fast_final_trials": 800
+    },
+    "estimate_defaults": {
+      "rcs": 0.5,
+      "traj": "high",
+      "awacs_area": 8,
+      "awacs_type": "aesa",
+      "standoff": 150,
+      "ship_area": 12,
+      "ship_type": "aesa",
+      "sam_range": 40,
+      "sam_max_alt": 33,
+      "vm": 2.6,
+      "vi": 3.8,
+      "interceptor_dia": 0.35,
+      "seeker_type": "active_aesa"
+    }
   }
 };

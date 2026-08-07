@@ -44,7 +44,7 @@ struct HubView: View {
                         )
                         .overlay(alignment: .top) {
                             Rectangle()
-                                .fill(sim.id == "saturation" ? Color(hex: 0xFFB020) : Color(hex: 0x38BDF8))
+                                .fill(sim.id == "missile_interception" ? Color(hex: 0xFFB020) : Color(hex: 0x38BDF8))
                                 .frame(height: 3)
                         }
                     }
@@ -66,8 +66,8 @@ struct HubView: View {
     @ViewBuilder
     private func destination(for sim: SimulatorEntry) -> some View {
         switch sim.ios_route ?? sim.id {
-        case "saturation":
-            SaturationStrikeView()
+        case "missile_interception":
+            MissileInterceptionStrikeView()
         default:
             ContentView()
         }
@@ -80,7 +80,7 @@ struct HubView: View {
             simulators = sims
             let ac = catalog.aircraft.count
             let cr = catalog.carriers.count
-            let sat = catalog.saturation_presets
+            let sat = catalog.missile_interception_presets
             let satCount = (sat?.asm?.count ?? 0) + (sat?.sam?.count ?? 0)
             status = sims.isEmpty
                 ? "data.json 缺少 simulators，请运行 build_all.py"

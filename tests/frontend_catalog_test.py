@@ -32,55 +32,61 @@ def test_build_catalog_payload_modes():
     assert 'py_sources' not in payload
     assert any(a['id'] == 'MV-22' for a in payload['aircraft'])
     # 第二功能：饱和打击预设
-    assert 'saturation_presets' in payload
-    assert set(payload['saturation_presets']) == {'asm', 'aew', 'ship', 'sam'}
-    assert len(payload['saturation_presets']['asm']) >= 1
+    assert 'missile_interception_presets' in payload
+    assert set(payload['missile_interception_presets']) == {'asm', 'aew', 'ship', 'sam'}
+    assert len(payload['missile_interception_presets']['asm']) >= 1
+    assert 'takeoff_config' in payload
+    assert 'missile_interception_config' in payload
+    assert payload['takeoff_config']['shared']['mu'] == 0.025
+    assert 'A' in payload['takeoff_config']['stovl_strategy_descriptions']
+    assert 'A' in payload['takeoff_config']['tiltrotor_strategy_descriptions']
+    assert payload['missile_interception_config']['traj_types']['glide']
 
 
-def test_docs_saturation_page_exists_and_links():
+def test_docs_missile_interception_page_exists_and_links():
     """饱和打击 HTML 页存在，并与起飞页/启动页互链。"""
     import re
     from utils.paths import ROOT
 
-    sat = ROOT / 'docs' / 'saturation-strike.html'
+    sat = ROOT / 'docs' / 'missile-interception-strike.html'
     hub = ROOT / 'docs' / 'index.html'
     takeoff = ROOT / 'docs' / 'takeoff.html'
     assert sat.is_file()
     assert hub.is_file()
     assert takeoff.is_file()
-    assert (ROOT / 'docs' / 'js' / 'saturation.js').is_file()
-    assert (ROOT / 'docs' / 'css' / 'saturation.css').is_file()
+    assert (ROOT / 'docs' / 'js' / 'missile_interception.js').is_file()
+    assert (ROOT / 'docs' / 'css' / 'missile_interception.css').is_file()
     assert (ROOT / 'docs' / 'js' / 'hub.js').is_file()
     sat_html = sat.read_text(encoding='utf-8')
     hub_html = hub.read_text(encoding='utf-8')
     takeoff_html = takeoff.read_text(encoding='utf-8')
-    sat_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
-    assert 'saturation.js' in sat_html
+    sat_js = (ROOT / 'docs' / 'js' / 'missile_interception.js').read_text(encoding='utf-8')
+    assert 'missile_interception.js' in sat_html
     assert 'index.html' in sat_html
     assert 'takeoff.html' in sat_html
-    assert 'saturation-strike.html' in takeoff_html
+    assert 'missile-interception-strike.html' in takeoff_html
     assert 'hub.js' in hub_html
-    assert 'run_saturation_json' in sat_js
+    assert 'run_missile_interception_json' in sat_js
     assert 'rerunRequested' in sat_js
     ver_js = re.search(r'const APP_VERSION\s*=\s*(\d+)', sat_js)
-    ver_html = re.search(r'saturation\.js\?v=(\d+)', sat_html)
+    ver_html = re.search(r'missile_interception\.js\?v=(\d+)', sat_html)
     assert ver_js and ver_html
     assert ver_js.group(1) == ver_html.group(1)
 
 
-def test_pyodide_bundles_saturation_presets_csv_deps():
-    """Pyodide 须打包 saturation_presets 的 CSV 依赖，避免 ModuleNotFoundError。"""
+def test_pyodide_bundles_missile_interception_presets_csv_deps():
+    """Pyodide 须打包 missile_interception_presets 的 CSV 依赖，避免 ModuleNotFoundError。"""
     from scripts.build_docs import PY_IMPORT_ORDER, PY_LOAD_ORDER
     from utils.paths import ROOT
 
     for rel in ('utils/paths.py', 'utils/database_csv.py'):
         assert rel in PY_LOAD_ORDER
-        assert PY_LOAD_ORDER.index(rel) < PY_LOAD_ORDER.index('utils/saturation_presets.py')
+        assert PY_LOAD_ORDER.index(rel) < PY_LOAD_ORDER.index('utils/missile_interception/missile_interception_presets.py')
     for mod in ('utils.paths', 'utils.database_csv'):
         assert mod in PY_IMPORT_ORDER
-        assert PY_IMPORT_ORDER.index(mod) < PY_IMPORT_ORDER.index('utils.saturation_presets')
+        assert PY_IMPORT_ORDER.index(mod) < PY_IMPORT_ORDER.index('utils.missile_interception.missile_interception_presets')
 
-    sat_js = (ROOT / 'docs' / 'js' / 'saturation.js').read_text(encoding='utf-8')
+    sat_js = (ROOT / 'docs' / 'js' / 'missile_interception.js').read_text(encoding='utf-8')
     assert "utils/paths.py" in sat_js
     assert "utils/database_csv.py" in sat_js
     assert "utils.paths" in sat_js
@@ -89,7 +95,7 @@ def test_pyodide_bundles_saturation_presets_csv_deps():
 
 def test_build_catalog_payload_includes_simulators_and_csv_presets():
     """catalog 须含启动页模拟器列表，且饱和预设与 CSV 一致。"""
-    from utils.database_csv import load_saturation_presets_csv
+    from utils.database_csv import load_missile_interception_presets_csv
     from scripts.frontend_catalog import SIMULATORS
 
     payload = build_catalog_payload(
@@ -97,9 +103,9 @@ def test_build_catalog_payload_includes_simulators_and_csv_presets():
         load_carriers_csv(CARRIERS_CSV),
     )
     assert payload['simulators'] == SIMULATORS
-    csv_data = load_saturation_presets_csv()
-    assert [x['id'] for x in payload['saturation_presets']['asm']] == [x['id'] for x in csv_data['asm']]
-    assert [x['id'] for x in payload['saturation_presets']['aew']] == [x['id'] for x in csv_data['aew']]
+    csv_data = load_missile_interception_presets_csv()
+    assert [x['id'] for x in payload['missile_interception_presets']['asm']] == [x['id'] for x in csv_data['asm']]
+    assert [x['id'] for x in payload['missile_interception_presets']['aew']] == [x['id'] for x in csv_data['aew']]
     assert len(payload['aircraft']) >= 1
     assert len(payload['carriers']) >= 1
 

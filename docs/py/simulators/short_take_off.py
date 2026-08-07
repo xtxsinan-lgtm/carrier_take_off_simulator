@@ -34,6 +34,7 @@ from utils.exhaust_plume import (
 )
 from utils.search_utils import fine_range_symmetric
 from utils.sim_config import apply_wind_knots_globals
+from utils.takeoff_config import cfg_range, mode_config, shared_config
 from utils.takeoff_physics import (
     G,
     KT_TO_MPS,
@@ -52,60 +53,63 @@ from utils.takeoff_physics import (
     taxi_alpha_deg,
 )
 
+_SHARED = shared_config()
+_MODE = mode_config('short_takeoff')
+_REF = _MODE['reference_aircraft']
+_SEARCH = _MODE['search']
+
 # ---------------------------------------------------------------------------
 # 大气与温度（推力在 T_THRUST_REF_C 海平面标定）
 # ---------------------------------------------------------------------------
-AMBIENT_TEMP_C = 15.0           # 环境温度，°C
+AMBIENT_TEMP_C = float(_MODE['ambient_temp_c'])
 
 RHO = calc_sea_level_density_kg_m3(AMBIENT_TEMP_C)
 THRUST_TEMP_FACTOR = calc_thrust_temp_factor(AMBIENT_TEMP_C)
 
 # ---------------------------------------------------------------------------
-# 飞机与推力参数（F-35B）
+# 飞机与推力参数（F-35B 参考默认值，Web 仿真前由 apply_aircraft_geometry 覆盖）
 # ---------------------------------------------------------------------------
-MASS_KG = 21620                 # 满内油 + 4 枚中距弹，kg
-WEIGHT_N = MASS_KG * G          # 重力，N
-S_REF_M2 = 42.7                 # 机翼参考面积，m²
-WINGSPAN_M = 10.7               # 翼展，m
-WING_HEIGHT_M = 1.96            # 机翼平均离地高度，m
-ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2  # 展弦比 AR = b²/S
+MASS_KG = float(_REF['mass_kg'])
+WEIGHT_N = MASS_KG * G
+S_REF_M2 = float(_REF['s_ref_m2'])
+WINGSPAN_M = float(_REF['wingspan_m'])
+WING_HEIGHT_M = float(_REF['wing_height_m'])
+ASPECT_RATIO = WINGSPAN_M ** 2 / S_REF_M2
 
-NOZZLE_RATE_DEG_S = 95 / 2.5    # 3BSM 主喷管偏转速率，°/s（95° 需 2.5 s）
-T_MAIN_STOVL_SL_N = 83260       # STOVL 模式主喷管推力（T_THRUST_REF_C 标定），N
-ROLLPOST_EFFICIENCY = 0.9       # 滚转喷管效率（关闭时功率回收给主喷管）
-T_LIFTFAN_SL_N = 83260          # 升力风扇推力（T_THRUST_REF_C 标定），N
-T_ROLLPOSTS_SL_N = 14600        # 滚转喷管总推力（T_THRUST_REF_C 标定），N
+NOZZLE_RATE_DEG_S = float(_SHARED['nozzle_rate_deg_s'])
+T_MAIN_STOVL_SL_N = float(_REF['t_main_stovl_sl_n'])
+ROLLPOST_EFFICIENCY = float(_SHARED['rollpost_efficiency'])
+T_LIFTFAN_SL_N = float(_REF['t_liftfan_sl_n'])
+T_ROLLPOSTS_SL_N = float(_REF['t_rollposts_sl_n'])
 T_MAIN_STOVL_N = T_MAIN_STOVL_SL_N * THRUST_TEMP_FACTOR
 T_LIFTFAN_N = T_LIFTFAN_SL_N * THRUST_TEMP_FACTOR
 T_ROLLPOSTS_N = T_ROLLPOSTS_SL_N * THRUST_TEMP_FACTOR
-T_MAIN_GROUND_N = T_MAIN_STOVL_N + T_ROLLPOSTS_N / ROLLPOST_EFFICIENCY  # 地面主喷管等效推力
-CD0 = 0.039                     # 零升阻力系数（襟翼放下、起落架未收）
-MU = 0.02                       # 甲板滚动摩擦系数
+T_MAIN_GROUND_N = T_MAIN_STOVL_N + T_ROLLPOSTS_N / ROLLPOST_EFFICIENCY
+CD0 = float(_REF['cd0'])
+MU = float(_MODE['mu'])
 
-SWEEP_LE_DEG = 35  # F-35B 35°，歼-35 38°，歼-15 42°
-ROTATION_AOA_DEG = 12.5         # F-35B 起飞拉杆攻角，°
+SWEEP_LE_DEG = float(_REF['sweep_le_deg'])
+ROTATION_AOA_DEG = float(_MODE['rotation_aoa_deg'])
 
-WIND_KT = 22
-V_WIND_MPS = WIND_KT * KT_TO_MPS  # 甲板逆风，m/s
+WIND_KT = float(_MODE['wind_kt'])
+V_WIND_MPS = WIND_KT * KT_TO_MPS
 
-# 策略 C：尾流约束（必须为负，表示该 x 以左的甲板须全程安全）
-MIN_SAFE_DISTANCE_M = -60.0
+MIN_SAFE_DISTANCE_M = float(_MODE['min_safe_distance_m'])
 
-# 搜索范围（粗搜 range；精搜 ± 对应粗搜步长，见 search_utils）
-NOZZLE_FINAL_DEG_START = 20
-NOZZLE_FINAL_DEG_END = 90
-NOZZLE_FINAL_DEG_STEP = 5
-V_TRANS_START_MPS = 0
-V_TRANS_END_MPS = 45
-V_TRANS_STEP_MPS = 5
-NOZZLE_B_DEG_START = 25
-NOZZLE_B_DEG_END = 89
-NOZZLE_B_DEG_STEP = 1
-FINE_SEARCH_STEP = 1
+NOZZLE_FINAL_DEG_START = _SEARCH['nozzle_final_deg']['start']
+NOZZLE_FINAL_DEG_END = _SEARCH['nozzle_final_deg']['end']
+NOZZLE_FINAL_DEG_STEP = _SEARCH['nozzle_final_deg']['step']
+V_TRANS_START_MPS = _SEARCH['v_trans_mps']['start']
+V_TRANS_END_MPS = _SEARCH['v_trans_mps']['end']
+V_TRANS_STEP_MPS = _SEARCH['v_trans_mps']['step']
+NOZZLE_B_DEG_START = _SEARCH['nozzle_b_deg']['start']
+NOZZLE_B_DEG_END = _SEARCH['nozzle_b_deg']['end']
+NOZZLE_B_DEG_STEP = _SEARCH['nozzle_b_deg']['step']
+FINE_SEARCH_STEP = int(_SHARED['fine_search_step'])
 
-DT_DEFAULT = 0.01
-MAX_SIM_TIME_S = 60.0
-MAX_RUNWAY_M = 3000.0
+DT_DEFAULT = float(_MODE['dt_default'])
+MAX_SIM_TIME_S = float(_MODE['max_sim_time_s'])
+MAX_RUNWAY_M = float(_MODE['max_runway_m'])
 
 PLUME_PARAMS: ExhaustPlumeParams = default_exhaust_plume_params()
 

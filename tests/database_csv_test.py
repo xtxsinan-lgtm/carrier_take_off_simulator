@@ -2,20 +2,20 @@
 import pytest
 
 from utils.database_csv import (
-    SATURATION_MISSILE_CSV_COLUMNS,
-    SATURATION_RADAR_CSV_COLUMNS,
-    list_model_ids_from_saturation_csv,
+    MISSILE_INTERCEPTION_MISSILE_CSV_COLUMNS,
+    MISSILE_INTERCEPTION_RADAR_CSV_COLUMNS,
+    list_model_ids_from_missile_interception_csv,
     load_aircraft_csv,
     load_carriers_csv,
-    load_saturation_missile_csv,
-    load_saturation_presets_csv,
-    load_saturation_radar_csv,
+    load_missile_interception_missile_csv,
+    load_missile_interception_presets_csv,
+    load_missile_interception_radar_csv,
 )
 from utils.paths import (
     AIRCRAFT_CSV,
     CARRIERS_CSV,
-    SATURATION_MISSILE_CSV,
-    SATURATION_RADAR_CSV,
+    MISSILE_INTERCEPTION_MISSILE_CSV,
+    MISSILE_INTERCEPTION_RADAR_CSV,
 )
 
 
@@ -56,9 +56,9 @@ def test_aircraft_a2a_mass_via_specs():
     assert hornet.t_max_sl_n == pytest.approx(156600)
 
 
-def test_load_saturation_missile_csv_groups():
+def test_load_missile_interception_missile_csv_groups():
     """饱和打击：导弹库含反舰弹与防空弹。"""
-    data = load_saturation_missile_csv(SATURATION_MISSILE_CSV)
+    data = load_missile_interception_missile_csv(MISSILE_INTERCEPTION_MISSILE_CSV)
     assert set(data) == {'asm', 'sam'}
     assert len(data['asm']) >= 7
     assert len(data['sam']) >= 8
@@ -67,9 +67,9 @@ def test_load_saturation_missile_csv_groups():
     assert 'guidance' in data['sam'][0]
 
 
-def test_load_saturation_radar_csv_groups():
+def test_load_missile_interception_radar_csv_groups():
     """饱和打击：雷达库含预警机与舰载雷达。"""
-    data = load_saturation_radar_csv(SATURATION_RADAR_CSV)
+    data = load_missile_interception_radar_csv(MISSILE_INTERCEPTION_RADAR_CSV)
     assert set(data) == {'aew', 'ship'}
     assert len(data['aew']) >= 4
     assert len(data['ship']) >= 5
@@ -79,33 +79,33 @@ def test_load_saturation_radar_csv_groups():
     assert 'standoff' not in data['ship'][0]
 
 
-def test_load_saturation_presets_csv_merges():
+def test_load_missile_interception_presets_csv_merges():
     """合并双库后应得到四类预设。"""
-    data = load_saturation_presets_csv()
+    data = load_missile_interception_presets_csv()
     assert set(data) == {'asm', 'aew', 'ship', 'sam'}
     assert data['asm'][0]['id'] == 'exocet'
     assert data['aew'][0]['id'] == 'e2d'
 
 
-def test_list_model_ids_from_saturation_csv():
+def test_list_model_ids_from_missile_interception_csv():
     """列出双库型号 id，供前端自动同步断言。"""
-    ids = list_model_ids_from_saturation_csv()
+    ids = list_model_ids_from_missile_interception_csv()
     assert 'yj12' in ids['asm']
     assert 'e2d' in ids['aew']
     assert 'type055' in ids['ship']
     assert 'hhq9' in ids['sam']
 
 
-def test_saturation_csv_columns_include_nation():
+def test_missile_interception_csv_columns_include_nation():
     """双库表头须含 nation 列，且位于 name 之后。"""
-    for columns in (SATURATION_MISSILE_CSV_COLUMNS, SATURATION_RADAR_CSV_COLUMNS):
+    for columns in (MISSILE_INTERCEPTION_MISSILE_CSV_COLUMNS, MISSILE_INTERCEPTION_RADAR_CSV_COLUMNS):
         assert 'nation' in columns
         assert columns.index('nation') == columns.index('name') + 1
 
 
-def test_saturation_presets_all_have_nation():
+def test_missile_interception_presets_all_have_nation():
     """四类预设每条记录均带非空国别（两级选择器依赖）。"""
-    data = load_saturation_presets_csv()
+    data = load_missile_interception_presets_csv()
     for cat in ('asm', 'sam', 'ship', 'aew'):
         assert data[cat], f'{cat} 无记录'
         for item in data[cat]:
@@ -122,32 +122,32 @@ def test_saturation_presets_all_have_nation():
     ('aew', 'kj600', '中国'),
     ('aew', 'e2d', '美国'),
 ])
-def test_saturation_preset_nation_samples(cat: str, item_id: str, nation: str):
+def test_missile_interception_preset_nation_samples(cat: str, item_id: str, nation: str):
     """抽样校验各类装备国别取值。"""
-    data = load_saturation_presets_csv()
+    data = load_missile_interception_presets_csv()
     item = next(x for x in data[cat] if x['id'] == item_id)
     assert item['nation'] == nation
 
 
-def test_saturation_missile_csv_missing_nation_raises(tmp_path):
+def test_missile_interception_missile_csv_missing_nation_raises(tmp_path):
     """国别为空时导弹库加载须报错，避免出现无国别型号。"""
     path = tmp_path / 'missile.csv'
     path.write_text(
-        ','.join(SATURATION_MISSILE_CSV_COLUMNS) + '\n'
+        ','.join(MISSILE_INTERCEPTION_MISSILE_CSV_COLUMNS) + '\n'
         'asm,x1,测试弹,,2.0,0.2,sea,,,,,\n',
         encoding='utf-8',
     )
     with pytest.raises(ValueError, match='nation'):
-        load_saturation_missile_csv(path)
+        load_missile_interception_missile_csv(path)
 
 
-def test_saturation_radar_csv_missing_nation_raises(tmp_path):
+def test_missile_interception_radar_csv_missing_nation_raises(tmp_path):
     """国别为空时雷达库加载须报错。"""
     path = tmp_path / 'radar.csv'
     path.write_text(
-        ','.join(SATURATION_RADAR_CSV_COLUMNS) + '\n'
+        ','.join(MISSILE_INTERCEPTION_RADAR_CSV_COLUMNS) + '\n'
         'ship,x1,测试舰,,12,aesa,,\n',
         encoding='utf-8',
     )
     with pytest.raises(ValueError, match='nation'):
-        load_saturation_radar_csv(path)
+        load_missile_interception_radar_csv(path)

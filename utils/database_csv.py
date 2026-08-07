@@ -22,23 +22,23 @@ CARRIERS_CSV_COLUMNS = (
 )
 
 # 饱和打击导弹库（反舰弹 / 防空弹）
-SATURATION_MISSILE_CSV_COLUMNS = (
+MISSILE_INTERCEPTION_MISSILE_CSV_COLUMNS = (
     'category', 'id', 'name', 'nation',
-    'vm_ma', 'rcs_m2', 'traj',
-    'vi_ma', 'dia_m', 'guidance', 'range_km',
+    'vm_ma', 'rcs_m2', 'traj', 'maneuver_class',
+    'vi_ma', 'dia_m', 'guidance', 'range_km', 'max_alt_km',
     'notes',
 )
 
 # 饱和打击雷达库（预警机 / 舰载雷达）
-SATURATION_RADAR_CSV_COLUMNS = (
+MISSILE_INTERCEPTION_RADAR_CSV_COLUMNS = (
     'category', 'id', 'name', 'nation',
     'area_m2', 'radar_type', 'standoff_km',
     'notes',
 )
 
-SATURATION_MISSILE_CATEGORIES = ('asm', 'sam')
-SATURATION_RADAR_CATEGORIES = ('aew', 'ship')
-SATURATION_CATEGORIES = ('asm', 'aew', 'ship', 'sam')
+MISSILE_INTERCEPTION_MISSILE_CATEGORIES = ('asm', 'sam')
+MISSILE_INTERCEPTION_RADAR_CATEGORIES = ('aew', 'ship')
+MISSILE_INTERCEPTION_CATEGORIES = ('asm', 'aew', 'ship', 'sam')
 
 def _cell_str(value: Any) -> str:
     if value is None:
@@ -181,18 +181,18 @@ def load_carriers_csv(path: str | Path) -> list['CarrierSpec']:
     return carriers
 
 
-def load_saturation_missile_csv(path: str | Path) -> dict[str, list[dict[str, Any]]]:
+def load_missile_interception_missile_csv(path: str | Path) -> dict[str, list[dict[str, Any]]]:
     """从导弹库 CSV 加载反舰弹 / 防空弹预设。
 
     返回 {'asm': [...], 'sam': [...]}；字段名与前端契约对齐（vm/rcs/traj/vi/dia/range）。
     """
     path = Path(path)
-    grouped: dict[str, list[dict[str, Any]]] = {k: [] for k in SATURATION_MISSILE_CATEGORIES}
+    grouped: dict[str, list[dict[str, Any]]] = {k: [] for k in MISSILE_INTERCEPTION_MISSILE_CATEGORIES}
     with path.open('r', encoding='utf-8-sig', newline='') as f:
         reader = csv.DictReader(f)
         if reader.fieldnames is None:
             raise ValueError(f'{path} 缺少表头')
-        missing = [c for c in SATURATION_MISSILE_CSV_COLUMNS if c not in reader.fieldnames]
+        missing = [c for c in MISSILE_INTERCEPTION_MISSILE_CSV_COLUMNS if c not in reader.fieldnames]
         if missing:
             raise ValueError(f'{path} 缺少列: {missing}')
         for row in reader:
@@ -213,33 +213,43 @@ def load_saturation_missile_csv(path: str | Path) -> dict[str, list[dict[str, An
                 item['vm'] = _parse_float(row.get('vm_ma') or '', 'vm_ma')
                 item['rcs'] = _parse_float(row.get('rcs_m2') or '', 'rcs_m2')
                 traj = (row.get('traj') or '').strip()
-                if traj not in ('sea', 'high'):
-                    raise ValueError(f'{path} asm {item_id} traj 须为 sea/high，得到 {traj!r}')
+                from utils.missile_interception.missile_interception_config import valid_traj_ids
+                allowed = valid_traj_ids()
+                if traj not in allowed:
+                    raise ValueError(
+                        f'{path} asm {item_id} traj 须为 {"|".join(sorted(allowed))} 之一，得到 {traj!r}'
+                    )
                 item['traj'] = traj
+                mclass = (row.get('maneuver_class') or '').strip()
+                if mclass:
+                    item['maneuver_class'] = mclass
             else:  # sam
                 item['vi'] = _parse_float(row.get('vi_ma') or '', 'vi_ma')
                 item['dia'] = _parse_float(row.get('dia_m') or '', 'dia_m')
                 item['guidance'] = (row.get('guidance') or '').strip()
                 item['range'] = _parse_float(row.get('range_km') or '', 'range_km')
+                max_alt = _parse_optional_float(row.get('max_alt_km') or '')
+                if max_alt is not None:
+                    item['max_alt'] = max_alt
             grouped[cat].append(item)
-    for cat in SATURATION_MISSILE_CATEGORIES:
+    for cat in MISSILE_INTERCEPTION_MISSILE_CATEGORIES:
         if not grouped[cat]:
             raise ValueError(f'{path} 类别 {cat} 无有效记录')
     return grouped
 
 
-def load_saturation_radar_csv(path: str | Path) -> dict[str, list[dict[str, Any]]]:
+def load_missile_interception_radar_csv(path: str | Path) -> dict[str, list[dict[str, Any]]]:
     """从雷达库 CSV 加载预警机 / 舰载雷达预设。
 
     返回 {'aew': [...], 'ship': [...]}；字段名与前端契约对齐（area/type/standoff）。
     """
     path = Path(path)
-    grouped: dict[str, list[dict[str, Any]]] = {k: [] for k in SATURATION_RADAR_CATEGORIES}
+    grouped: dict[str, list[dict[str, Any]]] = {k: [] for k in MISSILE_INTERCEPTION_RADAR_CATEGORIES}
     with path.open('r', encoding='utf-8-sig', newline='') as f:
         reader = csv.DictReader(f)
         if reader.fieldnames is None:
             raise ValueError(f'{path} 缺少表头')
-        missing = [c for c in SATURATION_RADAR_CSV_COLUMNS if c not in reader.fieldnames]
+        missing = [c for c in MISSILE_INTERCEPTION_RADAR_CSV_COLUMNS if c not in reader.fieldnames]
         if missing:
             raise ValueError(f'{path} 缺少列: {missing}')
         for row in reader:
@@ -261,23 +271,23 @@ def load_saturation_radar_csv(path: str | Path) -> dict[str, list[dict[str, Any]
             if cat == 'aew':
                 item['standoff'] = _parse_float(row.get('standoff_km') or '', 'standoff_km')
             grouped[cat].append(item)
-    for cat in SATURATION_RADAR_CATEGORIES:
+    for cat in MISSILE_INTERCEPTION_RADAR_CATEGORIES:
         if not grouped[cat]:
             raise ValueError(f'{path} 类别 {cat} 无有效记录')
     return grouped
 
 
-def load_saturation_presets_csv(
+def load_missile_interception_presets_csv(
     missile_path: str | Path | None = None,
     radar_path: str | Path | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
-    """合并导弹库与雷达库，返回四类预设（与前端 saturation_presets 一致）。"""
-    from utils.paths import SATURATION_MISSILE_CSV, SATURATION_RADAR_CSV
+    """合并导弹库与雷达库，返回四类预设（与前端 missile_interception_presets 一致）。"""
+    from utils.paths import MISSILE_INTERCEPTION_MISSILE_CSV, MISSILE_INTERCEPTION_RADAR_CSV
 
-    m_path = Path(missile_path) if missile_path is not None else SATURATION_MISSILE_CSV
-    r_path = Path(radar_path) if radar_path is not None else SATURATION_RADAR_CSV
-    missiles = load_saturation_missile_csv(m_path)
-    radars = load_saturation_radar_csv(r_path)
+    m_path = Path(missile_path) if missile_path is not None else MISSILE_INTERCEPTION_MISSILE_CSV
+    r_path = Path(radar_path) if radar_path is not None else MISSILE_INTERCEPTION_RADAR_CSV
+    missiles = load_missile_interception_missile_csv(m_path)
+    radars = load_missile_interception_radar_csv(r_path)
     return {
         'asm': missiles['asm'],
         'aew': radars['aew'],
@@ -286,10 +296,10 @@ def load_saturation_presets_csv(
     }
 
 
-def list_model_ids_from_saturation_csv(
+def list_model_ids_from_missile_interception_csv(
     missile_path: str | Path | None = None,
     radar_path: str | Path | None = None,
 ) -> dict[str, list[str]]:
     """列出导弹库 + 雷达库中各类装备 id（供前端/测试断言「自动识别型号」）。"""
-    data = load_saturation_presets_csv(missile_path, radar_path)
+    data = load_missile_interception_presets_csv(missile_path, radar_path)
     return {cat: [x['id'] for x in items] for cat, items in data.items()}

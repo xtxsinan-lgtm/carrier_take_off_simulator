@@ -3,10 +3,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from utils.ski_jump_geometry import compute_ski_jump_arc
+from utils.takeoff.ski_jump_geometry import compute_ski_jump_arc
+from utils.takeoff.takeoff_config import physics_config
 
-PILOT_LOAD_KG = 100.0
-A2A_MISSILE_COUNT = 4
+_PHYS = physics_config()
+PILOT_LOAD_KG = float(_PHYS['pilot_load_kg'])
+A2A_MISSILE_COUNT = int(_PHYS['a2a_missile_count'])
 
 # 数据库 type_label：垂直/短距起降（VTOL/STOVL）与倾转旋翼
 VTOL_TYPE_LABEL = 'v/stol'
@@ -86,7 +88,7 @@ class AircraftSpec:
 
     def exhaust_plume_params(self):
         """构造本机尾流模型参数；未填 ṁ/d₀ 时用机型默认值或 Pegasus/F-35B 回退。"""
-        from utils.exhaust_plume import (
+        from utils.takeoff.exhaust_plume import (
             EXHAUST_D0_M,
             EXHAUST_HEIGHT_M,
             EXHAUST_MDOT_KG_S,

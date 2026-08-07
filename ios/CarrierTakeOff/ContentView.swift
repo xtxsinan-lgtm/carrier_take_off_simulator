@@ -14,17 +14,21 @@ struct ContentView: View {
                     ModeSelector(items: vm.modeList, current: $vm.currentMode) { mode in
                         vm.applyMode(mode)
                     }
-                    Text("滑跃 / 短距滑跃需滑跃甲板；短距 / 倾转短距需平直甲板。倾转短距仅策略 A/B；轨迹图仅滑跃与短距滑跃成功后显示。")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(AppTheme.muted)
-                        .padding(.top, 4)
                     if vm.showStrategy {
                         Text(vm.strategyTitle.uppercased())
                             .font(.system(size: 10, design: .monospaced))
                             .foregroundStyle(AppTheme.accent)
                             .tracking(2)
                             .padding(.top, 8)
-                        ModeSelector(items: vm.strategyList, current: $vm.currentStrategy)
+                        ModeSelector(items: vm.strategyList, current: $vm.currentStrategy) { _ in
+                            vm.updateStrategyDescription()
+                        }
+                        if !vm.strategyDescription.isEmpty {
+                            Text(vm.strategyDescription)
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundStyle(AppTheme.muted)
+                                .padding(.top, 4)
+                        }
                     }
                 }
 

@@ -10,7 +10,7 @@ from scripts.frontend_catalog import SIMULATORS, build_catalog_payload
 from utils.database_csv import (
     load_aircraft_csv,
     load_carriers_csv,
-    load_saturation_presets_csv,
+    load_missile_interception_presets_csv,
 )
 from utils.paths import AIRCRAFT_CSV, CARRIERS_CSV, ROOT
 
@@ -20,13 +20,13 @@ def test_e2e_catalog_auto_detects_csv_models():
     """起飞与饱和 CSV 中的型号须全部出现在 catalog / API data。"""
     aircraft = load_aircraft_csv(AIRCRAFT_CSV)
     carriers = load_carriers_csv(CARRIERS_CSV)
-    sat = load_saturation_presets_csv()
+    sat = load_missile_interception_presets_csv()
     payload = build_catalog_payload(aircraft, carriers)
 
     assert {a['id'] for a in payload['aircraft']} == set(aircraft)
     assert {c['id'] for c in payload['carriers']} == {c.id for c in carriers}
     for cat in ('asm', 'aew', 'ship', 'sam'):
-        assert [x['id'] for x in payload['saturation_presets'][cat]] == [
+        assert [x['id'] for x in payload['missile_interception_presets'][cat]] == [
             x['id'] for x in sat[cat]
         ]
     assert payload['simulators'] == SIMULATORS
@@ -35,7 +35,7 @@ def test_e2e_catalog_auto_detects_csv_models():
     assert status == 200
     api = json.loads(body.decode())
     assert api['simulators'] == SIMULATORS
-    assert len(api['saturation_presets']['sam']) == len(sat['sam'])
+    assert len(api['missile_interception_presets']['sam']) == len(sat['sam'])
 
 
 @pytest.mark.e2e
@@ -46,7 +46,7 @@ def test_e2e_docs_hub_and_takeoff_pages():
     assert 'hub.js' in hub
     assert 'data.simulators' in hub_js or 'simulators' in hub_js
     assert (ROOT / 'docs' / 'takeoff.html').is_file()
-    assert (ROOT / 'docs' / 'saturation-strike.html').is_file()
+    assert (ROOT / 'docs' / 'missile-interception-strike.html').is_file()
 
 
 @pytest.mark.e2e

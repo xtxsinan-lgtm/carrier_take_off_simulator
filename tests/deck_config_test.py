@@ -1,8 +1,8 @@
 """Unit tests for deck_config.py."""
 import pytest
 
-from utils.deck_config import assign_ski_jump_globals, total_takeoff_distance_m
-from utils.ski_jump_geometry import compute_ski_jump_arc
+from utils.takeoff.deck_config import assign_ski_jump_globals, total_takeoff_distance_m
+from utils.takeoff.ski_jump_geometry import compute_ski_jump_arc
 
 
 def test_total_takeoff_distance():

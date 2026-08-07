@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>航母舰载机起飞距离仿真</title>
-  <link rel="stylesheet" href="css/style.css?v=21">
+  <link rel="stylesheet" href="css/style.css?v=22">
 </head>
 <body>
   <div class="scanline" aria-hidden="true"></div>
@@ -15,7 +15,7 @@
     </div>
     <div class="nav-links">
       <a class="nav-link" href="index.html">← 启动页</a>
-      <a class="nav-link" href="saturation-strike.html">饱和打击 →</a>
+      <a class="nav-link" href="missile-interception-strike.html">饱和打击 →</a>
       <span class="clock" id="takeoffClock">SYS READY</span>
     </div>
   </header>
@@ -24,11 +24,6 @@
     <section class="card">
       <h2><span>1. 起飞模式</span><span class="tag">MODE</span></h2>
       <div class="mode-group" id="modeGroup"></div>
-      <p id="modeHint" class="note">
-        滑跃 / 短距滑跃需滑跃甲板；短距 / 倾转短距需平直甲板（STOVL 或倾转旋翼）。
-        尾流波及仅对 STOVL 短距模式计算；倾转短距暂无策略 C。
-        起飞轨迹图仅在<strong>滑跃起飞</strong>与<strong>短距滑跃起飞</strong>成功后显示（策略 C 暂无轨迹）。
-      </p>
       <div id="strategySection" class="hidden" style="margin-top: 1rem;">
         <h3 id="strategyTitle">喷口 / 短舱策略</h3>
         <div class="mode-group" id="strategyGroup">
@@ -36,6 +31,7 @@
           <button type="button" class="mode-btn strategy-btn" data-strategy="B">策略 B</button>
           <button type="button" class="mode-btn strategy-btn" data-strategy="C" id="strategyBtnC">策略 C</button>
         </div>
+        <p id="strategyDesc" class="note hidden"></p>
       </div>
     </section>
 
@@ -86,7 +82,7 @@
         </div>
         <div class="field">
           <label for="tempInput">环境温度 (°C)</label>
-          <input type="number" id="tempInput" step="0.5" value="30">
+          <input type="number" id="tempInput" step="0.5" value="">
         </div>
         <div class="field">
           <label for="massInput">起飞重量 (kg)</label>
@@ -129,6 +125,6 @@
     仿真由 Python 物理模型计算 · 数据来自 aircraft_database.csv / carriers_database.csv
   </footer>
 
-  <script type="module" src="js/app.js?v=21"></script>
+  <script type="module" src="js/app.js?v=22"></script>
 </body>
 </html>

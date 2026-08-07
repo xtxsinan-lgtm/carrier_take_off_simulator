@@ -31,7 +31,7 @@ Page({
     const page = e.currentTarget.dataset.page;
     if (!page) return;
     // tabBar 页面用 switchTab，其它用 navigateTo
-    if (page.indexOf('/pages/index/') === 0 || page.indexOf('/pages/saturation/') === 0) {
+    if (page.indexOf('/pages/index/') === 0 || page.indexOf('/pages/missile_interception/') === 0) {
       wx.switchTab({ url: page });
     } else {
       wx.navigateTo({ url: page });

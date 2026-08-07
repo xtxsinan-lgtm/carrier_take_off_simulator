@@ -8,8 +8,10 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from utils.takeoff_config import physics_config
+
 # 仅给定滑跃角、无唇口高度时的参考圆弧半径，m（典型 STOBAR 量级）
-SKI_JUMP_REF_RADIUS_M = 200.0
+SKI_JUMP_REF_RADIUS_M = float(physics_config()['ski_jump_ref_radius_m'])
 
 
 @dataclass(frozen=True)

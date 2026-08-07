@@ -10,13 +10,10 @@
   <view class="card">
     <view class="card-title"><text>1. 起飞模式</text><text class="card-tag">MODE</text></view>
     <mode-selector modeList="{{modeList}}" current="{{currentMode}}" bind:change="onModeChange" />
-    <text class="card-hint">
-      滑跃 / 短距滑跃需滑跃甲板；短距 / 倾转短距需平直甲板。
-      倾转短距仅策略 A/B；轨迹图仅滑跃与短距滑跃成功后显示。
-    </text>
     <block wx:if="{{showStrategy}}">
       <text class="card-title" style="margin-top: 24rpx;">{{strategyTitle}}</text>
       <mode-selector modeList="{{strategyList}}" current="{{currentStrategy}}" bind:change="onStrategyChange" />
+      <text wx:if="{{strategyDescription}}" class="card-hint">{{strategyDescription}}</text>
     </block>
   </view>
 

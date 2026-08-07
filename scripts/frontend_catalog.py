@@ -5,7 +5,9 @@ from dataclasses import asdict
 from typing import Any
 
 from utils.specs import A2A_MISSILE_COUNT, PILOT_LOAD_KG
-from utils.takeoff_physics import PITCH_MAX_DEG
+from utils.takeoff.takeoff_config import build_takeoff_config_payload
+from utils.takeoff.takeoff_physics import PITCH_MAX_DEG
+from utils.missile_interception.missile_interception_config import build_missile_interception_config_payload
 
 MODES = {
     'ski_jump': '滑跃起飞',
@@ -26,7 +28,7 @@ TILTROTOR_STRATEGIES = {
 }
 
 # data.json 结构版本；字段变更时递增
-DATA_VERSION = 15
+DATA_VERSION = 22
 
 # 启动页可选模拟器（HTML / 小程序 / iOS 同源）
 SIMULATORS = [
@@ -40,13 +42,13 @@ SIMULATORS = [
         'ios_route': 'takeoff',
     },
     {
-        'id': 'saturation',
+        'id': 'missile_interception',
         'name': '饱和打击 / 反导拦截仿真',
         'eyebrow': 'SHIPBORNE MISSILE INTERCEPTION',
         'subtitle': '蒙特卡洛弹药分配 · 交战距离与拦截率估算',
-        'html': 'saturation-strike.html',
-        'miniprogram_page': '/pages/saturation/saturation',
-        'ios_route': 'saturation',
+        'html': 'missile-interception-strike.html',
+        'miniprogram_page': '/pages/missile_interception/missile_interception',
+        'ios_route': 'missile_interception',
     },
 ]
 
@@ -84,7 +86,7 @@ def aircraft_to_dict(ac: Any) -> dict:
 
 def build_catalog_payload(aircraft: dict, carriers: list) -> dict:
     """构建不含 py_sources 的共享目录数据（小程序 / API / Web 公共部分）。"""
-    from utils.saturation_presets import build_saturation_presets_payload
+    from utils.missile_interception.missile_interception_presets import build_missile_interception_presets_payload
 
     return {
         'version': DATA_VERSION,
@@ -98,5 +100,7 @@ def build_catalog_payload(aircraft: dict, carriers: list) -> dict:
         'aircraft': [aircraft_to_dict(ac) for ac in aircraft.values()],
         'carriers': [carrier_to_dict(c) for c in carriers],
         # 第二功能：饱和打击预设（由 CSV 自动识别型号）
-        'saturation_presets': build_saturation_presets_payload(),
+        'missile_interception_presets': build_missile_interception_presets_payload(),
+        'takeoff_config': build_takeoff_config_payload(),
+        'missile_interception_config': build_missile_interception_config_payload(),
     }

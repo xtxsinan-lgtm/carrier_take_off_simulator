@@ -56,17 +56,17 @@ def test_miniprogram_takeoff_cards_have_terminal_tags():
     assert '.card-tag' in wxss
     assert '#38bdf8' in wxss
 
-def test_miniprogram_saturation_page_and_tabbar():
+def test_miniprogram_missile_interception_page_and_tabbar():
     """小程序须注册启动页、起飞与饱和打击，且 tabBar 含三者。"""
     app = json.loads((ROOT / 'miniprogram' / 'app.json').read_text(encoding='utf-8'))
     assert app['pages'][0] == 'pages/home/home'
-    assert 'pages/saturation/saturation' in app['pages']
+    assert 'pages/missile_interception/missile_interception' in app['pages']
     assert 'tabBar' in app
     paths = [x['pagePath'] for x in app['tabBar']['list']]
     assert 'pages/home/home' in paths
-    assert 'pages/saturation/saturation' in paths
-    assert (ROOT / 'miniprogram' / 'pages' / 'saturation' / 'saturation.js').is_file()
+    assert 'pages/missile_interception/missile_interception' in paths
+    assert (ROOT / 'miniprogram' / 'pages' / 'missile_interception' / 'missile_interception.js').is_file()
     assert (ROOT / 'miniprogram' / 'pages' / 'home' / 'home.js').is_file()
     api_js = (ROOT / 'miniprogram' / 'utils' / 'api.js').read_text(encoding='utf-8')
-    assert 'runSaturationSimulation' in api_js
-    assert '/api/saturation/simulate' in api_js
+    assert 'runMissileInterceptionSimulation' in api_js
+    assert '/api/missile_interception/simulate' in api_js

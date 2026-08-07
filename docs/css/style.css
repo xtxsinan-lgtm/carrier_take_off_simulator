@@ -216,7 +216,7 @@ input:focus {
   font-weight: 700;
 }
 
-#modeHint,
+#strategyDesc,
 .card-hint,
 .note {
   margin: 10px 0 0;
